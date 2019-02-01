@@ -1,0 +1,7 @@
+.idea
+.pytest_cache
+.coverage
+.cache
+.pyc
+__pycache__
+fact_extractor/bin
