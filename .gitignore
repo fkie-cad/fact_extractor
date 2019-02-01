@@ -4,4 +4,5 @@
 .cache
 .pyc
 __pycache__
-fact_extractor/bin
+bin/
+install.log
