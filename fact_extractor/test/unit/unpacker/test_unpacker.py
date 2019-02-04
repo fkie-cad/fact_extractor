@@ -69,7 +69,7 @@ class TestUnpackerCore(TestUnpackerBase):
 
     def test_generate_and_store_file_objects_zero_file(self):
         file_pathes = ['{}/zero_byte'.format(get_test_data_dir()), '{}/get_files_test/testfile1'.format(get_test_data_dir())]
-        file_objects = self.unpacker.generate_and_store_file_objects(file_pathes, get_test_data_dir(), self.test_fo)
+        file_objects = self.unpacker.move_extracted_files(file_pathes, get_test_data_dir(), self.test_fo)
         file_objects = make_list_from_dict(file_objects)
         self.assertEqual(len(file_objects), 1, 'number of objects not correct')
         self.assertEqual(file_objects[0].file_name, 'testfile1', 'wrong object created')
