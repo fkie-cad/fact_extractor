@@ -1,5 +1,4 @@
 import logging
-import sys
 from os import getgid, getuid
 from subprocess import Popen, PIPE
 from time import time
@@ -17,15 +16,14 @@ class UnpackBase(object):
     The unpacker module unpacks all files included in a file
     '''
 
-    def __init__(self, config=None, worker_id=None):
+    def __init__(self, config=None):
         self.config = config
-        self.worker_id = worker_id
         self._setup_plugins()
 
     def _setup_plugins(self):
         self.unpacker_plugins = {}
         self.load_plugins()
-        logging.info('[worker {}] Plug-ins available: {}'.format(self.worker_id, self.source.list_plugins()))
+        logging.info('Plug-ins available: {}'.format(self.source.list_plugins()))
         self._set_whitelist()
 
     def load_plugins(self):
@@ -36,7 +34,7 @@ class UnpackBase(object):
 
     def _set_whitelist(self):
         self.whitelist = read_list_from_config(self.config, 'unpack', 'whitelist')
-        logging.debug('[worker {}] Ignore (Whitelist): {}'.format(self.worker_id, ', '.join(self.whitelist)))
+        logging.debug('Ignore (Whitelist): {}'.format(', '.join(self.whitelist)))
         for item in self.whitelist:
             self.register_plugin(item, self.unpacker_plugins['generic/nop'])
 
@@ -67,13 +65,13 @@ class UnpackBase(object):
             meta_data = {}
         meta_data['plugin_used'] = name
         meta_data['plugin_version'] = version
-        logging.debug('[worker {}] Try to unpack {} with {} plugin...'.format(self.worker_id, file_path, name))
+        logging.debug('Try to unpack {} with {} plugin...'.format(file_path, name))
 
         try:
             additional_meta = unpack_function(file_path, tmp_dir)
         except Exception as e:
-            logging.debug('[worker {}] Unpacking of {} failed: {}: {}'.format(self.worker_id, file_path, sys.exc_info()[0].__name__, e))
-            additional_meta = {'error': '{}: {}'.format(sys.exc_info()[0].__name__, e.__str__())}
+            logging.debug('Unpacking of {} failed: {}: {}'.format(file_path, type(e), str(e)))
+            additional_meta = {'error': '{}: {}'.format(type(e), str(e))}
         if isinstance(additional_meta, dict):
             meta_data.update(additional_meta)
 

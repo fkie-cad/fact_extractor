@@ -9,7 +9,6 @@ from common_helper_files import human_readable_file_size
 from common_helper_unpacking_classifier import avg_entropy, get_binary_size_without_padding, is_compressed
 
 from helperFunctions.fileSystem import file_is_empty, get_file_type_from_path
-from helperFunctions.hash import get_sha256
 from storage.fs_organizer import FS_Organizer
 from unpacker.unpackBase import UnpackBase
 
@@ -21,8 +20,8 @@ class Unpacker(UnpackBase):
     VALID_COMPRESSED_FILE_TYPES = ['application/x-shockwave-flash', 'audio/mpeg', 'audio/ogg', 'image/png', 'image/jpeg', 'image/gif', 'video/mp4', 'video/ogg']
     HEADER_OVERHEAD = 256
 
-    def __init__(self, config=None, worker_id=None):
-        super().__init__(config=config, worker_id=worker_id)
+    def __init__(self, config=None):
+        super().__init__(config=config)
         self.file_storage_system = FS_Organizer(config=self.config)
         self._shared_file_folder = Path(self.config.get('unpack', 'file_folder'))
         self._shared_report_folder = Path(self.config.get('unpack', 'report_folder'))
@@ -30,7 +29,7 @@ class Unpacker(UnpackBase):
     def unpack(self, file_path):
         binary = Path(file_path).read_bytes()
 
-        logging.debug('[worker {}] Extracting {}'.format(self.worker_id, Path(file_path).name))
+        logging.debug('Extracting {}'.format(Path(file_path).name))
 
         tmp_dir = TemporaryDirectory(prefix='faf_unpack_')
 
@@ -52,18 +51,19 @@ class Unpacker(UnpackBase):
 
     def _do_fallback_if_necessary(self, extracted_files: List, meta_data: Dict, tmp_dir: str, file_path: str) -> Tuple[List, Dict]:
         if not extracted_files and meta_data['plugin_used'] in self.GENERIC_FS_FALLBACK_CANDIDATES:
-            logging.warning('[worker {}] {} could not extract any files -> generic fs fallback'.format(self.worker_id, meta_data['plugin_used']))
+            logging.warning('{} could not extract any files -> generic fs fallback'.format(meta_data['plugin_used']))
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/fs')
         if not extracted_files and meta_data['plugin_used'] not in self.GENERIC_CARVER_FALLBACK_BLACKLIST:
-            logging.warning('[worker {}] {} could not extract any files -> generic carver fallback'.format(self.worker_id, meta_data['plugin_used']))
+            logging.warning('{} could not extract any files -> generic carver fallback'.format(meta_data['plugin_used']))
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/carver')
         return extracted_files, meta_data
 
-    def cleanup(self, tmp_dir: TemporaryDirectory):
+    @staticmethod
+    def cleanup(tmp_dir: TemporaryDirectory):
         try:
             tmp_dir.cleanup()
-        except Exception as e:
-            logging.error('[worker {}] Could not CleanUp tmp_dir: {} - {}'.format(self.worker_id, type(e), e))
+        except OSError as error:
+            logging.error('Could not CleanUp tmp_dir: {} - {}'.format(type(error), str(error)))
 
     def get_unpack_status(self, file_path, binary, extracted_files, meta_data: Dict):
         meta_data["summary"] = []
@@ -122,12 +122,5 @@ class Unpacker(UnpackBase):
 
     @staticmethod
     def remove_duplicates(extracted_files: List[Path]) -> List[Path]:
-        sha_dict = dict()
-        for extracted_file in extracted_files:
-            sha_dict[get_sha256(extracted_file.read_bytes())] = extracted_file
-
-        for extracted_file in extracted_files:
-            if extracted_file not in sha_dict.values():
-                extracted_file.unlink()
-
-        return list(sha_dict.values())
+        # passing this until it has a sensible implementation
+        return extracted_files

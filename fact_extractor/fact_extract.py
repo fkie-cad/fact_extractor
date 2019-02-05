@@ -1,17 +1,15 @@
 import logging
+from pathlib import Path
 
 from helperFunctions.program_setup import program_setup
-from objects.file import FileObject
 from unpacker.unpack import Unpacker
 
 
 def extract(file_path, config):
-    fo = FileObject(file_path=file_path)
-
     unpacker = Unpacker(config)
 
-    extracted_objects = unpacker.unpack(fo)
-    logging.debug('unpacking of {} complete: {} files extracted'.format(fo.get_uid(), len(extracted_objects)))
+    extracted_objects = unpacker.unpack(file_path)
+    logging.info('unpacking of {} complete: {} files extracted'.format(Path(file_path).name, len(extracted_objects)))
 
     for extracted_object in extracted_objects:
         print(extracted_object)
