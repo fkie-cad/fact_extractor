@@ -38,8 +38,8 @@ PROGRAM_NAME = 'FACT_extraction Installer'
 PROGRAM_VERSION = '0.1'
 PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor installation script'
 
-BIONIC_CODE_NAMES = ['bionic beaver', 'tara']
-XENIAL_CODE_NAMES = ['xenial xerus', 'yakkety yak', 'sarah', 'serena', 'sonya', 'sylvia']
+BIONIC_CODE_NAMES = ['bionic', 'tara']
+XENIAL_CODE_NAMES = ['xenial', 'yakkety', 'sarah', 'serena', 'sonya', 'sylvia']
 
 
 def _setup_argparser():
