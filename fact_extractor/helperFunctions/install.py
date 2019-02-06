@@ -53,29 +53,29 @@ def run_shell_command_raise_on_return_code(command: str, error: str, add_output_
 
 
 def apt_update_sources():
-    return run_shell_command_raise_on_return_code('sudo apt-get update', 'Unable to update repository sources. Check network.')
+    return run_shell_command_raise_on_return_code('sudo -E apt-get update', 'Unable to update repository sources. Check network.')
 
 
 def apt_upgrade_system():
-    return run_shell_command_raise_on_return_code('sudo apt-get upgrade -y', 'Unable to upgrade packages:', True)
+    return run_shell_command_raise_on_return_code('sudo -E apt-get upgrade -y', 'Unable to upgrade packages:', True)
 
 
 def apt_autoremove_packages():
-    return run_shell_command_raise_on_return_code('sudo apt-get autoremove -y', 'Automatic removal of packages failed:', True)
+    return run_shell_command_raise_on_return_code('sudo -E apt-get autoremove -y', 'Automatic removal of packages failed:', True)
 
 
 def apt_clean_system():
-    return run_shell_command_raise_on_return_code('sudo apt-get clean', 'Cleaning of package files failed:', True)
+    return run_shell_command_raise_on_return_code('sudo -E apt-get clean', 'Cleaning of package files failed:', True)
 
 
 def apt_install_packages(*args):
     log_current_packages(args)
-    return run_shell_command_raise_on_return_code('sudo apt-get install -y {}'.format(' '.join(args)), 'Error in installation of package(s) {}'.format(' '.join(args)), True)
+    return run_shell_command_raise_on_return_code('sudo -E apt-get install -y {}'.format(' '.join(args)), 'Error in installation of package(s) {}'.format(' '.join(args)), True)
 
 
 def apt_remove_packages(*args):
     log_current_packages(args, install=False)
-    return run_shell_command_raise_on_return_code('sudo apt-get remove -y {}'.format(' '.join(args)), 'Error in removal of package(s) {}'.format(' '.join(args)), True)
+    return run_shell_command_raise_on_return_code('sudo -E apt-get remove -y {}'.format(' '.join(args)), 'Error in removal of package(s) {}'.format(' '.join(args)), True)
 
 
 def _pip_install_packages(version, args):
