@@ -9,7 +9,6 @@ from common_helper_files import human_readable_file_size
 from common_helper_unpacking_classifier import avg_entropy, get_binary_size_without_padding, is_compressed
 
 from helperFunctions.fileSystem import file_is_empty, get_file_type_from_path
-from storage.fs_organizer import FS_Organizer
 from unpacker.unpackBase import UnpackBase
 
 
@@ -22,7 +21,6 @@ class Unpacker(UnpackBase):
 
     def __init__(self, config=None):
         super().__init__(config=config)
-        self.file_storage_system = FS_Organizer(config=self.config)
         self._shared_file_folder = Path(self.config.get('unpack', 'file_folder'))
         self._shared_report_folder = Path(self.config.get('unpack', 'report_folder'))
 
