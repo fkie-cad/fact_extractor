@@ -5,9 +5,9 @@ from pathlib import Path
 
 from common_helper_process import execute_shell_command_get_return_code
 
+from helperFunctions.config import load_config
 from helperFunctions.install import apt_remove_packages, apt_install_packages, apt_upgrade_system, apt_update_sources, \
-    apt_autoremove_packages, apt_clean_system, InstallationError, pip3_install_packages, install_github_project, \
-    OperateInDirectory
+    apt_autoremove_packages, apt_clean_system, InstallationError, pip3_install_packages
 
 
 def install_pip(python_command):
@@ -55,7 +55,6 @@ def main(distribution):
     install_pip('python2')
 
     # install general python dependencys
-    apt_install_packages('libmagic-dev')
     apt_install_packages('libffi-dev', 'libfuzzy-dev')
     pip3_install_packages('psutil')
     pip3_install_packages('pytest==3.5.1', 'pytest-cov', 'pytest-pep8', 'pylint', 'python-magic', 'xmltodict', 'yara-python==3.7.0', 'appdirs')
@@ -69,5 +68,10 @@ def main(distribution):
     pip3_install_packages('git+https://github.com/fkie-cad/common_helper_mongo.git')
     pip3_install_packages('git+https://github.com/mass-project/common_helper_encoder.git')
     pip3_install_packages('git+https://github.com/fkie-cad/common_helper_filter.git')
+
+    config = load_config('main.cfg')
+    data_folder = config.get('unpack', 'data_folder')
+    os.makedirs(str(Path(data_folder, 'files')), exist_ok=True)
+    os.makedirs(str(Path(data_folder, 'reports')), exist_ok=True)
 
     return 0

@@ -4,7 +4,7 @@ echo "Install Pre-Install Requirements"
 (apt-get update && apt-get install sudo) || true
 
 sudo apt-get update
-sudo apt-get -y install python3-pip git apt-transport-https ca-certificates curl software-properties-common wget
+sudo apt-get -y install python3-pip git apt-transport-https ca-certificates curl software-properties-common wget libmagic-dev
 
 sudo -EH pip3 install --upgrade distro python-magic
 

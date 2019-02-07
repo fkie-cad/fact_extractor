@@ -21,8 +21,8 @@ class Unpacker(UnpackBase):
 
     def __init__(self, config=None):
         super().__init__(config=config)
-        self._shared_file_folder = Path(self.config.get('unpack', 'file_folder'))
-        self._shared_report_folder = Path(self.config.get('unpack', 'report_folder'))
+        self._file_folder = Path(self.config.get('unpack', 'data_folder'), 'files')
+        self._report_folder = Path(self.config.get('unpack', 'data_folder'), 'reports')
 
     def unpack(self, file_path):
         binary = Path(file_path).read_bytes()
@@ -43,7 +43,7 @@ class Unpacker(UnpackBase):
 
         self.cleanup(tmp_dir)
 
-        Path(self._shared_report_folder, 'meta.json').write_text(json.dumps(meta_data))
+        Path(self._report_folder, 'meta.json').write_text(json.dumps(meta_data))
 
         return extracted_files
 
@@ -113,7 +113,7 @@ class Unpacker(UnpackBase):
         extracted_files = list()
         for item in file_paths:
             if not file_is_empty(item):
-                current_file = Path(self._shared_file_folder, Path(item).name)
+                current_file = Path(self._file_folder, Path(item).name)
                 shutil.move(item, str(current_file))
                 extracted_files.append(current_file)
         return extracted_files

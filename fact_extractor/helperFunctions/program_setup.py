@@ -11,21 +11,22 @@ from helperFunctions.config import get_config_dir
 from version import __VERSION__
 
 
-def program_setup(name, description, version=__VERSION__, command_line_options=sys.argv):
-    args = _setup_argparser(name, description, command_line_options=command_line_options, version=version)
+def program_setup(name, description, docker=False, version=__VERSION__, command_line_options=sys.argv):
+    args = _setup_argparser(name, description, docker=docker, command_line_options=command_line_options, version=version)
     config = _load_config(args)
     _setup_logging(config, args)
     return args, config
 
 
-def _setup_argparser(name, description, command_line_options=sys.argv, version=__VERSION__):
+def _setup_argparser(name, description, docker, command_line_options=sys.argv, version=__VERSION__):
     parser = argparse.ArgumentParser(description='{} - {}'.format(name, description))
     parser.add_argument('-V', '--version', action='version', version='{} {}'.format(name, version))
     parser.add_argument('-l', '--log_file', help='path to log file', default=None)
     parser.add_argument('-L', '--log_level', help='define the log level', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default=None)
     parser.add_argument('-d', '--debug', action='store_true', default=False, help='print debug messages')
     parser.add_argument('-C', '--config_file', help='set path to config File', default='{}/main.cfg'.format(get_config_dir()))
-    parser.add_argument('FILE_PATH', type=str, help='Path to file that should be extracted')
+    if not docker:
+        parser.add_argument('FILE_PATH', type=str, help='Path to file that should be extracted')
     return parser.parse_args(command_line_options[1:])
 
 

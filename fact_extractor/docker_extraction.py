@@ -18,8 +18,11 @@ def extract(file_path, config):
 
 
 def main():
-    arguments, config = program_setup('FACT extractor', 'Standalone extraction utility')
-    extract(arguments.FILE_PATH, config)
+    arguments, config = program_setup('FACT extractor', 'Standalone extraction utility', docker=True)
+    INPUT_DIR = Path(config.get('unpack', 'data_folder'), 'input')
+    input_file = list(INPUT_DIR.iterdir())[0]
+
+    extract(input_file, config)
 
     return 0
 
