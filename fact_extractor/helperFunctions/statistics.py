@@ -1,0 +1,48 @@
+from configparser import ConfigParser
+from contextlib import suppress
+from pathlib import Path
+from typing import List, Dict
+
+from common_helper_unpacking_classifier import avg_entropy, get_binary_size_without_padding, is_compressed
+
+from helperFunctions.config import read_list_from_config
+from helperFunctions.fileSystem import get_file_type_from_path
+
+
+def add_unpack_statistics(extraction_dir: str, meta_data: Dict):
+    unpacked_files, unpacked_directories = 0, 0
+    for extracted_item in Path(extraction_dir).iterdir():
+        if extracted_item.is_file():
+            unpacked_files += 1
+        elif extracted_item.is_dir():
+            unpacked_directories += 1
+
+    meta_data['number_of_unpacked_files'] = unpacked_files
+    meta_data['number_of_unpacked_directories'] = unpacked_directories
+
+
+def get_unpack_status(file_path: str, binary: bytes, extracted_files: List[Path], meta_data: Dict, config: ConfigParser):
+    meta_data["summary"] = []
+    meta_data["entropy"] = avg_entropy(binary)
+
+    if not extracted_files:
+        meta_data["summary"] = ["unpacked"] if get_file_type_from_path(file_path)["mime"] in read_list_from_config(config, 'ExpertSettings', 'compressed_file_types') or not is_compressed(binary, compress_entropy_threshold=config.getfloat("ExpertSettings", "unpack_threshold"), classifier=avg_entropy) else ["packed"]
+    else:
+        _detect_unpack_loss(binary, extracted_files, meta_data, config.getint("ExpertSettings", "header_overhead"))
+
+
+def _detect_unpack_loss(binary: bytes, extracted_files: List[Path], meta_data: Dict, header_overhead: int):
+    decoding_overhead = 1 - meta_data.get('encoding_overhead', 0)
+    cleaned_size = get_binary_size_without_padding(binary) * decoding_overhead - header_overhead
+    size_of_extracted_files = _get_accumulated_size_of_extracted_files(extracted_files)
+    meta_data['size_packed'] = cleaned_size
+    meta_data['size_unpacked'] = size_of_extracted_files
+    meta_data['summary'] = ['data lost'] if cleaned_size > size_of_extracted_files else ['no data lost']
+
+
+def _get_accumulated_size_of_extracted_files(extracted_files: List[Path]) -> int:
+    total_size = 0
+    for item in extracted_files:
+        with suppress(FileNotFoundError):
+            total_size += item.stat().st_size
+    return total_size
