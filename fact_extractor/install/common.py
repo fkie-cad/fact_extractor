@@ -56,18 +56,7 @@ def main(distribution):
 
     # install general python dependencys
     apt_install_packages('libffi-dev', 'libfuzzy-dev')
-    pip3_install_packages('psutil')
     pip3_install_packages('pytest==3.5.1', 'pytest-cov', 'pytest-pep8', 'pylint', 'python-magic', 'xmltodict', 'yara-python==3.7.0', 'appdirs')
-    pip3_install_packages('ssdeep')
-    pip3_install_packages('lief')
-    pip3_install_packages('requests')
-
-    #  installing common code modules
-    pip3_install_packages('hurry.filesize')
-    pip3_install_packages('git+https://github.com/fkie-cad/common_helper_files.git')
-    pip3_install_packages('git+https://github.com/fkie-cad/common_helper_mongo.git')
-    pip3_install_packages('git+https://github.com/mass-project/common_helper_encoder.git')
-    pip3_install_packages('git+https://github.com/fkie-cad/common_helper_filter.git')
 
     config = load_config('main.cfg')
     data_folder = config.get('unpack', 'data_folder')

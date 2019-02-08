@@ -12,8 +12,7 @@ def main(distribution):
     # dependencies
     apt_install_packages('python-dev', 'python-setuptools')
     apt_install_packages('libjpeg-dev', 'liblzma-dev', 'liblzo2-dev', 'zlib1g-dev')
-    apt_install_packages('libssl-dev python3-tk')
-    pip3_install_packages('pluginbase', 'Pillow', 'cryptography', 'pyopenssl', 'entropy', 'matplotlib')
+    pip3_install_packages('pluginbase', 'entropy')
 
     apt_install_packages('python-pip')
     # removes due to compatibilty reasons
@@ -25,7 +24,6 @@ def main(distribution):
     _install_unpacker(distribution == 'xenial')
 
     # installing common code modules
-    pip3_install_packages('git+https://github.com/fkie-cad/common_helper_process.git')
     pip3_install_packages('git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git')
 
     # install plug-in dependencies
@@ -42,9 +40,6 @@ def main(distribution):
 
     # configure environment
     _edit_sudoers()
-
-    # create directories
-    _create_firmware_directory()
 
     return 0
 
@@ -91,21 +86,8 @@ def _install_unpacker(xenial):
                          'sharutils')
     apt_install_packages('unar')
     # firmware-mod-kit
-    apt_install_packages('autoconf', 'zlib1g-dev', 'liblzma-dev')
     install_github_project('rampageX/firmware-mod-kit', ['git checkout 5e74fe9dd', '(cd src && sh configure && make)',
                                                          'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
-
-
-def _create_firmware_directory():
-    logging.info('Creating firmware directory')
-
-    config = load_main_config()
-    data_dir_name = config.get('data_storage', 'firmware_file_storage_directory')
-    mkdir_output, mkdir_code = execute_shell_command_get_return_code('sudo mkdir -p --mode=0744 {}'.format(data_dir_name))
-    chown_output, chown_code = execute_shell_command_get_return_code('sudo chown {}:{} {}'.format(os.getuid(), os.getgid(), data_dir_name))
-    if not all(code == 0 for code in (mkdir_code, chown_code)):
-        raise InstallationError('Failed to create directories for binary storage\n{}\n{}'.format(mkdir_output, chown_output))
-
 
 def _install_plugins():
     logging.info('Installing plugins')

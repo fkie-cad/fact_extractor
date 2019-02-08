@@ -15,10 +15,7 @@ class TestUnpackerBase(unittest.TestCase):
     def setUp(self):
         config = ConfigParser()
         self.ds_tmp_dir = TemporaryDirectory(prefix='faf_tests_')
-        config.add_section('data_storage')
-        config.set('data_storage', 'firmware_file_storage_directory', self.ds_tmp_dir.name)
         config.add_section('unpack')
-        config.set('unpack', 'max_depth', '3')
         config.set('unpack', 'whitelist', 'text/plain, image/png')
         config.add_section('ExpertSettings')
         self.unpacker = Unpacker(config=config)
