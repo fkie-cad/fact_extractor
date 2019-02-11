@@ -35,7 +35,7 @@ class Unpacker(UnpackBase):
         extracted_files = self.remove_duplicates(extracted_files)
 
         # These should be replaced
-        add_unpack_statistics(tmp_dir.name, meta_data)
+        add_unpack_statistics(self._file_folder, meta_data)
         get_unpack_status(file_path, binary, extracted_files, meta_data, self.config)
 
         self.cleanup(tmp_dir)

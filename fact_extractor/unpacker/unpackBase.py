@@ -33,9 +33,9 @@ class UnpackBase(object):
             plugin.setup(self)
 
     def _set_whitelist(self):
-        self.whitelist = read_list_from_config(self.config, 'unpack', 'whitelist')
-        logging.debug('Ignore (Whitelist): {}'.format(', '.join(self.whitelist)))
-        for item in self.whitelist:
+        self.blacklist = read_list_from_config(self.config, 'unpack', 'blacklist')
+        logging.debug('Ignore (Blacklist): {}'.format(', '.join(self.blacklist)))
+        for item in self.blacklist:
             self.register_plugin(item, self.unpacker_plugins['generic/nop'])
 
     def register_plugin(self, mime_type: str, unpacker_name_and_function: Tuple[Callable[[str, str], Dict], str, str]):

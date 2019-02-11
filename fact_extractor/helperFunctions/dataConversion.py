@@ -16,10 +16,6 @@ def make_unicode_string(code):
         return code.__str__()
 
 
-def make_list_from_dict(dict_object):
-    return list(dict_object.values())
-
-
 def get_value_of_first_key(input_dict):
     key_list = list(input_dict.keys())
     key_list.sort()

@@ -1,7 +1,7 @@
 import pytest
 
-from helperFunctions.dataConversion import make_bytes, make_unicode_string, make_list_from_dict, \
-    get_value_of_first_key, remove_uneccessary_spaces
+from helperFunctions.dataConversion import make_bytes, make_unicode_string, get_value_of_first_key, \
+    remove_uneccessary_spaces
 
 
 @pytest.mark.parametrize('input_data', [
@@ -30,7 +30,7 @@ def test_make_unicode_string(input_data, expected):
 
 def test_make_list_from_dict():
     test_dict = {'a': 'abc', 'b': 'bcd'}
-    result_list = make_list_from_dict(test_dict)
+    result_list = list(test_dict.values())
     assert isinstance(result_list, list), 'type is not list'
     result_list.sort()
     assert result_list == ['abc', 'bcd'], 'resulting list not correct'
