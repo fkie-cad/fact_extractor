@@ -19,7 +19,7 @@ class TestUnpackerBase(unittest.TestCase):
         self.tmp_dir = TemporaryDirectory(prefix='faf_tests_')
 
         self.config.add_section('unpack')
-        self.config.set('unpack', 'data_folder', self.tmp_dir.name)
+        self.config.set('unpack', 'data_folder', self.ds_tmp_dir.name)
         self.config.set('unpack', 'blacklist', 'text/plain, image/png')
         self.config.add_section('ExpertSettings')
         self.config.set('ExpertSettings', 'header_overhead', '256')
