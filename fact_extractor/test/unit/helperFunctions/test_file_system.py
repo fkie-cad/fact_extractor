@@ -4,8 +4,7 @@ import unittest
 from common_helper_files import get_files_in_dir
 
 from helperFunctions.fileSystem import get_parent_dir, get_src_dir, \
-    get_test_data_dir, get_absolute_path, get_file_type_from_path, file_is_empty, \
-    get_chroot_path, get_chroot_path_excluding_extracted_dir, get_faf_bin_dir
+    get_test_data_dir, get_file_type_from_path, file_is_empty, get_faf_bin_dir
 
 
 class TestFileSystemHelpers(unittest.TestCase):
@@ -37,24 +36,6 @@ class TestFileSystemHelpers(unittest.TestCase):
         self.assertTrue(os.path.isdir(bin_dir))
         self.assertIn('fact_extractor/bin', bin_dir)
         self.assertIn('custommime.mgc', files_in_bin_dir)
-
-    def test_get_absolute_path(self):
-        abs_path = '/foo/bar'
-        self.assertEqual(get_absolute_path(abs_path), '/foo/bar', 'absolute path of absolute path not correct')
-        rel_path = 'foo/bar'
-        self.assertEqual(get_absolute_path(rel_path, base_dir='/the'), '/the/foo/bar', 'absolute path of relative path not correct')
-
-    def test_get_chroot_path(self):
-        a = get_chroot_path('/foo/bar/com', '/foo/')
-        self.assertEqual(a, '/bar/com', 'simple case with /')
-        b = get_chroot_path('/foo/bar/com', '/foo')
-        self.assertEqual(b, '/bar/com', 'simple case without /')
-        c = get_chroot_path('/foo/bar/com', '/bar')
-        self.assertEqual(c, '/foo/bar/com', 'none matching root')
-
-    def test_get_chroot_excluding_extracted_prefix_dir(self):
-        d = get_chroot_path_excluding_extracted_dir('/foo/faf_extracted/bar/com', '/foo')
-        self.assertEqual(d, '/bar/com', 'including extracted')
 
     def test_get_file_type_system_magic(self):
         file_type = get_file_type_from_path('{}/container/test.zip'.format(get_test_data_dir()))

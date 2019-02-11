@@ -2,9 +2,8 @@
 This plugin unpacks several formats utilizing patool
 '''
 import logging
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, call, PIPE, STDOUT
 
-from helperFunctions.process import program_is_callable
 
 name = 'PaTool'
 mime_patterns = ['application/x-lrzip', 'application/x-cpio', 'application/x-archive', 'application/x-adf',
@@ -18,6 +17,10 @@ mime_patterns = ['application/x-lrzip', 'application/x-cpio', 'application/x-arc
                  'application/x-iso9660-image', 'application/x-compress', 'application/x-arc', 'audio/flac',
                  'application/x-ace', 'application/x-zoo', 'application/x-xz']
 version = '0.5'
+
+
+def program_is_callable(command):
+    return call('type {}'.format(command), shell=True, stdout=PIPE, stderr=STDOUT) == 0
 
 
 def unpack_function(file_path, tmp_dir):

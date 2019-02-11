@@ -12,7 +12,11 @@ from helperFunctions.install import apt_remove_packages, apt_install_packages, a
 
 def install_pip(python_command):
     logging.info('Installing {} pip'.format(python_command))
-    for command in ['wget https://bootstrap.pypa.io/get-pip.py', 'sudo -EH {} get-pip.py'.format(python_command), 'rm get-pip.py']:
+    for command in [
+        'wget https://bootstrap.pypa.io/get-pip.py',
+        'sudo -EH {} get-pip.py'.format(python_command),
+        'rm get-pip.py'
+    ]:
         output, return_code = execute_shell_command_get_return_code(command)
         if return_code != 0:
             raise InstallationError('Error in pip installation for {}:\n{}'.format(python_command, output))
@@ -21,13 +25,30 @@ def install_pip(python_command):
 def main(distribution):
     xenial = distribution == 'xenial'
 
-    apt_install_packages('apt-transport-https')
-
     logging.info('Updating system')
+
     apt_update_sources()
     apt_upgrade_system()
+
+    apt_remove_packages('python3-pip', 'python3-setuptools', 'python3-wheel')
+    apt_autoremove_packages()
+    apt_remove_packages('python-pip')
+    apt_autoremove_packages()
+
     apt_autoremove_packages()
     apt_clean_system()
+
+    # install python3 and general build stuff
+    apt_install_packages('python3', 'python3-dev', 'python-dev', 'python-setuptools', 'build-essential', 'automake',
+                         'autoconf', 'libtool', 'git', 'unzip', 'python', 'python-dev', 'libffi-dev', 'libfuzzy-dev')
+    # install general python dependencys
+    install_pip('python3')
+    install_pip('python2')
+    pip3_install_packages('pytest==3.5.1', 'pytest-cov', 'python-magic')
+
+    if not xenial:
+        pip3_install_packages('testresources')
+
 
     # update submodules
     git_output, git_code = execute_shell_command_get_return_code('(cd ../../ && git submodule foreach "git pull")')
@@ -37,26 +58,6 @@ def main(distribution):
     # make bin dir
     with suppress(FileExistsError):
         os.mkdir('../bin')
-
-    # install python3 and general build stuff
-    apt_install_packages('python3', 'python3-dev', 'build-essential', 'automake', 'autoconf', 'libtool', 'git', 'unzip')
-    if not xenial:
-        pip3_install_packages('testresources')
-
-    # get a bugfree recent pip version
-    apt_remove_packages('python3-pip', 'python3-setuptools', 'python3-wheel')
-    apt_autoremove_packages()
-    install_pip('python3')
-
-    # install python2
-    apt_install_packages('python', 'python-dev')
-    apt_remove_packages('python-pip')
-    apt_autoremove_packages()
-    install_pip('python2')
-
-    # install general python dependencys
-    apt_install_packages('libffi-dev', 'libfuzzy-dev')
-    pip3_install_packages('pytest==3.5.1', 'pytest-cov', 'pytest-pep8', 'pylint', 'python-magic', 'xmltodict', 'yara-python==3.7.0', 'appdirs')
 
     config = load_config('main.cfg')
     data_folder = config.get('unpack', 'data_folder')

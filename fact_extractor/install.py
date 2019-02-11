@@ -23,6 +23,8 @@ import os
 import sys
 from pathlib import Path
 
+from version import __VERSION__
+
 try:
     import distro
 
@@ -30,12 +32,12 @@ try:
 
     from helperFunctions.install import OperateInDirectory
     from install.common import main as common
-    from install.backend import main as backend
+    from install.unpacker import main as unpacker
 except ImportError:
     sys.exit('Could not import install dependencies. Please (re-)run install/pre_install.sh')
 
 PROGRAM_NAME = 'FACT_extraction Installer'
-PROGRAM_VERSION = '0.1'
+PROGRAM_VERSION = __VERSION__
 PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor installation script'
 
 BIONIC_CODE_NAMES = ['bionic', 'tara']
@@ -121,7 +123,7 @@ if __name__ == '__main__':
 
     with OperateInDirectory(installation_directory):
         common(distribution)
-        backend(distribution)
+        unpacker(distribution)
 
     logging.info('installation complete')
 

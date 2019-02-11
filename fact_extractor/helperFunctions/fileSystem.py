@@ -41,41 +41,6 @@ def get_parent_dir(dir_path):
     return dir_path
 
 
-def get_absolute_path(path, base_dir=os.getcwd()):
-    '''
-    Returns path if path is absolute
-    Returns base_dir/path if path is relative
-    '''
-    if path[0] == '/':
-        return path
-    else:
-        return os.path.join(base_dir, path)
-
-
-def get_chroot_path(absolute_path, base_path):
-    '''
-    set new root for path
-    example:
-    input: absolute_path=/foo/bar/abc, base_path=/foo/
-    output: /bar/abc
-    '''
-    if absolute_path[0:len(base_path)] == base_path:
-        new_path = absolute_path[len(base_path):len(absolute_path)]
-        if new_path[0] != '/':
-            new_path = '/{}'.format(new_path)
-        return new_path
-    else:
-        return absolute_path
-
-
-def get_chroot_path_excluding_extracted_dir(absolute_path, base_path):
-    '''
-    like get_chroot_path but removing 'faf_extracted' dir as well
-    '''
-    tmp = get_chroot_path(absolute_path, base_path)
-    return get_chroot_path(tmp, '/faf_extracted')
-
-
 def get_file_type_from_path(file_path: Union[str, Path]):
     '''
     This functions returns a dict with the file's mime- and full-type.

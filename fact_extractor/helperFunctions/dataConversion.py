@@ -16,15 +16,6 @@ def make_unicode_string(code):
         return code.__str__()
 
 
-def get_value_of_first_key(input_dict):
-    key_list = list(input_dict.keys())
-    key_list.sort()
-    if len(key_list) > 0:
-        return input_dict[key_list[0]]
-    else:
-        return None
-
-
 def remove_uneccessary_spaces(input_string):
     tmp = input_string.split()
     tmp = ' '.join(tmp)

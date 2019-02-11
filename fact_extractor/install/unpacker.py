@@ -4,17 +4,15 @@ from pathlib import Path
 
 from common_helper_process import execute_shell_command_get_return_code
 
-from helperFunctions.install import apt_remove_packages, apt_install_packages, InstallationError, pip3_install_packages, \
-    install_github_project, pip2_install_packages, pip2_remove_packages, OperateInDirectory, load_main_config
+from helperFunctions.install import apt_remove_packages, apt_install_packages, InstallationError, \
+    pip3_install_packages, install_github_project, pip2_install_packages, pip2_remove_packages, OperateInDirectory
 
 
 def main(distribution):
     # dependencies
-    apt_install_packages('python-dev', 'python-setuptools')
     apt_install_packages('libjpeg-dev', 'liblzma-dev', 'liblzo2-dev', 'zlib1g-dev')
     pip3_install_packages('pluginbase', 'entropy')
 
-    apt_install_packages('python-pip')
     # removes due to compatibilty reasons
     apt_remove_packages('python-lzma')
     pip2_remove_packages('pyliblzma')
@@ -57,13 +55,14 @@ def _edit_sudoers():
 
 def _install_unpacker(xenial):
     apt_install_packages('fakeroot')
-    # ---- sasquatch unpacker ----
-    # Original: devttys0/sasquatch
-    # Ubuntu 18.04 compatiblity issue in original source. Fixed in this fork:
+
+    # sasquatch unpacker
     install_github_project('kartone/sasquatch', ['./build.sh'])
+
     # ubi_reader
     pip2_install_packages('python-lzo')
     install_github_project('jrspruitt/ubi_reader', ['sudo python2 setup.py install --force'])
+
     # binwalk
     if xenial:
         apt_install_packages('cramfsprogs')
