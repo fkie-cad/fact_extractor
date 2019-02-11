@@ -32,9 +32,7 @@ class Unpacker(UnpackBase):
         extracted_files, meta_data = self._do_fallback_if_necessary(extracted_files, meta_data, tmp_dir.name, file_path)
 
         extracted_files = self.move_extracted_files(extracted_files, Path(tmp_dir.name))
-        extracted_files = self.remove_duplicates(extracted_files)
 
-        # These should be replaced
         add_unpack_statistics(self._file_folder, meta_data)
         get_unpack_status(file_path, binary, extracted_files, meta_data, self.config)
 
@@ -70,9 +68,4 @@ class Unpacker(UnpackBase):
                 os.makedirs(str(target_path.parent), exist_ok=True)
                 shutil.move(absolute_path, target_path)
                 extracted_files.append(target_path)
-        return extracted_files
-
-    @staticmethod
-    def remove_duplicates(extracted_files: List[Path]) -> List[Path]:
-        # passing this until it has a sensible implementation
         return extracted_files
