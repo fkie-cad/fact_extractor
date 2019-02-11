@@ -9,9 +9,9 @@ from helperFunctions.config import read_list_from_config
 from helperFunctions.fileSystem import get_file_type_from_path
 
 
-def add_unpack_statistics(extraction_dir: str, meta_data: Dict):
+def add_unpack_statistics(extraction_dir: Path, meta_data: Dict):
     unpacked_files, unpacked_directories = 0, 0
-    for extracted_item in extraction_dir.iterdir():
+    for extracted_item in extraction_dir.glob('**/*'):
         if extracted_item.is_file():
             unpacked_files += 1
         elif extracted_item.is_dir():

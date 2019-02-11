@@ -6,8 +6,6 @@ COPY . /opt/app
 
 WORKDIR /opt/app/fact_extractor
 
-ARG DEBIAN_FRONTEND
-
 ARG USER
 
 RUN install/pre_install.sh
