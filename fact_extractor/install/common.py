@@ -49,12 +49,6 @@ def main(distribution):
     if not xenial:
         pip3_install_packages('testresources')
 
-
-    # update submodules
-    git_output, git_code = execute_shell_command_get_return_code('(cd ../../ && git submodule foreach "git pull")')
-    if git_code != 0:
-        raise InstallationError('Failed to update submodules\n{}'.format(git_output))
-
     # make bin dir
     with suppress(FileExistsError):
         os.mkdir('../bin')
