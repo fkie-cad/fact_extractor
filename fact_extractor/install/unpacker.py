@@ -10,7 +10,7 @@ from helperFunctions.install import apt_remove_packages, apt_install_packages, I
 
 def main(distribution):
     # dependencies
-    apt_install_packages('libjpeg-dev', 'liblzma-dev', 'liblzo2-dev', 'zlib1g-dev')
+    apt_install_packages('libjpeg-dev', 'liblzma-dev', 'liblzo2-dev', 'zlib1g-dev', 'unzip', 'libffi-dev', 'libfuzzy-dev')
     pip3_install_packages('pluginbase', 'entropy')
 
     # removes due to compatibilty reasons

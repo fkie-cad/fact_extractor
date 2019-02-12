@@ -30,24 +30,22 @@ def main(distribution):
     apt_update_sources()
     apt_upgrade_system()
 
-    apt_remove_packages('python3-pip', 'python3-setuptools', 'python3-wheel')
-    apt_autoremove_packages()
-    apt_remove_packages('python-pip')
-    apt_autoremove_packages()
+    # Non python dependencies
+    apt_install_packages('build-essential', 'automake', 'autoconf', 'libtool')
 
+    # python dependencies
+    apt_install_packages('python3', 'python3-dev', 'python-dev', 'python-setuptools', 'python', 'python-dev')
+
+    apt_remove_packages('python-pip', 'python3-pip', 'python3-setuptools', 'python3-wheel')
     apt_autoremove_packages()
     apt_clean_system()
 
-    # install python3 and general build stuff
-    apt_install_packages('python3', 'python3-dev', 'python-dev', 'python-setuptools', 'build-essential', 'automake',
-                         'autoconf', 'libtool', 'git', 'unzip', 'python', 'python-dev', 'libffi-dev', 'libfuzzy-dev')
-    # install general python dependencys
     install_pip('python3')
-    install_pip('python2')
-    pip3_install_packages('pytest==3.5.1', 'pytest-cov', 'python-magic')
-
+    pip3_install_packages('wheel', 'setuptools', 'pytest==3.5.1', 'pytest-cov')
     if not xenial:
         pip3_install_packages('testresources')
+
+    install_pip('python2')
 
     # make bin dir
     with suppress(FileExistsError):
