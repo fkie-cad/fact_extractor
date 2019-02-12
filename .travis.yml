@@ -1,0 +1,8 @@
+dist: xenial
+language: python
+python: 3.5
+install:
+  - fact_extractor/install/pre_install.sh
+  - fact_extractor/install.py
+script:
+  - pytest
