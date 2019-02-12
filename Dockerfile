@@ -6,7 +6,7 @@ COPY . /opt/app
 
 WORKDIR /opt/app/fact_extractor
 
-ARG USER
+ARG USER=root
 
 RUN install/pre_install.sh
 

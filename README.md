@@ -6,7 +6,7 @@ Should be able to extract most of the common container formats.
 Build with
 
 ```sh
-docker build --build-arg USER=root -t fact_extractor .
+docker build -t fact_extractor .
 ```
 
 Run with
