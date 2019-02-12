@@ -28,7 +28,7 @@ def main(distribution):
     logging.info('Updating system')
 
     apt_update_sources()
-    apt_upgrade_system()
+    # apt_upgrade_system()
 
     # Non python dependencies
     apt_install_packages('build-essential', 'automake', 'autoconf', 'libtool')
