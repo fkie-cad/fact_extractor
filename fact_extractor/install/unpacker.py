@@ -28,7 +28,6 @@ def main(distribution):
     _install_unpacker(distribution == 'xenial')
 
     # installing common code modules
-    pip3_install_packages('git+https://github.com/fkie-cad/common_helper_files.git')
     pip3_install_packages('git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git')
 
     # install plug-in dependencies
