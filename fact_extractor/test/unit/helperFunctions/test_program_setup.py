@@ -1,58 +1,42 @@
-import pytest
 import logging
 import os
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from helperFunctions.fileSystem import get_test_data_dir
-from helperFunctions.program_setup import _get_console_output_level, _load_config, _setup_logging,\
-    program_setup
+from helperFunctions.config import get_config_dir
+from helperFunctions.program_setup import (
+    _load_config, _setup_logging, program_setup
+)
 
 
-class argument_mock():
-
-    config_file = get_test_data_dir() + '/load_cfg_test'
-    log_file = '/log/file/path'
-    log_level = 'DEBUG'
+class ArgumentMock():
+    config_file = '{}/main.cfg'.format(get_config_dir())
+    log_level = 'WARNING'
+    log_file = '/tmp/fact_test_log'
     silent = False
     debug = False
 
 
-config_mock = {
-    'Logging': {
-        'logFile': '/tmp/fact_test.log',
-        'logLevel': 'DEBUG'
-    }
-}
-
-
-@pytest.mark.parametrize('input_data, expected_output', [
-    (True, logging.DEBUG),
-    (False, logging.INFO)
-])
-def test_get_console_output_level(input_data, expected_output):
-    assert _get_console_output_level(input_data) == expected_output
-
-
 def test_load_config():
-    args = argument_mock()
+    args = ArgumentMock()
     config = _load_config(args)
-    assert config['Logging']['logLevel'] == 'DEBUG'
-    assert config['Logging']['logFile'] == '/log/file/path'
+    assert config['ExpertSettings']['unpack_threshold'] == '0.8'
 
 
 def test_setup_logging():
-    args = argument_mock
-    _setup_logging(config_mock, args)
+    args = ArgumentMock()
+    _setup_logging(args)
     logger = logging.getLogger('')
     assert logger.getEffectiveLevel() == logging.DEBUG
+    if Path(args.log_file).is_file():
+        Path(args.log_file).unlink()
 
 
 def test_program_setup():
     tmp_dir = TemporaryDirectory(prefix='fact_test_')
     log_file_path = tmp_dir.name + '/folder/log_file'
-    args, config = program_setup('test', 'test description', command_line_options=['script_name', '--config_file', argument_mock.config_file, '--log_file', log_file_path, 'ANY_FILE'])
+    args, _ = program_setup('test', 'test description', command_line_options=['script_name', '--log_file', log_file_path, 'ANY_FILE'])
     assert args.debug is False
-    assert config['Logging']['logFile'] == log_file_path
     assert os.path.exists(log_file_path)
 
     tmp_dir.cleanup()
