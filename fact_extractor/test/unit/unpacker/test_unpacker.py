@@ -25,8 +25,8 @@ class TestUnpackerBase(unittest.TestCase):
         self.config.set('ExpertSettings', 'header_overhead', '256')
 
         self.unpacker = Unpacker(config=self.config)
-        os.makedirs(self.unpacker._report_folder, exist_ok=True)
-        os.makedirs(self.unpacker._file_folder, exist_ok=True)
+        os.makedirs(str(self.unpacker._report_folder), exist_ok=True)
+        os.makedirs(str(self.unpacker._file_folder), exist_ok=True)
 
         self.test_file_path = Path(get_test_data_dir(), 'get_files_test/testfile1')
 
