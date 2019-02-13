@@ -5,4 +5,4 @@ install:
   - sudo fact_extractor/install/pre_install.sh
   - sudo fact_extractor/install.py
 script:
-  - sudo pytest
+  - sudo pytest --ignore fact_extractor/test/data
