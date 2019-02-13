@@ -1,0 +1,46 @@
+Please add pre_commit feature from fact_core
+
+README.md:
+Add Acknowledgemts and License Block from FACT_core Readme.md.
+
+3: First sentence is somehow broken
+
+
+Dockerfile:
+
+15: there are some unpackers that use the sudo command. eg. generic_fs
+
+fact_extractor/install.py:
+Execution bit not set: chmod +x
+File logging should be removed since it is expected to use the docker container.
+
+4: update year to 2019
+
+31: unused import?
+
+122: double use of Path can be avoided and absolute is not necessary:
+`str(Path(__file__).parent / 'install')` should work
+
+
+fact_extractor/install/common.py
+
+13: Compiling the newest version of pip might be to much overhead, if it is just for the docker container.
+39: see above
+43: see above
+48: see above
+=> installation of pip2 via apt-get should be added to pre-install as well.
+
+
+fact_extractor/docker_extraction.py:
+21: unused argument: 'arguments' -> '_'
+
+
+fact_extractor/helperFunctions/program_setup.py
+file logging should be removed
+
+
+fact_extractor/helperFunctions/statistics.py
+quotation mix "->'
+
+fact_extractor/helperFunctions/hash.py
+17: too many blank lines at end
