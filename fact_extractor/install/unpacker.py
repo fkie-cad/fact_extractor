@@ -3,9 +3,11 @@ import os
 from pathlib import Path
 
 from common_helper_process import execute_shell_command_get_return_code
-
-from helperFunctions.install import apt_remove_packages, apt_install_packages, InstallationError, \
-    pip3_install_packages, install_github_project, pip2_install_packages, pip2_remove_packages, OperateInDirectory
+from helperFunctions.install import (
+    InstallationError, OperateInDirectory, apt_install_packages,
+    apt_remove_packages, install_github_project, pip2_install_packages,
+    pip2_remove_packages, pip3_install_packages
+)
 
 
 def main(distribution):
@@ -14,8 +16,12 @@ def main(distribution):
     pip3_install_packages('pluginbase', 'entropy')
 
     # removes due to compatibilty reasons
-    apt_remove_packages('python-lzma')
-    pip2_remove_packages('pyliblzma')
+    try:
+        apt_remove_packages('python-lzma')
+        pip2_remove_packages('pyliblzma')
+    except InstallationError:
+        logging.debug('python-lzma not removed because present already')
+
     apt_install_packages('python-lzma')
 
     # installing unpacker
@@ -45,7 +51,9 @@ def main(distribution):
 def _edit_sudoers():
     logging.info('add rules to sudo...')
     username = os.environ['USER']
-    sudoers_content = '\n'.join(('{}\tALL=NOPASSWD: {}'.format(username, command) for command in ('/bin/mount', '/bin/umount', '/bin/mknod', '/usr/local/bin/sasquatch', '/bin/rm', '/bin/cp', '/bin/dd', '/bin/chown')))
+    sudoers_content = '\n'.join(
+        ('{}\tALL=NOPASSWD: {}'.format(username, command) for command in ('/bin/mount', '/bin/umount', '/bin/mknod', '/usr/local/bin/sasquatch', '/bin/rm', '/bin/cp', '/bin/dd', '/bin/chown'))
+    )
     Path('/tmp/fact_overrides').write_text('{}\n'.format(sudoers_content))
     chown_output, chown_code = execute_shell_command_get_return_code('sudo chown root:root /tmp/fact_overrides')
     mv_output, mv_code = execute_shell_command_get_return_code('sudo mv /tmp/fact_overrides /etc/sudoers.d/fact_overrides')
@@ -87,6 +95,7 @@ def _install_unpacker(xenial):
     # firmware-mod-kit
     install_github_project('rampageX/firmware-mod-kit', ['git checkout 5e74fe9dd', '(cd src && sh configure && make)',
                                                          'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
+
 
 def _install_plugins():
     logging.info('Installing plugins')

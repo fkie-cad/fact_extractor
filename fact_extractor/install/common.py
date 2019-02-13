@@ -19,7 +19,7 @@ def main(distribution):
     apt_install_packages('build-essential', 'automake', 'autoconf', 'libtool')
 
     # python dependencies
-    apt_install_packages('python3', 'python3-dev', 'python3-wheel', 'python3-setuptools', 'python', 'python-dev', 'python-wheel', 'python-setuptools')
+    apt_install_packages('python3', 'python3-dev', 'python3-wheel', 'python', 'python-dev', 'python-wheel', 'python-setuptools')
 
     pip3_install_packages('pytest==3.5.1', 'pytest-cov')
     if not xenial:
