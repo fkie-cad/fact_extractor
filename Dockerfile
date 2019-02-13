@@ -12,6 +12,4 @@ RUN install/pre_install.sh
 
 RUN ./install.py
 
-RUN SUDO_FORCE_REMOVE=yes apt-get remove -y sudo
-
 ENTRYPOINT ["./docker_extraction.py"]

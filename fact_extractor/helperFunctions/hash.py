@@ -13,4 +13,3 @@ def get_hash(hash_function, binary):
 
 def get_sha256(code):
     return get_hash('sha256', code)
-
