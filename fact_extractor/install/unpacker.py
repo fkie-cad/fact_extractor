@@ -4,9 +4,9 @@ from pathlib import Path
 
 from common_helper_process import execute_shell_command_get_return_code
 from helperFunctions.install import (
-    InstallationError, OperateInDirectory, apt_install_packages,
-    apt_remove_packages, install_github_project, pip2_install_packages,
-    pip2_remove_packages, pip3_install_packages
+    InstallationError, apt_install_packages, apt_remove_packages,
+    install_github_project, pip2_install_packages, pip2_remove_packages,
+    pip3_install_packages
 )
 
 
@@ -29,18 +29,10 @@ def main(distribution):
 
     # installing common code modules
     pip3_install_packages('git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git')
+    pip3_install_packages('git+https://github.com/fkie-cad/fact_helper_file.git')
 
     # install plug-in dependencies
     _install_plugins()
-
-    # compile custom magic file
-    with OperateInDirectory('../mime'):
-        cat_output, cat_code = execute_shell_command_get_return_code('cat custom_* > custommime')
-        file_output, file_code = execute_shell_command_get_return_code('file -C -m custommime')
-        mv_output, mv_code = execute_shell_command_get_return_code('mv -f custommime.mgc ../bin/')
-        if any(code != 0 for code in (cat_code, file_code, mv_code)):
-            raise InstallationError('Failed to properly compile magic file\n{}'.format('\n'.join((cat_output, file_output, mv_output))))
-        Path('custommime').unlink()
 
     # configure environment
     _edit_sudoers()
