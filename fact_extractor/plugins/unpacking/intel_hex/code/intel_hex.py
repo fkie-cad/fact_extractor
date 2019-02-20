@@ -1,12 +1,13 @@
 '''
 This plugin decodes / unpacks Intel HEX files (.hex)
 '''
-from intelhex import IntelHex, HexRecordError, IntelHexError
 from pathlib import Path
 
-name = 'IntelHEX'
-mime_patterns = ['firmware/intel-hex']
-version = '0.1'
+from intelhex import HexRecordError, IntelHex, IntelHexError
+
+NAME = 'IntelHEX'
+MIME_PATTERNS = ['firmware/intel-hex']
+VERSION = '0.1'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -29,5 +30,5 @@ def unpack_function(file_path, tmp_dir):
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

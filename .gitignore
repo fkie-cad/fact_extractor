@@ -1,8 +1,11 @@
-.idea
-.pytest_cache
-.coverage
 .cache
+.coverage
+.idea
+.project
 .pyc
+.pydevproject
+.pytest_cache
+.settings
 __pycache__
 bin/
 install.log

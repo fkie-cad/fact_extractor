@@ -5,9 +5,9 @@ import logging
 
 from common_helper_process.fail_safe_subprocess import execute_shell_command
 
-name = 'UBIFS'
-mime_patterns = ['filesystem/ubifs']
-version = '0.3'
+NAME = 'UBIFS'
+MIME_PATTERNS = ['filesystem/ubifs']
+VERSION = '0.3'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -24,5 +24,5 @@ def unpack_function(file_path, tmp_dir):
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

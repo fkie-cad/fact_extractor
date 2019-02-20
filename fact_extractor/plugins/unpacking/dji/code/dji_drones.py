@@ -1,16 +1,14 @@
-# -*- coding: utf-8 -*-
 
 import re
 from os import path, rename
 
-from common_helper_files import get_files_in_dir, delete_file
+from common_helper_files import delete_file, get_files_in_dir
 from common_helper_process import execute_shell_command
-
 from helperFunctions.fileSystem import get_faf_bin_dir
 
-name = 'DJI_drones'
-mime_patterns = ['firmware/dji-drone']
-version = '0.3.1'
+NAME = 'DJI_drones'
+MIME_PATTERNS = ['firmware/dji-drone']
+VERSION = '0.3.1'
 
 TOOL_PATH = path.join(get_faf_bin_dir(), 'dji_xv4_fwcon.py')
 
@@ -73,5 +71,5 @@ def _remove_ini_files(tmp_dir):
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

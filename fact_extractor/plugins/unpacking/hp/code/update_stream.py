@@ -4,9 +4,9 @@ from common_helper_extraction import (
 )
 from common_helper_files import get_binary_from_file
 
-name = 'HP-Stream'
-mime_patterns = ['firmware/hp-us']
-version = '0.1'
+NAME = 'HP-Stream'
+MIME_PATTERNS = ['firmware/hp-us']
+VERSION = '0.1'
 
 
 def unpack_function(file_path: str, tmp_dir: str) -> dict:
@@ -35,5 +35,5 @@ def _get_meta_data(data_sections: list, lzma_streams: list) -> dict:
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

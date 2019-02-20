@@ -5,14 +5,13 @@ import os
 
 from common_helper_passwords import get_merged_password_set
 from common_helper_process import execute_shell_command
-
 from helperFunctions.fileSystem import get_src_dir
 
-name = '7z'
-mime_patterns = ['application/x-lzma', 'application/x-7z-compressed', 'application/zip', 'application/x-zip-compressed']
-unpacker_program = '7z'
-version = '0.7'
+NAME = '7z'
+MIME_PATTERNS = ['application/x-lzma', 'application/x-7z-compressed', 'application/zip', 'application/x-zip-compressed']
+VERSION = '0.7'
 
+UNPACKER_EXECUTEABLE = '7z'
 PW_LIST = get_merged_password_set(os.path.join(get_src_dir(), 'unpacker/passwords'))
 
 
@@ -23,7 +22,7 @@ def unpack_function(file_path, tmp_dir):
     '''
     meta = {}
     for password in PW_LIST:
-        execution_string = 'fakeroot {} x -y -p{} -o{} {}'.format(unpacker_program, password, tmp_dir, file_path)
+        execution_string = 'fakeroot {} x -y -p{} -o{} {}'.format(UNPACKER_EXECUTEABLE, password, tmp_dir, file_path)
         output = execute_shell_command(execution_string)
 
         meta['output'] = output
@@ -36,5 +35,5 @@ def unpack_function(file_path, tmp_dir):
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

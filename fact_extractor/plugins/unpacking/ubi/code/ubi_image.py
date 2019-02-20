@@ -3,10 +3,9 @@ This plugin unpacks ubi images
 '''
 from common_helper_process import execute_shell_command
 
-
-name = 'UBI-Image'
-mime_patterns = ['firmware/ubi-image']
-version = '0.2'
+NAME = 'UBI-Image'
+MIME_PATTERNS = ['firmware/ubi-image']
+VERSION = '0.2'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -21,5 +20,5 @@ def unpack_function(file_path, tmp_dir):
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))
