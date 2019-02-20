@@ -66,6 +66,6 @@ class Unpacker(UnpackBase):
                 relative_path = absolute_path.relative_to(extraction_dir)
                 target_path = Path(self._file_folder, relative_path)
                 os.makedirs(str(target_path.parent), exist_ok=True)
-                shutil.move(absolute_path, target_path)
+                shutil.move(str(absolute_path), str(target_path))
                 extracted_files.append(target_path)
         return extracted_files

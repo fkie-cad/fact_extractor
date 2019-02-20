@@ -14,7 +14,7 @@ class TestXeroxDLM(TestUnpackerBase):
         super().setUp()
 
         self.test_path = Path(TEST_DATA_DIR, 'DLM-First_1MB.DLM')
-        self.firmware_container = XeroxDLM(self.test_path)
+        self.firmware_container = XeroxDLM(str(self.test_path))
 
     def test_unpacker_selection(self):
         self.check_unpacker_selection('firmware/xerox-dlm', 'XeroxDLM')
