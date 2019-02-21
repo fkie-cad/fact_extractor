@@ -6,9 +6,9 @@ import os
 
 from common_helper_process import execute_shell_command
 
-name = 'JFFS2'
-mime_patterns = ['filesystem/jffs2', 'filesystem/jffs2-big']
-version = '0.5'
+NAME = 'JFFS2'
+MIME_PATTERNS = ['filesystem/jffs2', 'filesystem/jffs2-big']
+VERSION = '0.5'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -26,5 +26,5 @@ def unpack_function(file_path, tmp_dir):
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

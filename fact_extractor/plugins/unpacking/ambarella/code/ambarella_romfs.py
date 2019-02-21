@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
 
 from os import path
 
 from common_helper_process import execute_shell_command
-
 from helperFunctions.fileSystem import get_faf_bin_dir
 
-name = 'Ambarella_RomFS'
-mime_patterns = ['filesystem/ambarella-romfs']
-version = '0.3'
+NAME = 'Ambarella_RomFS'
+MIME_PATTERNS = ['filesystem/ambarella-romfs']
+VERSION = '0.3'
 
 TOOL_PATH = path.join(get_faf_bin_dir(), "amba_romfs.py")
 
@@ -24,5 +22,5 @@ def unpack_function(file_path, tmp_dir):
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

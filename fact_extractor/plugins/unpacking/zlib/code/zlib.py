@@ -6,9 +6,9 @@ import zlib
 
 from common_helper_files import get_binary_from_file, write_binary_to_file
 
-name = 'Zlib'
-mime_patterns = ['compression/zlib']
-version = '0.1'
+NAME = 'Zlib'
+MIME_PATTERNS = ['compression/zlib']
+VERSION = '0.1'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -27,5 +27,5 @@ def unpack_function(file_path, tmp_dir):
 # ----> Do not edit below this line <----
 
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

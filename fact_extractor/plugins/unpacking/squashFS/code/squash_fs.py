@@ -10,10 +10,10 @@ THIS_FILES_DIR = os.path.dirname(os.path.abspath(__file__))
 BIN_DIR = os.path.join(THIS_FILES_DIR, '../bin')
 
 
-name = 'SquashFS'
-mime_patterns = ['filesystem/squashfs']
-version = '0.7'
-squash_unpacker = ['sasquatch', BIN_DIR + '/unsquashfs4-avm-be', BIN_DIR + '/unsquashfs4-avm-le', BIN_DIR + '/unsquashfs4-avm-le']
+NAME = 'SquashFS'
+MIME_PATTERNS = ['filesystem/squashfs']
+VERSION = '0.7'
+SQUASH_UNPACKER = ['sasquatch', BIN_DIR + '/unsquashfs4-avm-be', BIN_DIR + '/unsquashfs4-avm-le', BIN_DIR + '/unsquashfs4-avm-le']
 
 
 def unpack_function(file_path, tmp_dir):
@@ -22,7 +22,7 @@ def unpack_function(file_path, tmp_dir):
     tmp_dir should be used to store the extracted files.
     '''
     unpack_result = dict()
-    for unpacker in squash_unpacker:
+    for unpacker in SQUASH_UNPACKER:
         output = execute_shell_command('fakeroot {} -d {}/fact_extracted {}'.format(unpacker, tmp_dir, file_path))
         if _unpack_success(tmp_dir):
             unpack_result['unpacking_tool'] = _get_unpacker_name(unpacker)
@@ -43,5 +43,5 @@ def _unpack_success(tmp_dir):
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

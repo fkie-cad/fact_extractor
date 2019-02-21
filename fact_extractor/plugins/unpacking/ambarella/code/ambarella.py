@@ -1,17 +1,15 @@
-# -*- coding: utf-8 -*-
 
 import logging
 import re
-from os import chdir, getcwd, path, rename, remove
+from os import chdir, getcwd, path, remove, rename
 
 from common_helper_files import get_files_in_dir
 from common_helper_process import execute_shell_command
-
 from helperFunctions.fileSystem import get_src_dir
 
-name = 'Ambarella'
-mime_patterns = ['firmware/ambarella']
-version = '0.2'
+NAME = 'Ambarella'
+MIME_PATTERNS = ['firmware/ambarella']
+VERSION = '0.2'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -71,5 +69,5 @@ def _remove_ini_files():
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

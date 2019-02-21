@@ -1,19 +1,19 @@
-from base64 import a85decode
-from common_helper_files import write_binary_to_file, get_binary_from_file
 import logging
 import os
 import re
-import sys
+import binascii
+from base64 import a85decode
 
-from helperFunctions.dataConversion import make_bytes, remove_uneccessary_spaces, \
-    make_unicode_string
+from common_helper_files import get_binary_from_file, write_binary_to_file
+from helperFunctions.dataConversion import (
+    make_bytes, make_unicode_string, remove_uneccessary_spaces
+)
 
+NAME = 'Postscript'
+MIME_PATTERNS = ['text/postscript']
+VERSION = '0.4'
 
-name = 'Postscript'
-mime_patterns = ['text/postscript']
-version = '0.4'
-
-encoding_overhead = 0.25
+ENCODING_OVERHEAD = 0.25
 
 META_FIELDS = ['Title', 'For', 'Product', 'Release', 'Release ?Date', 'Release ?Versions', 'TargetDevice']
 FILE_HEADER = re.compile(b'currentfile /ASCII85Decode( filter [/\\w]+)*( exec)?\\s')
@@ -23,7 +23,7 @@ FILE_FOOTER = re.compile(b'~>')
 def unpack_function(file_path, tmp_dir):
     raw = get_binary_from_file(file_path)
     meta_dict = _get_meta_data(raw)
-    meta_dict['encoding_overhead'] = encoding_overhead
+    meta_dict['encoding_overhead'] = ENCODING_OVERHEAD
     payloads = _get_payloads(raw)
     _store_files(payloads, tmp_dir)
     return meta_dict
@@ -48,8 +48,8 @@ def _convert_payloads(raw_payloads):
     for item in raw_payloads:
         try:
             payloads.append(a85decode(item, adobe=True))
-        except Exception as e:
-            logging.error('Could not decode payload: {} - {}'.format(sys.exc_info()[0].__name__, e))
+        except binascii.Error as error_message:
+            logging.error('Could not decode payload: {}'.format(error_message))
     return payloads
 
 
@@ -72,11 +72,9 @@ def _get_next_payload(raw, start_pos, payload_header_regex=FILE_HEADER, payload_
         payload_footer = payload_footer_regex.search(raw, payload_header.end())
         if payload_footer:
             return raw[payload_header.end():payload_footer.end()], payload_footer.end()
-        else:
-            logging.error('End of Payload could not be found!')
-            return None, len(raw)
-    else:
+        logging.error('End of Payload could not be found!')
         return None, len(raw)
+    return None, len(raw)
 
 
 def _store_files(payloads, tmp_dir):
@@ -89,5 +87,5 @@ def _store_files(payloads, tmp_dir):
 
 
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))
