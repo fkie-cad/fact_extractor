@@ -2,12 +2,12 @@
 This plugin does not unpack any files files.
 '''
 
-name = 'NOP'
-mime_patterns = ['generic/nop', 'inode/symlink']
-version = '0.1'
+NAME = 'NOP'
+MIME_PATTERNS = ['generic/nop', 'inode/symlink']
+VERSION = '0.1'
 
 
-def unpack_function(file_path, tmp_dir):
+def unpack_function(*_, **__):
     """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
@@ -18,5 +18,5 @@ def unpack_function(file_path, tmp_dir):
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

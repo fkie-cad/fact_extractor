@@ -9,14 +9,12 @@ from common_helper_files import get_binary_from_file
 INTERNAL_DIR = Path(__file__).parent.parent / 'internal'
 sys.path.append(str(INTERNAL_DIR))
 
-from pjl_helper import (
-    extract_all_upgrades, extract_fingerprint, get_pjl_commands
-)
+from pjl_helper import extract_all_upgrades, extract_fingerprint, get_pjl_commands  # noqa: E402 pylint: disable=import-error,wrong-import-position
 
 
-name = 'PJL'
-mime_patterns = ['firmware/hp-pjl']
-version = '0.3'
+NAME = 'PJL'
+MIME_PATTERNS = ['firmware/hp-pjl']
+VERSION = '0.3'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -34,5 +32,5 @@ def unpack_function(file_path, tmp_dir):
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

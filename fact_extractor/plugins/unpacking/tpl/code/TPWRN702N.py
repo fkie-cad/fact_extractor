@@ -1,12 +1,12 @@
 import binascii
 from struct import unpack
 
+from common_helper_files import write_binary_to_file
 from unpacker.helper.carving import Carver
 
-
-name = 'TP-WR702N'
-mime_patterns = ['firmware/tp-wr702n']
-version = '0.1'
+NAME = 'TP-WR702N'
+MIME_PATTERNS = ['firmware/tp-wr702n']
+VERSION = '0.1.1'
 
 
 class InvalidImg0InformationException(Exception):
@@ -28,35 +28,16 @@ def unpack_function(file_path, tmp_dir):
     """
     tpwr702n = TPWR702N(file_path)
 
-    container_header_path = '{}/container_header.hdr'.format(tmp_dir)
-    with open(container_header_path, 'wb') as container_header:
-        container_header.write(tpwr702n.get_container_header())
-
-    img0_path = '{}/img0.hdr'.format(tmp_dir)
-    with open(img0_path, 'wb') as img0:
-        img0.write(tpwr702n.get_tpimg0_header())
-
-    bootloader_path = '{}/bootloader.7z'.format(tmp_dir)
-    with open(bootloader_path, 'wb') as bootloader:
-        bootloader.write(tpwr702n.get_bootloader())
-
-    main_path = '{}/main.img'.format(tmp_dir)
-    with open(main_path, 'wb') as main_part:
-        main_part.write(tpwr702n.get_os_and_fs())
-
-    main_path = '{}/main.7z'.format(tmp_dir)
-    with open(main_path, 'wb') as main_part:
-        main_part.write(tpwr702n.get_os())
-
-    owfs_path = '{}/main.owfs'.format(tmp_dir)
-    with open(owfs_path, 'wb') as owfs:
-        owfs.write(tpwr702n.get_fs())
+    write_binary_to_file(tpwr702n.get_container_header(), '{}/container_header.hdr'.format(tmp_dir))
+    write_binary_to_file(tpwr702n.get_tpimg0_header(), '{}/img0.hdr'.format(tmp_dir))
+    write_binary_to_file(tpwr702n.get_bootloader(), '{}/bootloader.7z'.format(tmp_dir))
+    write_binary_to_file(tpwr702n.get_os_and_fs(), '{}/main.img'.format(tmp_dir))
+    write_binary_to_file(tpwr702n.get_os(), '{}/main.7z'.format(tmp_dir))
+    write_binary_to_file(tpwr702n.get_fs(), '{}/main.owfs'.format(tmp_dir))
 
     remaining = tpwr702n.get_remaining_blocks()
     for offset in remaining:
-        unknown_path = '{}/{}_unknown.bin'.format(tmp_dir, offset)
-        with open(unknown_path, 'wb') as hdr:
-            hdr.write(remaining[offset])
+        write_binary_to_file(remaining[offset], '{}/{}_unknown.bin'.format(tmp_dir, offset))
 
     return tpwr702n.get_meta_dict()
 
@@ -160,14 +141,14 @@ class TPWR702N:
         return os_and_fs.find(search_pattern)
 
 
-class TPIMG0:
+class TPIMG0:  # pylint: disable=too-many-instance-attributes
     # -------- TP-Link Languages --------
     LANGUAGE_TP_LINK_CHINESE = b'\x00\x01'
     LANGUAGE_TP_LINK_ENGLISH = b'\x11\x01'
 
     def __init__(self, filename, offset):
         self.offset = offset
-        self.HEADER_SIZE = 12
+        self.header_size = 12
 
         self.device_id = None
         self.language = None
@@ -199,26 +180,24 @@ class TPIMG0:
     def get_language_string(self):
         if self.language == self.LANGUAGE_TP_LINK_CHINESE:
             return 'Chinese'
-        elif self.language == self.LANGUAGE_TP_LINK_ENGLISH:
+        if self.language == self.LANGUAGE_TP_LINK_ENGLISH:
             return 'English'
-        else:
-            return 'Unknown'
+        return 'Unknown'
 
     def _read_container_information(self):
-        header = unpack('>4sI2s2s', self.firmware.read(self.HEADER_SIZE))
+        header = unpack('>4sI2s2s', self.firmware.read(self.header_size))
         self.container_size = header[1]
         self.device_id = header[2]
         self.language = header[3]
 
     def _read_sub_header(self):
-        self.firmware.seek(self.offset + self.HEADER_SIZE)
+        self.firmware.seek(self.offset + self.header_size)
         rest_of_the_file = self.firmware.read()
         sub_header_offset = rest_of_the_file.find(b'\x49\x4d\x47\x30')
         if sub_header_offset < 0:
             return None
-        else:
-            sub_header_offset = sub_header_offset + self.HEADER_SIZE + self.offset
-            return TPIMG0(self.firmware_filepath, sub_header_offset)
+        sub_header_offset = sub_header_offset + self.header_size + self.offset
+        return TPIMG0(self.firmware_filepath, sub_header_offset)
 
     def check_header(self):
         if self.container_size <= 0:
@@ -236,5 +215,5 @@ class TPIMG0:
 
 
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

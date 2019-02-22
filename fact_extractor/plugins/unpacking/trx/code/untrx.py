@@ -2,12 +2,13 @@ from os import path
 from tempfile import NamedTemporaryFile
 
 from common_helper_process.fail_safe_subprocess import execute_shell_command
-
 from helperFunctions.fileSystem import get_faf_bin_dir
 
-name = 'untrx'
-mime_patterns = ['firmware/trx']
-version = '0.4'
+NAME = 'untrx'
+MIME_PATTERNS = ['firmware/trx']
+VERSION = '0.4'
+
+UNPACKER_EXECUTEABLE = path.join(get_faf_bin_dir(), 'untrx')
 
 
 def unpack_function(file_path, tmp_dir):
@@ -42,11 +43,10 @@ def _remove_non_trx_header(source_path, target_fp, offset):
 
 
 def _unpack_trx(file_path, target_dir):
-    path_to_unpacker = path.join(get_faf_bin_dir(), 'untrx')
-    return execute_shell_command('fakeroot {} {} {}'.format(path_to_unpacker, file_path, target_dir))
+    return execute_shell_command('fakeroot {} {} {}'.format(UNPACKER_EXECUTEABLE, file_path, target_dir))
 
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

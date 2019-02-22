@@ -6,11 +6,13 @@ from unpacker.helper.carving import Carver
 
 THIS_FILE = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(THIS_FILE, '..', 'internal'))
-from uboot_container import uBootHeader
 
-name = 'Uboot'
-mime_patterns = ['firmware/u-boot']
-version = '0.1'
+from uboot_container import uBootHeader  # noqa: E402 pylint: disable=import-error,wrong-import-position
+
+
+NAME = 'Uboot'
+MIME_PATTERNS = ['firmware/u-boot']
+VERSION = '0.1'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -60,8 +62,8 @@ class Uboot:
         return self.carver.extract_data(uBootHeader.HEADER_LENGTH, uBootHeader.HEADER_LENGTH + self.ubootheader.image_data_size)
 
     def _set_uboot_header(self):
-        with open(self.firmware_filepath, 'r+b') as f:
-            mm = mmap.mmap(f.fileno(), 0)
+        with open(self.firmware_filepath, 'r+b') as raw_file:
+            mm = mmap.mmap(raw_file.fileno(), 0)
 
             ubootheader = uBootHeader()
             ubootheader.create_from_binary(mm.read(uBootHeader.HEADER_LENGTH))
@@ -74,5 +76,5 @@ class Uboot:
 
 
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))

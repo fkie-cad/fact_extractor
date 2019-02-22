@@ -43,9 +43,9 @@ def main(distribution):
 def _edit_sudoers():
     logging.info('add rules to sudo...')
     username = os.environ['USER']
-    sudoers_content = '\n'.join(
-        ('{}\tALL=NOPASSWD: {}'.format(username, command) for command in ('/bin/mount', '/bin/umount', '/bin/mknod', '/usr/local/bin/sasquatch', '/bin/rm', '/bin/cp', '/bin/dd', '/bin/chown'))
-    )
+    sudoers_content = '\n'.join(('{}\tALL=NOPASSWD: {}'.format(username, command) for command in (
+        '/sbin/kpartx', '/sbin/losetup', '/bin/mount', '/bin/umount', '/bin/mknod', '/usr/local/bin/sasquatch', '/bin/rm', '/bin/cp', '/bin/dd', '/bin/chown'
+    )))
     Path('/tmp/fact_overrides').write_text('{}\n'.format(sudoers_content))
     chown_output, chown_code = execute_shell_command_get_return_code('sudo chown root:root /tmp/fact_overrides')
     mv_output, mv_code = execute_shell_command_get_return_code('sudo mv /tmp/fact_overrides /etc/sudoers.d/fact_overrides')

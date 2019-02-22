@@ -1,10 +1,10 @@
 import os
-import pytest
 from tempfile import TemporaryDirectory
+import pytest
 
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from test.unit.unpacker.test_unpacker import TestUnpackerBase  # pylint: disable=wrong-import-order
 
-from ..code.squashFS import _get_unpacker_name, _unpack_success, unpack_function
+from ..code.squash_fs import _get_unpacker_name, _unpack_success, unpack_function
 
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')

@@ -1,6 +1,6 @@
-name = 'XeroxDLM'
-mime_patterns = ['firmware/xerox-dlm']
-version = '0.3'
+NAME = 'XeroxDLM'
+MIME_PATTERNS = ['firmware/xerox-dlm']
+VERSION = '0.3'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -37,7 +37,9 @@ class XeroxDLM:
         self.dlm_extraction_criteria = None
 
     def __str__(self):
-        return 'DLM-Signature: {}\nDLM-Version: {}\nDLM-Name: {}\nDLM-Extraction-Criteria: {}'.format(self.get_signature(), self.get_dlm_version(), self.get_dlm_name(), self.get_dlm_extraction_criteria())
+        return 'DLM-Signature: {}\nDLM-Version: {}\nDLM-Name: {}\nDLM-Extraction-Criteria: {}'.format(
+            self.get_signature(), self.get_dlm_version(), self.get_dlm_name(), self.get_dlm_extraction_criteria()
+        )
 
     def get_header_end_offset(self):
         if self.header_end_offset is not None:
@@ -97,5 +99,5 @@ class XeroxDLM:
 
 
 def setup(unpack_tool):
-    for item in mime_patterns:
-        unpack_tool.register_plugin(item, (unpack_function, name, version))
+    for item in MIME_PATTERNS:
+        unpack_tool.register_plugin(item, (unpack_function, NAME, VERSION))
