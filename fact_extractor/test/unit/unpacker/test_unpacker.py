@@ -80,11 +80,11 @@ class TestUnpackerCore(TestUnpackerBase):
         self.assertIn('/get_files_test/testfile1', str(moved_files[0].absolute()))
 
     def test_unpack_failure_generic_carver_fallback(self):
-        self.unpacker.GENERIC_CARVER_FALLBACK_BLACKLIST = []
+        self.unpacker.CARVER_FALLBACK_BLACKLIST = []
         self._unpack_fallback_check('generic/carver', 'generic_carver')
 
     def test_unpack_failure_generic_fs_fallback(self):
-        self.unpacker.GENERIC_FS_FALLBACK_CANDIDATES = ['7z']
+        self.unpacker.FS_FALLBACK_CANDIDATES = ['7z']
         meta_data = self._unpack_fallback_check('generic/fs', 'generic_carver')
         self.assertIn('0_FALLBACK_genericFS', meta_data, 'generic FS Fallback entry missing')
         self.assertIn('0_ERROR_genericFS', meta_data, 'generic FS ERROR entry missing')
