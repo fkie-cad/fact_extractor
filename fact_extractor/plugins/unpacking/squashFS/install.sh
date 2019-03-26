@@ -17,7 +17,7 @@ git clone https://github.com/Freetz/freetz.git
 (
 cd freetz || exit
 sudo chown -R makeuser .
-su makeuser -c "umask 0022 && make -j$(nproc) tools"
+sudo su makeuser -c "umask 0022 && make -j$(nproc) tools"
 sudo chown -R "$USER" . || true
 
 cp tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi ../
