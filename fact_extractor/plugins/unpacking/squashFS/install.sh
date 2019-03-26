@@ -13,12 +13,13 @@ sudo useradd -M makeuser
 mkdir bin
 (
 cd bin/ || exit
+umask 0022
 git clone https://github.com/Freetz/freetz.git
 (
 cd freetz || exit
-sudo chown -R makeuser .
+sudo chown -R makeuser ..
 sudo su makeuser -c "umask 0022 && make -j$(nproc) tools"
-sudo chown -R "$USER" . || true
+sudo chown -R "$USER" .. || true
 
 cp tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi ../
 cd ..
