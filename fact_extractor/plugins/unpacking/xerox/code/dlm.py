@@ -28,7 +28,7 @@ def _create_meta_dict(xeroxdlm):
 
 
 class XeroxDLM:
-    def __init__(self, firmware_file):
+    def __init__(self, firmware_file: str):
         self.firmware_file = firmware_file
         self.header_end_offset = None
         self.dlm_signature = None

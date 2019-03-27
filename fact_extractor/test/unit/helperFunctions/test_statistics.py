@@ -46,7 +46,7 @@ def test_unpack_status_unpacked_file(config_fixture):
 
 
 def test_detect_unpack_loss_data_lost(config_fixture, common_tmpdir):
-    included_file = Path(common_tmpdir, 'inner')
+    included_file = Path(str(common_tmpdir), 'inner')
     included_file.write_bytes(256 * b'ABCDEFGH')
     result = {'summary': []}
 
@@ -57,7 +57,7 @@ def test_detect_unpack_loss_data_lost(config_fixture, common_tmpdir):
 
 
 def test_detect_unpack_loss_no_data_lost(config_fixture, common_tmpdir):
-    included_file = Path(common_tmpdir, 'inner')
+    included_file = Path(str(common_tmpdir), 'inner')
     included_file.write_bytes(512 * b'ABCDEFGH')
     result = {'summary': []}
 
