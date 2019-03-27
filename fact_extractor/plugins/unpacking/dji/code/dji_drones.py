@@ -4,13 +4,13 @@ from os import path, rename
 
 from common_helper_files import delete_file, get_files_in_dir
 from common_helper_process import execute_shell_command
-from helperFunctions.fileSystem import get_faf_bin_dir
+from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'DJI_drones'
 MIME_PATTERNS = ['firmware/dji-drone']
 VERSION = '0.3.1'
 
-TOOL_PATH = path.join(get_faf_bin_dir(), 'dji_xv4_fwcon.py')
+TOOL_PATH = path.join(get_fact_bin_dir(), 'dji_xv4_fwcon.py')
 
 
 def unpack_function(file_path, tmp_dir):

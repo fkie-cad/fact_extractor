@@ -1,6 +1,6 @@
 import unittest
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
-from helperFunctions.fileSystem import get_test_data_dir
+from helperFunctions.file_system import get_test_data_dir
 
 
 class TestGenericCarver(TestUnpackerBase):

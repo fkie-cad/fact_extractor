@@ -2,13 +2,13 @@ from os import path
 from tempfile import NamedTemporaryFile
 
 from common_helper_process.fail_safe_subprocess import execute_shell_command
-from helperFunctions.fileSystem import get_faf_bin_dir
+from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'untrx'
 MIME_PATTERNS = ['firmware/trx']
 VERSION = '0.4'
 
-UNPACKER_EXECUTEABLE = path.join(get_faf_bin_dir(), 'untrx')
+UNPACKER_EXECUTEABLE = path.join(get_fact_bin_dir(), 'untrx')
 
 
 def unpack_function(file_path, tmp_dir):

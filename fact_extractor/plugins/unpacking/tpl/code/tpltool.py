@@ -2,12 +2,12 @@ import os
 from shutil import copyfile
 
 from common_helper_process import execute_shell_command
-from helperFunctions.fileSystem import get_faf_bin_dir
+from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'tpl-tool'
 MIME_PATTERNS = ['firmware/tp-link']
 VERSION = '0.3'
-UNPACKER_EXECUTEABLE = os.path.join(get_faf_bin_dir(), 'tpl-tool')
+UNPACKER_EXECUTEABLE = os.path.join(get_fact_bin_dir(), 'tpl-tool')
 
 
 def unpack_function(file_path, tmp_dir):
