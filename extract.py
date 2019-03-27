@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 
 import argparse
+import json
+import os
 import shutil
 import subprocess
 import sys
+from contextlib import suppress
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -12,6 +15,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='FACT extractor CLI')
     parser.add_argument('-c', '--container', help='docker container', default='fkiecad/fact_extractor')
     parser.add_argument('-o', '--output_directory', help='path to extracted files', default=None)
+    parser.add_argument('-r', '--report_file', help='write report to a file', default=None)
     parser.add_argument('ARCHIVE', type=str, nargs=1, help='Archive for extraction')
 
     return parser.parse_args()
@@ -21,7 +25,7 @@ def container_exists(container):
     return subprocess.run('docker history {}'.format(container), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).returncode == 0
 
 
-def call_docker(input_file, container, target):
+def call_docker(input_file, container, target, report_file):
     tmpdir = TemporaryDirectory()
     tmp = tmpdir.name
 
@@ -32,14 +36,19 @@ def call_docker(input_file, container, target):
 
     subprocess.run('docker run --rm -v {}:/tmp/extractor -v /dev:/dev --privileged {}'.format(tmp, container), shell=True)
 
-    shutil.copytree(str(Path(tmp, 'files')), target)
+    print('Now taking ownership of the files. You may need to enter your password.')
+    subprocess.run('sudo chown -R {} {}'.format(os.environ['USER'], tmpdir.name), shell=True)
 
-    try:
-        tmpdir.cleanup()
-    except PermissionError:
-        print('Cleanup requires root. If you would be so kind..')
-        subprocess.run('sudo rm -rf {}'.format(tmpdir.name), shell=True)
-        tmpdir.cleanup()
+    with suppress(shutil.Error):
+        shutil.copytree(str(Path(tmp, 'files')), target)
+
+    indented_report = json.dumps(json.loads(Path(tmp, 'reports', 'meta.json').read_text()), indent=4)
+    if report_file:
+        Path(report_file).write_text(indented_report)
+    else:
+        print(indented_report)
+
+    tmpdir.cleanup()
 
 
 def main():
@@ -57,7 +66,13 @@ def main():
     if not Path(arguments.ARCHIVE[0]).is_file():
         print('Given input file {} doesn\'t exist. Please give an existing path.'.format(arguments.ARCHIVE[0]))
 
-    call_docker(arguments.ARCHIVE[0], arguments.container, output_directory)
+    if arguments.report_file and not Path(arguments.report_file).parent.is_dir():
+        print('Report file ({}) can not be created. Check if parent directory exists.'.format(arguments.report_file))
+        return 1
+    if arguments.report_file and Path(arguments.report_file).exists():
+        print('Warning: Report file will be overwritten.')
+
+    call_docker(arguments.ARCHIVE[0], arguments.container, output_directory, arguments.report_file)
 
     return 0
 
