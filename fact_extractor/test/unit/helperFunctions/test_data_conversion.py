@@ -1,6 +1,8 @@
+import json
+
 import pytest
 
-from helperFunctions.dataConversion import make_bytes, make_unicode_string, remove_uneccessary_spaces
+from helperFunctions.dataConversion import make_bytes, make_unicode_string, remove_uneccessary_spaces, ReportEncoder
 
 
 @pytest.mark.parametrize('input_data', [
@@ -41,3 +43,19 @@ def test_make_list_from_dict():
 ])
 def test_remove_uneccessary_spaces(input_data, expected):
     assert remove_uneccessary_spaces(input_data) == expected
+
+
+@pytest.mark.parametrize('source, result', [
+    (b'abc', '"abc"'),
+    (b'\x00\xFF', '"00ff"'),
+    (('ab', 'cd'), '["ab", "cd"]'),
+    ({1, 3, 7}, '"[1, 3, 7]"'),
+    ((i for i in range(3)), '"[0, 1, 2]"')
+])
+def test_report_encoder_success(source, result):
+    assert result == json.dumps(source, cls=ReportEncoder)
+
+
+def test_report_encoder_failure():
+    with pytest.raises(TypeError):
+        json.dumps(lambda x: 5, cls=ReportEncoder)
