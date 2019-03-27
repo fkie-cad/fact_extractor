@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from helperFunctions.fileSystem import get_test_data_dir
+from helperFunctions.file_system import get_test_data_dir
 from helperFunctions.config import get_config_dir, load_config, read_list_from_config
 
 

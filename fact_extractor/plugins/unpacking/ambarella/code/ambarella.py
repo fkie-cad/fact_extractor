@@ -5,7 +5,7 @@ from os import chdir, getcwd, path, remove, rename
 
 from common_helper_files import get_files_in_dir
 from common_helper_process import execute_shell_command
-from helperFunctions.fileSystem import get_src_dir
+from helperFunctions.file_system import get_src_dir
 
 NAME = 'Ambarella'
 MIME_PATTERNS = ['firmware/ambarella']

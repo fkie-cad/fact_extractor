@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 from typing import List, Dict, Tuple
 
 from helperFunctions.dataConversion import ReportEncoder
-from helperFunctions.fileSystem import file_is_empty
+from helperFunctions.file_system import file_is_empty
 from helperFunctions.statistics import get_unpack_status, add_unpack_statistics
 from unpacker.unpackBase import UnpackBase
 
@@ -27,7 +27,7 @@ class Unpacker(UnpackBase):
 
         logging.debug('Extracting {}'.format(Path(file_path).name))
 
-        tmp_dir = TemporaryDirectory(prefix='faf_unpack_')
+        tmp_dir = TemporaryDirectory(prefix='fact_unpack_')
 
         extracted_files, meta_data = self.extract_files_from_file(file_path, tmp_dir.name)
         extracted_files, meta_data = self._do_fallback_if_necessary(extracted_files, meta_data, tmp_dir.name, file_path)

@@ -5,7 +5,7 @@ import os
 
 from common_helper_passwords import get_merged_password_set
 from common_helper_process import execute_shell_command
-from helperFunctions.fileSystem import get_src_dir
+from helperFunctions.file_system import get_src_dir
 
 NAME = '7z'
 MIME_PATTERNS = ['application/x-lzma', 'application/x-7z-compressed', 'application/zip', 'application/x-zip-compressed']

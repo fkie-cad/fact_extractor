@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 from intelhex import IntelHexError
 
-from helperFunctions.fileSystem import get_test_data_dir
+from helperFunctions.file_system import get_test_data_dir
 from plugins.unpacking.intel_hex.code.intel_hex import unpack_function
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 

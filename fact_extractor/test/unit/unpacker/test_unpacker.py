@@ -8,15 +8,15 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from helperFunctions.fileSystem import get_test_data_dir
+from helperFunctions.file_system import get_test_data_dir
 from unpacker.unpack import Unpacker
 
 
 class TestUnpackerBase(unittest.TestCase):
     def setUp(self):
         self.config = ConfigParser()
-        self.ds_tmp_dir = TemporaryDirectory(prefix='faf_tests_')
-        self.tmp_dir = TemporaryDirectory(prefix='faf_tests_')
+        self.ds_tmp_dir = TemporaryDirectory(prefix='fact_tests_')
+        self.tmp_dir = TemporaryDirectory(prefix='fact_tests_')
 
         self.config.add_section('unpack')
         self.config.set('unpack', 'data_folder', self.ds_tmp_dir.name)
