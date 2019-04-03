@@ -1,14 +1,14 @@
 from os import path
 
 from common_helper_process import execute_shell_command
-from helperFunctions.fileSystem import get_faf_bin_dir
+from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'YAFFS'
 MIME_PATTERNS = ['filesystem/yaffs']
 VERSION = '0.4'
 
 UNYAFFS_EXECUTEABLE = '/usr/bin/unyaffs'
-UNYAFFS2_EXECUTEABLE = path.join(get_faf_bin_dir(), 'unyaffs2')
+UNYAFFS2_EXECUTEABLE = path.join(get_fact_bin_dir(), 'unyaffs2')
 
 
 def unpack_function(file_path, tmp_dir):

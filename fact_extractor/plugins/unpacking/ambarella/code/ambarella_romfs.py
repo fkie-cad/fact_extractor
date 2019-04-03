@@ -2,13 +2,13 @@
 from os import path
 
 from common_helper_process import execute_shell_command
-from helperFunctions.fileSystem import get_faf_bin_dir
+from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'Ambarella_RomFS'
 MIME_PATTERNS = ['filesystem/ambarella-romfs']
 VERSION = '0.3'
 
-TOOL_PATH = path.join(get_faf_bin_dir(), "amba_romfs.py")
+TOOL_PATH = path.join(get_fact_bin_dir(), "amba_romfs.py")
 
 
 def unpack_function(file_path, tmp_dir):

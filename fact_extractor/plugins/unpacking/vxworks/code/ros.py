@@ -1,13 +1,13 @@
 import os
 
 from common_helper_process.fail_safe_subprocess import execute_shell_command
-from helperFunctions.fileSystem import get_faf_bin_dir
+from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'ROSFile'
 MIME_PATTERNS = ['firmware/ros']
 VERSION = '0.7'
 
-TOOL_PATH = os.path.join(get_faf_bin_dir(), 'ros_unpack')
+TOOL_PATH = os.path.join(get_fact_bin_dir(), 'ros_unpack')
 
 
 def unpack_function(file_path, tmp_dir):
