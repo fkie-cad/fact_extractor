@@ -10,9 +10,12 @@ from contextlib import suppress
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+__VERSION__ = '0.1'
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='FACT extractor CLI')
+    parser.add_argument('-v', '--version', action='version', version=__VERSION__)
     parser.add_argument('-c', '--container', help='docker container', default='fkiecad/fact_extractor')
     parser.add_argument('-o', '--output_directory', help='path to extracted files', default=None)
     parser.add_argument('-r', '--report_file', help='write report to a file', default=None)
