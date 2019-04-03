@@ -12,11 +12,15 @@ from helperFunctions.config import read_list_from_config
 
 def add_unpack_statistics(extraction_dir: Path, meta_data: Dict):
     unpacked_files, unpacked_directories = 0, 0
-    for extracted_item in extraction_dir.glob('**/*'):
-        if extracted_item.is_file():
-            unpacked_files += 1
-        elif extracted_item.is_dir():
-            unpacked_directories += 1
+    try:
+        for extracted_item in extraction_dir.glob('**/*'):
+            with suppress(OSError):
+                if extracted_item.is_file():
+                    unpacked_files += 1
+                elif extracted_item.is_dir():
+                    unpacked_directories += 1
+    except OSError:
+        meta_data['warning'] = 'Statistics are not correct due to errors caused by broken symbolic links'
 
     meta_data['number_of_unpacked_files'] = unpacked_files
     meta_data['number_of_unpacked_directories'] = unpacked_directories
@@ -48,6 +52,6 @@ def _detect_unpack_loss(binary: bytes, extracted_files: List[Path], meta_data: D
 def _total_size_of_extracted_files(extracted_files: List[Path]) -> int:
     total_size = 0
     for item in extracted_files:
-        with suppress(FileNotFoundError):
+        with suppress(OSError):
             total_size += item.stat().st_size
     return total_size
