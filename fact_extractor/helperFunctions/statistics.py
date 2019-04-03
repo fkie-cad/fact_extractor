@@ -3,6 +3,7 @@ from contextlib import suppress
 from pathlib import Path
 from typing import Dict, List
 
+from common_helper_files import safe_rglob
 from common_helper_unpacking_classifier import (
     avg_entropy, get_binary_size_without_padding, is_compressed
 )
@@ -12,15 +13,11 @@ from helperFunctions.config import read_list_from_config
 
 def add_unpack_statistics(extraction_dir: Path, meta_data: Dict):
     unpacked_files, unpacked_directories = 0, 0
-    try:
-        for extracted_item in extraction_dir.glob('**/*'):
-            with suppress(OSError):
-                if extracted_item.is_file():
-                    unpacked_files += 1
-                elif extracted_item.is_dir():
-                    unpacked_directories += 1
-    except OSError:
-        meta_data['warning'] = 'Statistics are not correct due to errors caused by broken symbolic links'
+    for extracted_item in safe_rglob(extraction_dir):
+        if extracted_item.is_file():
+            unpacked_files += 1
+        elif extracted_item.is_dir():
+            unpacked_directories += 1
 
     meta_data['number_of_unpacked_files'] = unpacked_files
     meta_data['number_of_unpacked_directories'] = unpacked_directories
