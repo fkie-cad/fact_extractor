@@ -70,3 +70,9 @@ class Unpacker(UnpackBase):
                 shutil.move(str(absolute_path), str(target_path))
                 extracted_files.append(target_path)
         return extracted_files
+
+
+def unpack(file_path, config):
+    extracted_objects = Unpacker(config).unpack(file_path)
+    logging.info('{} files extracted'.format(len(extracted_objects)))
+    logging.debug('Extracted files:\n{}'.format('\n'.join((str(path) for path in extracted_objects))))

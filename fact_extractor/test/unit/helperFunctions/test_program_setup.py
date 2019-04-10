@@ -1,11 +1,9 @@
 import logging
-import os
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 from helperFunctions.config import get_config_dir
 from helperFunctions.program_setup import (
-    _load_config, _setup_logging, program_setup
+    load_config, setup_logging, setup_argparser
 )
 
 
@@ -18,25 +16,23 @@ class ArgumentMock():
 
 
 def test_load_config():
-    args = ArgumentMock()
-    config = _load_config(args)
+    config = load_config('{}/main.cfg'.format(get_config_dir()))
     assert config['ExpertSettings']['unpack_threshold'] == '0.8'
 
 
 def test_setup_logging():
     args = ArgumentMock()
-    _setup_logging(args)
+    setup_logging(args)
     logger = logging.getLogger('')
     assert logger.getEffectiveLevel() == logging.DEBUG
     if Path(args.log_file).is_file():
         Path(args.log_file).unlink()
 
 
-def test_program_setup():
-    tmp_dir = TemporaryDirectory(prefix='fact_test_')
-    log_file_path = tmp_dir.name + '/folder/log_file'
-    args, _ = program_setup('test', 'test description', command_line_options=['script_name', '--log_file', log_file_path, 'ANY_FILE'])
-    assert args.debug is False
-    assert os.path.exists(log_file_path)
+def test_setup_argparser():
+    log_file_path = 'any/given/path'
+    args = setup_argparser('test', 'test description', command_line_options=['script_name', '--log_file', log_file_path, 'ANY_FILE'])
 
-    tmp_dir.cleanup()
+    assert args.debug is False
+    assert args.log_file == log_file_path
+    assert args.log_level is None

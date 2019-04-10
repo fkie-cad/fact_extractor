@@ -17,26 +17,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import logging
-from pathlib import Path
+import sys
 
-from helperFunctions.program_setup import program_setup
-from unpacker.unpack import Unpacker
-
-
-def extract(file_path, config):
-    unpacker = Unpacker(config)
-
-    extracted_objects = unpacker.unpack(file_path)
-    logging.info('unpacking of {} complete: {} files extracted'.format(Path(file_path).name, len(extracted_objects)))
-
-    for extracted_object in extracted_objects:
-        print(extracted_object)
+from helperFunctions.program_setup import setup_argparser, setup_logging, load_config
+from unpacker.unpack import unpack
 
 
 def main():
-    arguments, config = program_setup('FACT extractor', 'Standalone extraction utility')
-    extract(arguments.FILE_PATH, config)
+    arguments = setup_argparser('FACT extractor', 'Standalone extraction utility', sys.argv)
+    config = load_config(arguments.config_file)
+    setup_logging(arguments.debug, log_file=arguments.log_file, log_level=arguments.log_level)
+
+    unpack(arguments.FILE_PATH, config)
 
     return 0
 
