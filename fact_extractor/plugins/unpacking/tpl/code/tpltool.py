@@ -1,7 +1,9 @@
+
+import logging
 import os
 from shutil import copyfile
 
-from common_helper_process import execute_shell_command
+from common_helper_process import execute_shell_command, execute_shell_command_get_return_code
 from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'tpl-tool'
@@ -19,14 +21,14 @@ def unpack_function(file_path, tmp_dir):
     tmp_file_path = os.path.join(tmp_dir, os.path.basename(file_path))
     copyfile(file_path, tmp_file_path)
 
-    result = {}
-
-    result['output'] = execute_shell_command('fakeroot {} -x {}'.format(UNPACKER_EXECUTEABLE, tmp_file_path))
-    result['header-info'] = execute_shell_command('{} -s {}'.format(UNPACKER_EXECUTEABLE, tmp_file_path))
-
+    output, return_code = execute_shell_command_get_return_code('fakeroot {} -x {}'.format(UNPACKER_EXECUTEABLE, tmp_file_path))
+    header = execute_shell_command('{} -s {}'.format(UNPACKER_EXECUTEABLE, tmp_file_path))
     os.remove(tmp_file_path)
-
-    return result
+    if return_code != 0:
+        raise Exception('Non-zero error code {} when executing shell command.'.format(return_code))
+    meta_data = {'output': output, 'header-info': header, 'return_code': return_code}
+    logging.debug(output)
+    return meta_data
 
 
 # ----> Do not edit below this line <----

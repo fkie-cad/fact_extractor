@@ -1,7 +1,9 @@
+import logging
+
 from os import path
 from tempfile import NamedTemporaryFile
 
-from common_helper_process.fail_safe_subprocess import execute_shell_command
+from common_helper_process.fail_safe_subprocess import execute_shell_command_get_return_code
 from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'untrx'
@@ -43,7 +45,12 @@ def _remove_non_trx_header(source_path, target_fp, offset):
 
 
 def _unpack_trx(file_path, target_dir):
-    return execute_shell_command('fakeroot {} {} {}'.format(UNPACKER_EXECUTEABLE, file_path, target_dir))
+    output, return_code = execute_shell_command_get_return_code('fakeroot {} {} {}'.format(UNPACKER_EXECUTEABLE, file_path, target_dir))
+    if return_code != 0:
+        raise Exception('Non-zero error code {} when executing shell command.'.format(return_code))
+    meta_data = {'output': output, 'return_code': return_code}
+    logging.debug(output)
+    return meta_data
 
 
 # ----> Do not edit below this line <----

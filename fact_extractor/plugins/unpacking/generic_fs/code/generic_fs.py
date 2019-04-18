@@ -62,7 +62,8 @@ def _mount_from_boot_record(file_path, tmp_dir):
         # thus "host" loop device is used instead of filename
         k_output, return_code = execute_shell_command_get_return_code('sudo kpartx -d -v {}'.format(_get_host_loop(loop_devices)))
         execute_shell_command('sudo losetup -d {}'.format(_get_host_loop(loop_devices)))
-        return output + k_output
+        output += k_output
+        return output
 
     return output
 
@@ -70,7 +71,8 @@ def _mount_from_boot_record(file_path, tmp_dir):
 def _process_loop_device(loop_device, mount_point, target_directory, index):
     output = execute_shell_command('sudo mount -o ro -v /dev/mapper/{} {}'.format(loop_device, mount_point))
     output += execute_shell_command('sudo cp -av {}/ {}/partition_{}/'.format(mount_point, target_directory, index))
-    return output + execute_shell_command('sudo umount -v {}'.format(mount_point))
+    output += execute_shell_command('sudo umount -v {}'.format(mount_point))
+    return output
 
 
 def _extract_loop_devices(kpartx_output):

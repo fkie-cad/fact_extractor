@@ -27,11 +27,11 @@ def test_unpack_success(unpack_path, expected):
 
 
 def test_not_unpackable_file():
-    empty_test_file = os.path.join(TEST_DATA_DIR, 'empty')
-    unpack_dir = TemporaryDirectory(prefix='fact_test_')
-    result = unpack_function(empty_test_file, unpack_dir)
-    assert 'sasquatch - error' in result.keys()
-    assert 'unsquashfs4-avm-be - error' in result.keys()
+    with pytest.raises(Exception):
+        empty_test_file = os.path.join(TEST_DATA_DIR, 'empty')
+        unpack_dir = TemporaryDirectory(prefix='fact_test_')
+        _ = unpack_function(empty_test_file, unpack_dir)
+
 
 
 class TestSquashUnpacker(TestUnpackerBase):

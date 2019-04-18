@@ -15,5 +15,5 @@ class TestHelperFunctionsPlugin(unittest.TestCase):
     def test_load_plugins(self):
         result = import_plugins('plugins.test', TEST_PLUGINS_BASE_PATH)
         imported_plugins = result.list_plugins()
-        self.assertEqual(len(imported_plugins), 1, 'worng number of plugins imported')
+        self.assertEqual(len(imported_plugins), 1, 'wrong number of plugins imported')
         self.assertEqual(imported_plugins[0], 'plugin_one', 'plugin name not correct')

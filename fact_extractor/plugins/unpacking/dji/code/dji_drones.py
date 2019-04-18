@@ -1,9 +1,10 @@
 
+import logging
 import re
 from os import path, rename
 
 from common_helper_files import delete_file, get_files_in_dir
-from common_helper_process import execute_shell_command
+from common_helper_process import execute_shell_command_get_return_code
 from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'DJI_drones'
@@ -17,11 +18,15 @@ def unpack_function(file_path, tmp_dir):
     if not path.exists(TOOL_PATH):
         return {'output': 'Error: phantom_firmware_tools not installed! Re-Run the installation script!'}
 
-    output = execute_shell_command('(cd {} && fakeroot python3 {} -x -vv -p {})'.format(tmp_dir, TOOL_PATH, file_path)) + '\n'
+    output, return_code = execute_shell_command_get_return_code('(cd {} && fakeroot python3 {} -x -vv -p {})'.format(tmp_dir, TOOL_PATH, file_path))
 
     _rename_files(tmp_dir)
     _remove_ini_files(tmp_dir)
-    meta_data = {'output': output}
+
+    if return_code != 0:
+        raise Exception('Non-zero error code {} when executing shell command.'.format(return_code))
+    meta_data = {'output': output, 'return_code': return_code}
+    logging.debug(output)
     return meta_data
 
 

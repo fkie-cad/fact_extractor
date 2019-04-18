@@ -1,6 +1,7 @@
+import logging
 from os import path
 
-from common_helper_process import execute_shell_command
+from common_helper_process import execute_shell_command_get_return_code
 from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'YAFFS'
@@ -17,9 +18,12 @@ def unpack_function(file_path, tmp_dir):
     tmp_dir should be used to store the extracted files.
     '''
     unpacker = '{} -e'.format(UNYAFFS2_EXECUTEABLE) if _is_big_endian(file_path) else '{} -v'.format(UNYAFFS_EXECUTEABLE)
-    output = execute_shell_command('fakeroot {} {} {}'.format(unpacker, file_path, tmp_dir))
-    return {'output': output}
-
+    output, return_code = execute_shell_command_get_return_code('fakeroot {} {} {}'.format(unpacker, file_path, tmp_dir))
+    if return_code != 0:
+        raise Exception('Non-zero error code {} when executing shell command.'.format(return_code))
+    meta_data = {'output': output, 'return_code': return_code}
+    logging.debug(output)
+    return meta_data
 
 def _is_big_endian(file_path):
     with open(file_path, 'br') as fp:

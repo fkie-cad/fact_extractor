@@ -4,7 +4,7 @@ import re
 from os import chdir, getcwd, path, remove, rename
 
 from common_helper_files import get_files_in_dir
-from common_helper_process import execute_shell_command
+from common_helper_process import execute_shell_command_get_return_code
 from helperFunctions.file_system import get_src_dir
 
 NAME = 'Ambarella'
@@ -20,14 +20,18 @@ def unpack_function(file_path, tmp_dir):
     fallback_directory = getcwd()
     chdir(tmp_dir)
 
-    output = execute_shell_command('fakeroot {} -x -vv -m {}'.format(script_path, file_path)) + "\n"
+    output, return_code = execute_shell_command_get_return_code('fakeroot {} -x -vv -m {}'.format(script_path, file_path)) + "\n"
+
 
     _rename_files(file_path)
     _remove_ini_files()
 
     chdir(fallback_directory)
 
-    meta_data = {'output': output}
+    if return_code != 0:
+        raise Exception('Non-zero error code {} when executing shell command.'.format(return_code))
+
+    meta_data = {'output': output, 'return_code': return_code}
     logging.debug(output)
     return meta_data
 

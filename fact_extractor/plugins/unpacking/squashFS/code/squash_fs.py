@@ -4,7 +4,7 @@ This plugin unpacks SquashFS filesystem images
 import os
 
 from common_helper_files import get_files_in_dir
-from common_helper_process import execute_shell_command
+from common_helper_process import execute_shell_command_get_return_code
 
 THIS_FILES_DIR = os.path.dirname(os.path.abspath(__file__))
 BIN_DIR = os.path.join(THIS_FILES_DIR, '../bin')
@@ -23,13 +23,17 @@ def unpack_function(file_path, tmp_dir):
     '''
     unpack_result = dict()
     for unpacker in SQUASH_UNPACKER:
-        output = execute_shell_command('fakeroot {} -d {}/fact_extracted {}'.format(unpacker, tmp_dir, file_path))
+        output, return_code = execute_shell_command_get_return_code('fakeroot {} -d {}/fact_extracted {}'.format(unpacker, tmp_dir, file_path))
         if _unpack_success(tmp_dir):
             unpack_result['unpacking_tool'] = _get_unpacker_name(unpacker)
             unpack_result['output'] = output
+            unpack_result['return_code'] = return_code
             break
         else:
             unpack_result['{} - error'.format(_get_unpacker_name(unpacker))] = output
+            unpack_result['return_code'] = return_code
+    if unpack_result['return_code'] !=0:
+        raise Exception('Non-zero error code {} when executing shell command.'.format(unpack_result['return_code']))
     return unpack_result
 
 

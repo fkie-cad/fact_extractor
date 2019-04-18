@@ -1,7 +1,9 @@
 '''
 This plugin unpacks several formats utilizing patool
 '''
-from common_helper_process import execute_shell_command
+import logging
+
+from common_helper_process import execute_shell_command_get_return_code
 
 NAME = 'PaTool'
 MIME_PATTERNS = ['application/x-lrzip', 'application/x-cpio', 'application/x-archive', 'application/x-adf',
@@ -22,9 +24,12 @@ def unpack_function(file_path, tmp_dir):
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
     """
-    output = execute_shell_command('fakeroot patool extract --outdir {} {}'.format(tmp_dir, file_path), timeout=600)
-    return {'output': output}
-
+    output, return_code = execute_shell_command_get_return_code('fakeroot patool extract --outdir {} {}'.format(tmp_dir, file_path), timeout=600)
+    if return_code != 0:
+        raise Exception('Non-zero error code {} when executing shell command.'.format(return_code))
+    meta_data = {'output': output, 'return_code': return_code}
+    logging.debug(output)
+    return meta_data
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
