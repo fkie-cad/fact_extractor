@@ -18,6 +18,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='FACT extractor CLI')
     parser.add_argument('-v', '--version', action='version', version=__VERSION__)
     parser.add_argument('-c', '--container', help='docker container', default='fkiecad/fact_extractor')
+    parser.add_argument('-m', '--memory', help='memory limit for docker container (in MB)', default='512')
     parser.add_argument('-o', '--output_directory', help='path to extracted files', default=None)
     parser.add_argument('-r', '--report_file', help='write report to a file', default=None)
     parser.add_argument('-V', '--verbose', action='store_true', default=False, help='increase verbosity')
@@ -41,7 +42,7 @@ def container_exists(container):
     return subprocess.run('docker history {}'.format(container), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).returncode == 0
 
 
-def call_docker(input_file, container, target, report_file):
+def call_docker(input_file, container, target, report_file, memory_limit):
     tmpdir = TemporaryDirectory()
     tmp = tmpdir.name
 
@@ -50,7 +51,7 @@ def call_docker(input_file, container, target, report_file):
 
     shutil.copy(input_file, str(Path(tmp, 'input', Path(input_file).name)))
 
-    subprocess.run('docker run --rm -v {}:/tmp/extractor -v /dev:/dev --privileged {}'.format(tmp, container), shell=True)
+    subprocess.run('docker run --rm -m {}m -v {}:/tmp/extractor -v /dev:/dev --privileged {}'.format(memory_limit, tmp, container), shell=True)
 
     logging.warning('Now taking ownership of the files. You may need to enter your password.')
 
@@ -95,7 +96,13 @@ def main():
     if arguments.report_file and Path(arguments.report_file).exists():
         logging.warning('Warning: Report file will be overwritten.')
 
-    call_docker(arguments.ARCHIVE[0], arguments.container, output_directory, arguments.report_file)
+    call_docker(
+        input_file=arguments.ARCHIVE[0],
+        container=arguments.container,
+        target=output_directory,
+        report_file=arguments.report_file,
+        memory_limit=arguments.memory
+    )
 
     return 0
 
