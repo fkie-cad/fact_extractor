@@ -42,24 +42,23 @@ def container_exists(container):
     return subprocess.run('docker history {}'.format(container), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).returncode == 0
 
 
-def call_docker(input_file, container, target, report_file, memory_limit):
-    tmpdir = TemporaryDirectory()
-    tmp = tmpdir.name
+def call_docker(input_file, container, target, report_file, memory_limit, tmpdir=None):
+    tmpdir = tmpdir if tmpdir else TemporaryDirectory()
 
     for subpath in ['files', 'reports', 'input']:
-        Path(tmp, subpath).mkdir()
+        Path(tmpdir.name, subpath).mkdir(exist_ok=True)
 
-    shutil.copy(input_file, str(Path(tmp, 'input', Path(input_file).name)))
+    shutil.copy(input_file, str(Path(tmpdir.name, 'input', Path(input_file).name)))
 
-    subprocess.run('docker run --rm -m {}m -v {}:/tmp/extractor -v /dev:/dev --privileged {}'.format(memory_limit, tmp, container), shell=True)
+    subprocess.run('docker run --rm -m {}m -v {}:/tmp/extractor -v /dev:/dev --privileged {}'.format(memory_limit, tmpdir.name, container), shell=True)
 
     logging.warning('Now taking ownership of the files. You may need to enter your password.')
 
     subprocess.run('sudo chown -R {} {}'.format(os.environ['USER'], tmpdir.name), shell=True)
     with suppress(shutil.Error):
-        shutil.copytree(str(Path(tmp, 'files')), target)
+        shutil.copytree(str(Path(tmpdir.name, 'files')), target)
 
-    handle_report(report_file, tmp)
+    handle_report(report_file, tmpdir.name)
 
     tmpdir.cleanup()
 
