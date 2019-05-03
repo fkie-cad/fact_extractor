@@ -12,6 +12,10 @@ def exec_stub(command, *_, **__):
         def __init__(self, rc):
             self.returncode = rc
 
+        @property
+        def stdout(self):
+            return b''
+
     if command.endswith('fail'):
         return ProcessResult(255)
     return ProcessResult(0)
@@ -20,7 +24,7 @@ def exec_stub(command, *_, **__):
 def test_parse_arguments(monkeypatch):
     monkeypatch.setattr('extract.sys.argv', ['extract.py', 'ANY'])
     args = parse_arguments()
-    assert args.ARCHIVE[0] == 'ANY'
+    assert args.FILE[0] == 'ANY'
 
 
 def test_parse_arguments_no_archive(monkeypatch, capsys):
@@ -28,7 +32,7 @@ def test_parse_arguments_no_archive(monkeypatch, capsys):
 
     with pytest.raises(SystemExit) as sys_exit:
         parse_arguments()
-    assert 'required: ARCHIVE' in capsys.readouterr().err
+    assert 'required: FILE' in capsys.readouterr().err
     assert sys_exit.value.code == 2
 
 
