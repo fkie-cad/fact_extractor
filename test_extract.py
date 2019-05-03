@@ -41,6 +41,7 @@ def test_parse_arguments_show_version(monkeypatch, capsys):
 
     with pytest.raises(SystemExit) as sys_exit:
         parse_arguments()
+
     assert '0.1' in capsys.readouterr().out
     assert sys_exit.value.code == 0
 

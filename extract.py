@@ -27,7 +27,6 @@ def parse_arguments():
     parser.add_argument('-r', '--report_file', help='write report to a file', default=None)
     parser.add_argument('-V', '--verbose', action='store_true', default=False, help='increase verbosity')
     parser.add_argument('FILE', type=str, nargs=1, help='File for extraction')
-
     return parser.parse_args()
 
 
