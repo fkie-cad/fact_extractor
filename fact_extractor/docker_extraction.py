@@ -17,29 +17,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import logging
 from pathlib import Path
 
-from helperFunctions.program_setup import program_setup
-from unpacker.unpack import Unpacker
-
-
-def extract(file_path, config):
-    unpacker = Unpacker(config)
-
-    extracted_objects = unpacker.unpack(file_path)
-    logging.info('unpacking of {} complete: {} files extracted'.format(Path(file_path).name, len(extracted_objects)))
-
-    for extracted_object in extracted_objects:
-        print(extracted_object)
+from helperFunctions.config import get_config_dir
+from helperFunctions.program_setup import load_config, setup_logging
+from unpacker.unpack import unpack
 
 
 def main():
-    _, config = program_setup('FACT extractor', 'Standalone extraction utility', docker=True)
+    config = load_config('{}/main.cfg'.format(get_config_dir()))
+    setup_logging(debug=False)
+
     input_dir = Path(config.get('unpack', 'data_folder'), 'input')
     input_file = list(input_dir.iterdir())[0]
 
-    extract(input_file, config)
+    unpack(input_file, config)
 
     return 0
 

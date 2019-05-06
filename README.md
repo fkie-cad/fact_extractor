@@ -6,6 +6,23 @@ Should be able to extract most of the common container formats.
 
 ## Command line usage
 
+Quickest usage if you have docker running:
+
+```sh
+docker pull fkiecad/fact_extractor
+wget https://raw.githubusercontent.com/fkie-cad/fact_extractor/master/extract.py
+chmod +x extract.py
+./extract.py ./relative/or/absolute/path/to/your/file
+```
+
+for more options see
+
+```sh
+./extract.py --help
+```
+
+## Local setup (aka not running through docker)
+
 Install with:
 
 ```bash
@@ -19,7 +36,6 @@ The tool can then be run with
 ```bash
 fact_extractor/fact_extract.py [OPTIONS] PATH_TO_FIRMWARE
 ```
-
 The tool is build with docker in mind.
 To that end it extracts all files into a directory specified in the config.
 The same directory also contains the meta data report.
@@ -33,15 +49,16 @@ It looks like:
 ```
 
 
-## Docker usage
+## Use docker container directly
 
 Build with
 
 ```bash
 docker build -t fact_extractor .
 ```
+(Replace `fact_extractor` with own id if you like)
 
-The docker execution was build so that a single shared directory can be used for container input and output.  
+The docker execution was build so that a single shared directory can be used for container input and output.
 Prepare a folder on the host system that resembles
 
 ```text
@@ -56,8 +73,11 @@ where **firmware_file** is the file you want to unpack.
 Run the extraction with
 
 ```bash
-docker run -v <path_to_shared_folder>:/tmp/extractor --rm fact_extractor
+docker run -v <path_to_shared_folder>:/tmp/extractor -v /dev:/dev --privileged --rm fact_extractor
 ```
+(see above)
+
+:warning: Note that the container is run in privileged mode and shares the /dev folder. Thus the container can possibly harm your system in every way.
 
 
 ## Contribute
