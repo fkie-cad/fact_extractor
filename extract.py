@@ -59,8 +59,9 @@ def default_container_status():
 def set_version():
     container_tag, container_creation = default_container_status()
 
-    return '{}\nProgramm version:\t0.1\nDefault container:\t{}\nContainer tag:\t\t{}\nContainer creation:\t{}'.format(
+    return '{}\nProgramm version:\t{}\nDefault container:\t{}\nContainer tag:\t\t{}\nContainer creation:\t{}'.format(
         NAME,
+        VERSION,
         DEFAULT_CONTAINER,
         container_tag,
         container_creation
