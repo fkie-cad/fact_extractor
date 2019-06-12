@@ -82,7 +82,7 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
 
     return {
         'file_information': parts,
-        'endianess': endianess,
+        'endianess': 'le' if endianess == '<' else 'be',
         'ros_header_version': header[0x04:0x08].decode()
     }
 
