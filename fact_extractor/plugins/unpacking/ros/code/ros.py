@@ -4,7 +4,7 @@ from typing import List, NoReturn
 
 NAME = 'ROSFile'
 MIME_PATTERNS = ['firmware/ros']
-VERSION = '0.7'
+VERSION = '0.8'
 
 MAXIMUM_PART_NUMBER = 100
 HEADER_VERSIONS_AND_SIZES = {
