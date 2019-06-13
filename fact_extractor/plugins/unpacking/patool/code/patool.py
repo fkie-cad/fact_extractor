@@ -1,6 +1,10 @@
 '''
 This plugin unpacks several formats utilizing patool
 '''
+from os import symlink
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
 from common_helper_process import execute_shell_command
 
 NAME = 'PaTool'
@@ -17,12 +21,32 @@ MIME_PATTERNS = ['application/x-lrzip', 'application/x-cpio', 'application/x-arc
 VERSION = '0.5.1'
 
 
+def run_patool(file_path, tmp_dir):
+    return execute_shell_command('fakeroot patool extract --outdir {} {}'.format(tmp_dir, file_path), timeout=600)
+
+
+def handle_arj_files_explicitly(file_path, output, tmp_dir):
+    '''
+    arj needs target files to end on .arj
+    So here a fitting symlink is created
+    '''
+    if 'running /usr/bin/arj x -r' in output and not list(Path(tmp_dir).iterdir()):
+        with TemporaryDirectory() as staging_dir:
+            staged_path = str(Path(staging_dir) / '{}.arj'.format(Path(file_path).name))
+            symlink(file_path, staged_path)
+            output = run_patool(staged_path, tmp_dir)
+    return output
+
+
 def unpack_function(file_path, tmp_dir):
     """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
     """
-    output = execute_shell_command('fakeroot patool extract --outdir {} {}'.format(tmp_dir, file_path), timeout=600)
+    output = run_patool(file_path, tmp_dir)
+
+    output = handle_arj_files_explicitly(file_path, output, tmp_dir)
+
     return {'output': output}
 
 
