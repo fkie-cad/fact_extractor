@@ -73,7 +73,7 @@ def _install_unpacker(xenial):
     pip3_install_packages('pyqtgraph', 'capstone', 'cstruct', 'python-lzo', 'numpy', 'scipy')
     install_github_project('sviehb/jefferson', ['sudo python3 setup.py install'])
     _install_stuffit()
-    install_github_project('devttys0/binwalk', ['sudo python3 setup.py install --force'])
+    install_github_project('dorpvom/binwalk', ['sudo python3 setup.py install --force'])
     # patool and unpacking backends
     pip2_install_packages('patool')
     apt_install_packages('openjdk-8-jdk')
