@@ -18,7 +18,7 @@ MIME_PATTERNS = [
     'application/java-archive', 'application/x-iso9660-image', 'application/x-compress', 'application/x-arc',
     'audio/flac','application/x-ace', 'application/x-zoo', 'application/x-xz'
 ]
-VERSION = '0.5.1'
+VERSION = '0.5.2'
 
 
 def unpack_function(file_path, tmp_dir):
