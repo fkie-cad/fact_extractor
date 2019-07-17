@@ -1,10 +1,6 @@
 '''
 This plugin unpacks several formats utilizing patool
 '''
-from os import symlink
-from pathlib import Path
-from tempfile import TemporaryDirectory
-
 from common_helper_process import execute_shell_command
 
 NAME = 'PaTool'
@@ -16,7 +12,7 @@ MIME_PATTERNS = [
     'application/x-debian-package', 'application/x-rzip', 'application/x-tar', 'application/x-shar',
     'application/x-lzip', 'application/x-alzip', 'application/x-rar', 'application/rar',
     'application/java-archive', 'application/x-iso9660-image', 'application/x-compress', 'application/x-arc',
-    'audio/flac','application/x-ace', 'application/x-zoo', 'application/x-xz'
+    'audio/flac', 'application/x-ace', 'application/x-zoo', 'application/x-xz'
 ]
 VERSION = '0.5.2'
 

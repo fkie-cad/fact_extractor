@@ -11,7 +11,8 @@ VERSION = '0.1'
 
 def unpack_function(file_path, tmp_dir):
     """
-    Extract arj files using patool while ensuring files end with .arj
+    Extract arj files
+    Since the arj binary only works correct when files end with .arj, this is taken care of
     """
     with TemporaryDirectory() as staging_dir:
         staged_path = str(Path(staging_dir) / '{}.arj'.format(Path(file_path).name))
