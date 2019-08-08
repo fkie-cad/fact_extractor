@@ -18,14 +18,17 @@ def unpack_function(file_path, tmp_dir):
     target_file = Path(tmp_dir, Path(file_path).name)
 
     try:
-        with open(file_path, 'rb') as f:
-            srec = f.readlines()
-        with open(str(target_file.absolute()), 'wb') as f:
+        with Path.open(Path(file_path), 'rb') as encoded:
+            srec = encoded.readlines()
+
+        with Path.open(target_file, 'wb') as decoded:
             for line in srec:
-                type_, address, size, data = bincopy.unpack_srec(line.decode())
-                f.write(data)
-    except bincopy.Error as srecError:
-        return {'output': 'Unknown error in srec decoding: {}'.format(str(srecError))}
+                _, _, _, data = bincopy.unpack_srec(line.decode())
+                decoded.write(data)
+    except bincopy.Error as srec_error:
+        return {'output': 'Unknown error in srec decoding: {}'.format(str(srec_error))}
+    except FileNotFoundError as fnf_error:
+        return {'output': 'Failed to open file: {}'.format(str(fnf_error))}
 
     return {'output': 'Successfully decoded srec file'}
 
