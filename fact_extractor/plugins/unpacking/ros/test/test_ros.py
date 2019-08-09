@@ -5,7 +5,7 @@ import pytest
 
 from helperFunctions.file_system import get_test_data_dir
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
-from ..code.ros import infer_header_size_from_version, infer_endianess_from_file_count, unpack_function
+from ..code.ros import infer_header_size_from_version, infer_endianness_from_file_count, unpack_function
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
@@ -23,11 +23,11 @@ class TestRosUnpacker(TestUnpackerBase):
         self.assertIn('file_information', meta_data, 'Output meta not set')
 
 
-def test_infer_endianess():
+def test_infer_endianness():
     little = b'\x00' * 0x20 + b'\x05\x00\x00\x00'
     big = b'\x00' * 0x20 + b'\x00\x00\x00\x05'
-    assert infer_endianess_from_file_count(little) == '<'
-    assert infer_endianess_from_file_count(big) == '>'
+    assert infer_endianness_from_file_count(little) == '<'
+    assert infer_endianness_from_file_count(big) == '>'
 
 
 def test_infer_header_size():
