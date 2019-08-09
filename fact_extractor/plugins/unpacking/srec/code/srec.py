@@ -16,15 +16,14 @@ def unpack_function(file_path, tmp_dir):
     tmp_dir should be used to store the extracted files.
     '''
     target_file = Path(tmp_dir, Path(file_path).name)
-
+    decoded = b''
     try:
-        with Path.open(Path(file_path), 'rb') as encoded:
-            srec = encoded.readlines()
+        srec = Path(file_path).read_text().splitlines()
+        for l in srec:
+            _, _, _, data = bincopy.unpack_srec(l)
+            decoded += data
+        Path(target_file).write_bytes(decoded)
 
-        with Path.open(target_file, 'wb') as decoded:
-            for line in srec:
-                _, _, _, data = bincopy.unpack_srec(line.decode())
-                decoded.write(data)
     except bincopy.Error as srec_error:
         return {'output': 'Unknown error in srec decoding: {}'.format(str(srec_error))}
     except FileNotFoundError as fnf_error:
