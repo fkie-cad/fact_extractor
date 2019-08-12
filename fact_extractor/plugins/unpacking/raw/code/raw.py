@@ -11,7 +11,7 @@ VERSION = '0.2'
 
 def unpack_function(file_path, tmp_dir):
     raw_binary = get_binary_from_file(file_path)
-    data_sections = _get_padding_seperated_data_sections(raw_binary)
+    data_sections = _get_padding_seperated_sections(raw_binary)
     ihex_streams = extract_encoded_streams(raw_binary, INTEL_HEX_REGEX)
     srecord_streams = extract_encoded_streams(raw_binary, SRECORD_REGEX)
     lzma_streams = extract_lzma_streams(raw_binary)
@@ -34,7 +34,7 @@ def _get_meta_data(data_sections: list, ihex_streams: list, srecord_streams: lis
     return meta_data
 
 
-def _get_padding_seperated_data_sections(raw_binary: bytes) -> list:
+def _get_padding_seperated_sections(raw_binary: bytes) -> list:
     data_sections = cut_at_padding(raw_binary, padding_min_length=16, padding_pattern=b'\xff')
     if len(data_sections) == 1 and data_sections[0][0] == 0 and len(data_sections[0][1]) == len(raw_binary):  # data_section == raw_binary
         return []

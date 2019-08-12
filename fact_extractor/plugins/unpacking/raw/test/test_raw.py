@@ -35,6 +35,6 @@ class TestRawUnpacker(TestUnpackerBase):
 
     def test_extraction_nothing_included(self):
         input_file = Path(TEST_DATA_DIR, 'nothing.bin')
-        unpacked_files, meta_data = self.unpacker.extract_files_from_file(str(input_file), self.tmp_dir.name)
+        unpacked_files, _ = self.unpacker.extract_files_from_file(str(input_file), self.tmp_dir.name)
         print(unpacked_files)
         self.assertEqual(len(unpacked_files), 0)
