@@ -1,6 +1,6 @@
 import struct
 from pathlib import Path
-from typing import List, NoReturn
+from typing import List
 
 NAME = 'ROSFile'
 MIME_PATTERNS = ['firmware/ros']
@@ -13,7 +13,7 @@ HEADER_VERSIONS_AND_SIZES = {
 }
 
 
-def infer_endianess_from_file_count(header: bytes) -> str:
+def infer_endianness_from_file_count(header: bytes) -> str:
     return '<' if struct.unpack('<I', header[0x20:0x24])[0] < MAXIMUM_PART_NUMBER else '>'
 
 
@@ -24,11 +24,11 @@ def infer_header_size_from_version(header: bytes) -> int:
     raise ValueError('Unknown ros header version {}'.format(header[0x04:0x08]))
 
 
-def calculate_file_count(header: bytes, endianess: str) -> int:
-    return struct.unpack('{}I'.format(endianess), header[0x20:0x24])[0]
+def calculate_file_count(header: bytes, endianness: str) -> int:
+    return struct.unpack('{}I'.format(endianness), header[0x20:0x24])[0]
 
 
-def generate_part_information(header: bytes, endianess: str, number_of_files: int) -> List[dict]:
+def generate_part_information(header: bytes, endianness: str, number_of_files: int) -> List[dict]:
     parts = list()
     header_size = infer_header_size_from_version(header)
 
@@ -38,7 +38,7 @@ def generate_part_information(header: bytes, endianess: str, number_of_files: in
             {
                 'index': index,
                 'file_name': header[offset:offset + 16].decode().strip('\x00'),
-                'offset': struct.unpack('{}i'.format(endianess), header[offset + 16: offset + 20])[0]
+                'offset': struct.unpack('{}i'.format(endianness), header[offset + 16: offset + 20])[0]
             }
         )
     return parts
@@ -48,7 +48,7 @@ def is_last_part(index: int, number_of_parts: int) -> bool:
     return index == number_of_parts - 1
 
 
-def calculate_part_sizes(rosfile: Path, parts: List[dict]) -> NoReturn:
+def calculate_part_sizes(rosfile: Path, parts: List[dict]):
     for part in parts:
         if is_last_part(part['index'], len(parts)):
             part['size'] = rosfile.stat().st_size - part['offset']
@@ -56,7 +56,7 @@ def calculate_part_sizes(rosfile: Path, parts: List[dict]) -> NoReturn:
             part['size'] = parts[part['index'] + 1]['offset'] - part['offset']
 
 
-def store_parts_in_tmp_dir(file_path: str, parts: List[dict], tmp_dir: str) -> NoReturn:
+def store_parts_in_tmp_dir(file_path: str, parts: List[dict], tmp_dir: str):
     with open(file_path, 'rb') as ros_fd:
         for part in parts:
             part_file = Path(tmp_dir, part['file_name'])
@@ -68,11 +68,11 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
     with open(file_path, 'rb') as fd:
         header = fd.read(512)
 
-    endianess = infer_endianess_from_file_count(header)
-    number_of_files = calculate_file_count(header, endianess)
+    endianness = infer_endianness_from_file_count(header)
+    number_of_files = calculate_file_count(header, endianness)
 
     try:
-        parts = generate_part_information(header, endianess, number_of_files)
+        parts = generate_part_information(header, endianness, number_of_files)
     except ValueError as value_error:
         return {'error': str(value_error)}
 
@@ -82,7 +82,7 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
 
     return {
         'file_information': parts,
-        'endianess': 'le' if endianess == '<' else 'be',
+        'endianness': 'le' if endianness == '<' else 'be',
         'ros_header_version': header[0x04:0x08].decode()
     }
 
