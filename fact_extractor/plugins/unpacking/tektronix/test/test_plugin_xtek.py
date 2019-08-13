@@ -6,7 +6,7 @@ from unittest.mock import patch
 from binascii import Error
 
 from helperFunctions.file_system import get_test_data_dir
-from plugins.unpacking.tektronix_extended.code.xtek import unpack_function
+from plugins.unpacking.tektronix.code.xtek import unpack_function
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
