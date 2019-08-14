@@ -20,6 +20,13 @@ def i_always_crash_file_not_found(*args, **kwargs):
     raise FileNotFoundError()
 
 
+def successful_extraction(files, meta_data):
+    assert len(files) == 1
+    content = Path(files[0]).read_bytes()
+    assert b'Hello world.' in content
+    assert 'Success' in meta_data['output']
+
+
 class TestTektronixExtendedHex(TestUnpackerBase):
 
     def test_unpacker_selection_generic(self):
@@ -28,10 +35,12 @@ class TestTektronixExtendedHex(TestUnpackerBase):
     def test_extraction(self):
         files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, 'testfile.xtek'),
                                                                  self.tmp_dir.name)
-        assert len(files) == 1
-        content = Path(files[0]).read_bytes()
-        assert b'Hello world.' in content
-        assert 'Success' in meta_data['output']
+        successful_extraction(files, meta_data)
+
+    def test_extraction_objcopy(self):
+        files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, 'objcopy.xtek'),
+                                                                 self.tmp_dir.name)
+        successful_extraction(files, meta_data)
 
     def test_extraction_bad_file(self):
         file_path = Path(get_test_data_dir(), 'test_data_file.bin')

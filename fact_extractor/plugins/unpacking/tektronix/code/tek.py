@@ -17,15 +17,14 @@ def unpack_function(file_path, tmp_dir):
     target_file = Path(tmp_dir, Path(file_path).name)
     decoded = b''
     try:
-        tek = Path(file_path).read_text().splitlines()
-        for l in tek:
-            _addr = int(l[1:5], 16)
-            _dlen = int(l[5:7], 16)
-            _crc1 = int(l[7:9], 16)
-            _data = l[9:9 + _dlen * 2]
-            _crc2 = int(l[-2:], 16)
+        for rec in Path(file_path).read_text().splitlines():
+            _addr = int(rec[1:5], 16)
+            _dlen = int(rec[5:7], 16)
+            _crc1 = int(rec[7:9], 16)
+            _data = rec[9:9 + _dlen * 2]
+            _crc2 = int(rec[-2:], 16)
 
-            expected_crc1 = sum(int(i, 16) for i in (l[1:7])) & 0xff
+            expected_crc1 = sum(int(i, 16) for i in (rec[1:7])) & 0xff
             expected_crc2 = sum(int(i, 16) for i in _data) & 0xff
 
             try:
@@ -34,9 +33,9 @@ def unpack_function(file_path, tmp_dir):
                 return {'output': 'Unknown error in tek record decoding: {}'.format(str(tek_error))}
 
             if _crc1 != expected_crc1 or _crc2 != expected_crc2:
-                return {'output': 'CRC mismatch in tek record: {}'.format(l)}
+                return {'output': 'CRC mismatch in tek record: {}'.format(rec)}
 
-            Path(target_file).write_bytes(decoded)
+        Path(target_file).write_bytes(decoded)
 
     except FileNotFoundError as fnf_error:
         return {'output': 'Failed to open file: {}'.format(str(fnf_error))}
