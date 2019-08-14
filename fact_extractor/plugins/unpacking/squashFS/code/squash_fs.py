@@ -13,7 +13,8 @@ BIN_DIR = os.path.join(THIS_FILES_DIR, '../bin')
 NAME = 'SquashFS'
 MIME_PATTERNS = ['filesystem/squashfs']
 VERSION = '0.7'
-SQUASH_UNPACKER = ['sasquatch', BIN_DIR + '/unsquashfs4-avm-be', BIN_DIR + '/unsquashfs4-avm-le', BIN_DIR + '/unsquashfs4-avm-le']
+SQUASH_UNPACKER = ['sasquatch', BIN_DIR + '/unsquashfs4-avm-be',
+                   BIN_DIR + '/unsquashfs4-avm-le', BIN_DIR + '/unsquashfs3-multi']
 
 
 def unpack_function(file_path, tmp_dir):
