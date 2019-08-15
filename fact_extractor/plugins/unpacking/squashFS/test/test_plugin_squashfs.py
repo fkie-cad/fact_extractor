@@ -1,11 +1,10 @@
 import os
 from tempfile import TemporaryDirectory
+
 import pytest
 
-from test.unit.unpacker.test_unpacker import TestUnpackerBase  # pylint: disable=wrong-import-order
-
+from test.unit.unpacker.test_unpacker import TestUnpackerBase
 from ..code.squash_fs import _get_unpacker_name, _unpack_success, unpack_function
-
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
@@ -39,4 +38,5 @@ class TestSquashUnpacker(TestUnpackerBase):
         self.check_unpacker_selection('filesystem/squashfs', 'SquashFS')
 
     def test_extraction_sqfs(self):
-        self.check_unpacking_of_standard_unpack_set(os.path.join(TEST_DATA_DIR, 'sqfs.img'), additional_prefix_folder='fact_extracted')
+        self.check_unpacking_of_standard_unpack_set(os.path.join(TEST_DATA_DIR, 'sqfs.img'),
+                                                    additional_prefix_folder='fact_extracted')
