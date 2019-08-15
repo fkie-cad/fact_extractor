@@ -21,10 +21,16 @@ def i_always_crash_file_not_found(*args, **kwargs):
 
 
 def successful_extraction(files, meta_data):
-    assert len(files) == 1
+    assert len(files) != 0
     content = Path(files[0]).read_bytes()
     assert b'Hello world.' in content
     assert 'Success' in meta_data['output']
+
+
+def meta_data_for_failed_analysis(file_path):
+    with TemporaryDirectory() as tmp_dir:
+        meta_data = unpack_function(file_path, tmp_dir)
+    return meta_data
 
 
 class TestTektronixExtendedHex(TestUnpackerBase):
@@ -33,20 +39,15 @@ class TestTektronixExtendedHex(TestUnpackerBase):
         self.check_unpacker_selection('firmware/xtek', 'Tektronix extended HEX')
 
     def test_extraction(self):
-        files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, 'testfile.xtek'),
-                                                                 self.tmp_dir.name)
-        successful_extraction(files, meta_data)
-
-    def test_extraction_objcopy(self):
-        files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, 'objcopy.xtek'),
-                                                                 self.tmp_dir.name)
-        successful_extraction(files, meta_data)
+        for f in ['testfile.xtek', 'objcopy.xtek']:
+            files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, f),
+                                                                     self.tmp_dir.name)
+            successful_extraction(files, meta_data)
 
     def test_extraction_bad_file(self):
         file_path = Path(get_test_data_dir(), 'test_data_file.bin')
 
-        with TemporaryDirectory() as tmp_dir:
-            meta_data = unpack_function(file_path, tmp_dir)
+        meta_data = meta_data_for_failed_analysis(file_path)
 
         assert 'Failed to slice xtek record' in meta_data['output']
 
@@ -54,8 +55,7 @@ class TestTektronixExtendedHex(TestUnpackerBase):
     def test_extraction_decoding_error(self):
         file_path = Path(TEST_DATA_DIR, 'testfile.xtek')
 
-        with TemporaryDirectory() as tmp_dir:
-            meta_data = unpack_function(file_path, tmp_dir)
+        meta_data = meta_data_for_failed_analysis(file_path)
 
         assert 'Unknown' in meta_data['output']
 
@@ -63,7 +63,6 @@ class TestTektronixExtendedHex(TestUnpackerBase):
     def test_extraction_filenotfound_error(self):
         file_path = Path(TEST_DATA_DIR, 'testfile2.xtek')
 
-        with TemporaryDirectory() as tmp_dir:
-            meta_data = unpack_function(file_path, tmp_dir)
+        meta_data = meta_data_for_failed_analysis(file_path)
 
         assert 'Failed to open file' in meta_data['output']
