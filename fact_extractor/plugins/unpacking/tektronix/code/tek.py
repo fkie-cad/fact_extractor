@@ -24,7 +24,7 @@ def unpack_function(file_path, tmp_dir):
             _data = rec[9:9 + _dlen * 2]
             _crc2 = int(rec[-2:], 16)
 
-            expected_crc1 = sum(int(i, 16) for i in (rec[1:7])) & 0xff
+            expected_crc1 = sum(int(i, 16) for i in rec[1:7]) & 0xff
             expected_crc2 = sum(int(i, 16) for i in _data) & 0xff
 
             try:
