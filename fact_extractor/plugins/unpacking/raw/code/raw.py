@@ -1,3 +1,13 @@
+'''
+This plug-in is intended to be used on flash-dumps and unknown file types.
+It dumps ff-padded data-sections and encoded regions.
+Additionally it trys to detect and extract lzma streams.
+Supported encodings are:
+ - intel hex
+ - motorola s-record
+ - tektronix
+ - tektronix extended
+'''
 from common_helper_extraction import (
     cut_at_padding, dump_files, extract_lzma_streams,
     get_decompressed_lzma_streams, extract_encoded_streams, INTEL_HEX_REGEX, SRECORD_REGEX
