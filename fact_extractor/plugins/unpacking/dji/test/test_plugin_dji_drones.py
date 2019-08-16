@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
