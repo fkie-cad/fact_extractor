@@ -18,7 +18,7 @@ def unpack_function(file_path, tmp_dir):
     target_file = Path(tmp_dir, Path(file_path).name)
     try:
         for rec in Path(file_path).read_text().splitlines():
-            _rec_len = int(rec[1:3], 16)
+            # _rec_len = int(rec[1:3], 16)  # noqa: information not used by now
 
             _type = int(rec[3])
             if _type == 3:
@@ -53,7 +53,7 @@ def verify_crc(rec):
 
 def get_data_field(rec):
     _addr_size = int(rec[6], 16)
-    _addr = int(rec[7:7 + _addr_size], 16)
+    # _addr = int(rec[7:7 + _addr_size], 16)  # information not used by now
     _data = rec[7 + _addr_size:]
     return _data
 

@@ -21,7 +21,7 @@ def main(distribution):
     # python dependencies
     apt_install_packages('python3', 'python3-dev', 'python', 'python-dev', 'python-wheel', 'python-setuptools')
 
-    pip3_install_packages('pytest', 'pytest-cov', 'pytest-pep8')
+    pip3_install_packages('pytest', 'pytest-cov', 'pytest-flake8')
     if not xenial:
         pip3_install_packages('testresources')
 

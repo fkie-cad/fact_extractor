@@ -18,7 +18,7 @@ def unpack_function(file_path, tmp_dir):
     decoded = b''
     try:
         for rec in Path(file_path).read_text().splitlines():
-            _addr = int(rec[1:5], 16)
+            #  addr = int(rec[1:5], 16)  # inrformation not used by now
             _dlen = int(rec[5:7], 16)
             _crc1 = int(rec[7:9], 16)
             _data = rec[9:9 + _dlen * 2]
