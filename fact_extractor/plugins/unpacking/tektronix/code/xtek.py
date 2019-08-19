@@ -18,7 +18,7 @@ def unpack_function(file_path, tmp_dir):
     target_file = Path(tmp_dir, Path(file_path).name)
     try:
         for rec in Path(file_path).read_text().splitlines():
-            # _rec_len = int(rec[1:3], 16)  # noqa: information not used by now
+            # _rec_len = int(rec[1:3], 16)  # information not used by now
 
             _type = int(rec[3])
             if _type == 3:
