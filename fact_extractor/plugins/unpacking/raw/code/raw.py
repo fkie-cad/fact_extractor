@@ -15,7 +15,7 @@ from common_helper_extraction import (
 from common_helper_files import get_binary_from_file
 
 NAME = 'RAW'
-MIME_PATTERNS = ['application/octet-stream', 'data/raw']
+MIME_PATTERNS = ['data/raw']
 VERSION = '0.2'
 
 
