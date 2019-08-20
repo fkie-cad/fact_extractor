@@ -32,7 +32,7 @@ class TestAdobeASCII85(TestUnpackerBase):
 
     @staticmethod
     @patch('base64.a85decode', i_always_crash)
-    def test_extraction_decoding_error(self):
+    def test_extraction_decoding_error():
         file_path = Path(TEST_DATA_DIR, 'testfile.adobe85')
 
         with TemporaryDirectory() as tmp_dir:
@@ -42,7 +42,7 @@ class TestAdobeASCII85(TestUnpackerBase):
 
     @staticmethod
     @patch('pathlib.Path.open', i_always_crash_file_not_found)
-    def test_extraction_filenotfound_error(self):
+    def test_extraction_filenotfound_error():
         file_path = Path(TEST_DATA_DIR, 'testfile2.adobe85')
 
         with TemporaryDirectory() as tmp_dir:
