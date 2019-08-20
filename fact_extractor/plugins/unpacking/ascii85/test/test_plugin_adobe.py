@@ -30,6 +30,7 @@ class TestAdobeASCII85(TestUnpackerBase):
         assert b'test for a FACT plugin' in content
         assert 'Success' in meta_data['output']
 
+    @staticmethod
     @patch('base64.a85decode', i_always_crash)
     def test_extraction_decoding_error(self):
         file_path = Path(TEST_DATA_DIR, 'testfile.adobe85')
@@ -39,6 +40,7 @@ class TestAdobeASCII85(TestUnpackerBase):
 
         assert 'Unknown' in meta_data['output']
 
+    @staticmethod
     @patch('pathlib.Path.open', i_always_crash_file_not_found)
     def test_extraction_filenotfound_error(self):
         file_path = Path(TEST_DATA_DIR, 'testfile2.adobe85')
