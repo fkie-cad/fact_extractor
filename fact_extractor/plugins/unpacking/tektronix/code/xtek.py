@@ -10,6 +10,10 @@ MIME_PATTERNS = ['firmware/xtek']
 VERSION = '0.1'
 
 
+class XtekUnpackerError(Exception):
+    pass
+
+
 def unpack_function(file_path, tmp_dir):
     '''
     file_path specifies the input file.
@@ -17,46 +21,37 @@ def unpack_function(file_path, tmp_dir):
     '''
     decoded = b''
     target_file = Path(tmp_dir, Path(file_path).name)
-    read_records = get_records(file_path)
-    if isinstance(read_records, dict):
-        return read_records
+    try:
 
-    for rec in Path(file_path).read_text().splitlines():
-        _dec = decode_records(rec)
-        if not isinstance(_dec, dict):
-            decoded += _dec
-        else:
-            return _dec
-    return write_decoded(decoded, target_file)
+        for rec in Path(file_path).read_text().splitlines():
+            decoded += decode_records(rec)
+        return write_decoded(decoded, target_file)
+    except binascii.Error as tek_error:
+        return {'output': 'Unknown error in xtek record decoding: {}'.format(str(tek_error))}
+    except ValueError as v_error:
+        return {'output': 'Failed to slice xtek record: {}'.format(str(v_error))}
+    except FileNotFoundError as fnf_error:
+        return {'output': 'Failed to open file: {}'.format(str(fnf_error))}
+    except XtekUnpackerError as merr:
+        return {'output': str(merr)}
 
 
 def decode_records(rec):
-    if verify_alphabet(rec):
-        return {'output': 'Invalid characters in record: {}'.format(rec)}
+    if not is_valid_character_set(rec):
+        raise XtekUnpackerError('Invalid characters in record {}'.format(rec))
 
     _type = int(rec[3])
     if _type not in [3, 8]:
-        vrec_len = verify_rec_len(rec)
-        if vrec_len:
-            return vrec_len
+        if not is_valid_record_length(rec):
+            raise XtekUnpackerError('Record length mismatch in xtek record: {}'.format(rec))
 
-        if verify_crc(rec):
-            return {'output': 'CRC mismatch in xtek record: {}'.format(rec)}
-
+        if not is_valid_crc(rec):
+            raise XtekUnpackerError('CRC mismatch in xtek record: {}'.format(rec))
     return decode_record(rec)
 
 
-def get_records(_file):
-    try:
-        return Path(_file).read_text().splitlines()
-    except FileNotFoundError as fnf_error:
-        return {'output': 'Failed to open file: {}'.format(str(fnf_error))}
-
-
-def verify_alphabet(rec):
-    if all(c in string.hexdigits + '.sec' for c in rec[1:]):
-        return None
-    return 1
+def is_valid_character_set(rec):
+    return all(c in string.hexdigits + '.sec' for c in rec[1:])
 
 
 def write_decoded(decoded, target_file):
@@ -67,22 +62,15 @@ def write_decoded(decoded, target_file):
         return {'output': 'Failed to open file: {}'.format(str(fnf_error))}
 
 
-def verify_rec_len(rec):
-    try:
-        _rec_len = int(rec[1:3], 16)
-        if _rec_len != len(rec) - 1:
-            return {'output': 'Record length mismatch in xtek record: {}'.format(rec)}
-        return None
-    except ValueError as v_error:
-        return {'output': 'Failed to slice xtek record: {}'.format(str(v_error))}
+def is_valid_record_length(rec):
+    _rec_len = int(rec[1:3], 16)
+    return _rec_len == len(rec) - 1
 
 
-def verify_crc(rec):
+def is_valid_crc(rec):
     _actual_crc = int(rec[4:6], 16)
     expected_crc = sum(int(i, 16) for i in rec[1:4] + rec[6:]) & 0xff
-    if _actual_crc != expected_crc:
-        return 1
-    return None
+    return _actual_crc == expected_crc
 
 
 def get_data_field(rec):
@@ -93,10 +81,7 @@ def get_data_field(rec):
 
 
 def decode_record(rec):
-    try:
-        return binascii.unhexlify(get_data_field(rec))
-    except binascii.Error as tek_error:
-        return {'output': 'Unknown error in xtek record decoding: {}'.format(str(tek_error))}
+    return binascii.unhexlify(get_data_field(rec))
 
 
 # ----> Do not edit below this line <----
