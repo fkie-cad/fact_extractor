@@ -28,14 +28,14 @@ def unpack_function(file_path, tmp_dir):
             decoded += decode_rec(_data)
 
         Path(target_file).write_bytes(decoded)
+        return {'output': 'Successfully decoded tek file'}
+
     except binascii.Error as tek_error:
         return {'output': 'Unknown error in tek record decoding: {}'.format(str(tek_error))}
     except FileNotFoundError as fnf_error:
         return {'output': 'Failed to open file: {}'.format(str(fnf_error))}
     except ValueError as v_error:
         return {'output': 'Failed to slice tek record: {}'.format(str(v_error))}
-
-    return {'output': 'Successfully decoded tek file'}
 
 
 def decode_rec(_data):
