@@ -25,7 +25,9 @@ def unpack_function(file_path, tmp_dir):
 
         for rec in Path(file_path).read_text().splitlines():
             decoded += decode_records(rec)
-        return write_decoded(decoded, target_file)
+        write_decoded(decoded, target_file)
+        return {'output': 'Successfully decoded xtek file'}
+
     except binascii.Error as tek_error:
         return {'output': 'Unknown error in xtek record decoding: {}'.format(str(tek_error))}
     except ValueError as v_error:
@@ -55,11 +57,7 @@ def is_valid_character_set(rec):
 
 
 def write_decoded(decoded, target_file):
-    try:
-        Path(target_file).write_bytes(decoded)
-        return {'output': 'Successfully decoded xtek file'}
-    except FileNotFoundError as fnf_error:
-        return {'output': 'Failed to open file: {}'.format(str(fnf_error))}
+    Path(target_file).write_bytes(decoded)
 
 
 def is_valid_record_length(rec):
