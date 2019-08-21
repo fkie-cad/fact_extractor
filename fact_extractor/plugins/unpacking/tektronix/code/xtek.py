@@ -32,8 +32,8 @@ def unpack_function(file_path, tmp_dir):
         return {'output': 'Failed to slice xtek record: {}'.format(str(v_error))}
     except FileNotFoundError as fnf_error:
         return {'output': 'Failed to open file: {}'.format(str(fnf_error))}
-    except XtekUnpackerError as merr:
-        return {'output': str(merr)}
+    except XtekUnpackerError as xtek_err:
+        return {'output': str(xtek_err)}
 
 
 def decode_records(rec):
