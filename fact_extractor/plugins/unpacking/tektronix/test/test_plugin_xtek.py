@@ -50,7 +50,7 @@ class TestTektronixExtendedHex(TestUnpackerBase):
 
         meta_data = meta_data_for_failed_analysis(file_path)
 
-        assert 'Failed to slice xtek record' in meta_data['output']
+        assert 'Invalid characters in record' in meta_data['output']
 
     @staticmethod
     @patch('binascii.unhexlify', i_always_crash_binascii)
