@@ -21,7 +21,7 @@ def i_always_crash_file_not_found(*args, **kwargs):
 
 
 def successful_extraction(files, meta_data):
-    assert len(files) != 0
+    assert files
     content = Path(files[0]).read_bytes()
     assert b'Hello world.' in content
     assert 'Success' in meta_data['output']
@@ -39,28 +39,31 @@ class TestTektronixExtendedHex(TestUnpackerBase):
         self.check_unpacker_selection('firmware/xtek', 'Tektronix extended HEX')
 
     def test_extraction(self):
-        for f in ['testfile.xtek', 'objcopy.xtek']:
-            files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, f),
+        for tfile in ['testfile.xtek', 'objcopy.xtek']:
+            files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, tfile),
                                                                      self.tmp_dir.name)
             successful_extraction(files, meta_data)
 
-    def test_extraction_bad_file(self):
+    @staticmethod
+    def test_extraction_bad_file():
         file_path = Path(get_test_data_dir(), 'test_data_file.bin')
 
         meta_data = meta_data_for_failed_analysis(file_path)
 
-        assert 'Failed to slice xtek record' in meta_data['output']
+        assert 'Invalid characters in record' in meta_data['output']
 
+    @staticmethod
     @patch('binascii.unhexlify', i_always_crash_binascii)
-    def test_extraction_decoding_error(self):
+    def test_extraction_decoding_error():
         file_path = Path(TEST_DATA_DIR, 'testfile.xtek')
 
         meta_data = meta_data_for_failed_analysis(file_path)
 
         assert 'Unknown' in meta_data['output']
 
+    @staticmethod
     @patch('pathlib.Path.open', i_always_crash_file_not_found)
-    def test_extraction_filenotfound_error(self):
+    def test_extraction_filenotfound_error():
         file_path = Path(TEST_DATA_DIR, 'testfile2.xtek')
 
         meta_data = meta_data_for_failed_analysis(file_path)

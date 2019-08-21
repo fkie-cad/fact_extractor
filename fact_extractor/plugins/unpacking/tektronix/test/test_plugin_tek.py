@@ -28,12 +28,13 @@ class TestTektronixHex(TestUnpackerBase):
     def test_extraction(self):
         files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, 'testfile.tek'),
                                                                  self.tmp_dir.name)
-        assert len(files) == 1
+        assert files
         content = Path(files[0]).read_bytes()
         assert b'Hello world.' in content
         assert 'Success' in meta_data['output']
 
-    def test_extraction_bad_file(self):
+    @staticmethod
+    def test_extraction_bad_file():
         file_path = Path(get_test_data_dir(), 'test_data_file.bin')
 
         with TemporaryDirectory() as tmp_dir:
@@ -41,8 +42,9 @@ class TestTektronixHex(TestUnpackerBase):
 
         assert 'Failed to slice tek record' in meta_data['output']
 
+    @staticmethod
     @patch('binascii.unhexlify', i_always_crash_binascii)
-    def test_extraction_decoding_error(self):
+    def test_extraction_decoding_error():
         file_path = Path(TEST_DATA_DIR, 'testfile.tek')
 
         with TemporaryDirectory() as tmp_dir:
@@ -50,8 +52,9 @@ class TestTektronixHex(TestUnpackerBase):
 
         assert 'Unknown' in meta_data['output']
 
+    @staticmethod
     @patch('pathlib.Path.open', i_always_crash_file_not_found)
-    def test_extraction_filenotfound_error(self):
+    def test_extraction_filenotfound_error():
         file_path = Path(TEST_DATA_DIR, 'testfile2.tek')
 
         with TemporaryDirectory() as tmp_dir:
