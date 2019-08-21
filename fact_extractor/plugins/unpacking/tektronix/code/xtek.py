@@ -2,8 +2,8 @@
 This plugin decodes / unpacks Tektronix extended hex files (.xtek)
 '''
 import binascii
-from pathlib import Path
 import string
+from pathlib import Path
 
 NAME = 'Tektronix extended HEX'
 MIME_PATTERNS = ['firmware/xtek']
