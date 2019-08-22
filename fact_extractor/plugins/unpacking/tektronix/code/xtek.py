@@ -30,8 +30,6 @@ def unpack_function(file_path, tmp_dir):
 
     except binascii.Error as tek_error:
         return {'output': 'Unknown error in xtek record decoding: {}'.format(str(tek_error))}
-    except ValueError as v_error:
-        return {'output': 'Failed to slice xtek record: {}'.format(str(v_error))}
     except FileNotFoundError as fnf_error:
         return {'output': 'Failed to open file: {}'.format(str(fnf_error))}
     except XtekUnpackerError as xtek_err:

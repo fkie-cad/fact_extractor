@@ -43,6 +43,15 @@ class TestTektronixHex(TestUnpackerBase):
         assert 'Failed to slice tek record' in meta_data['output']
 
     @staticmethod
+    def test_crc_mismatch():
+        file_path = Path(TEST_DATA_DIR, 'testfile_crc.tek')
+
+        with TemporaryDirectory() as tmp_dir:
+            meta_data = unpack_function(file_path, tmp_dir)
+
+        assert 'CRC mismatch' in meta_data['output']
+
+    @staticmethod
     @patch('binascii.unhexlify', i_always_crash_binascii)
     def test_extraction_decoding_error():
         file_path = Path(TEST_DATA_DIR, 'testfile.tek')
