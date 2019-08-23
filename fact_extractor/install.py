@@ -37,7 +37,7 @@ PROGRAM_NAME = 'FACT_extractor Installer'
 PROGRAM_VERSION = __VERSION__
 PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor installation script'
 
-BIONIC_CODE_NAMES = ['bionic', 'tara']
+BIONIC_CODE_NAMES = ['bionic', 'tara', 'tessa', 'tina']
 XENIAL_CODE_NAMES = ['xenial', 'yakkety', 'sarah', 'serena', 'sonya', 'sylvia']
 
 
