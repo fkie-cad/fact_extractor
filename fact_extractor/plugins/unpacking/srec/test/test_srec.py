@@ -20,6 +20,13 @@ def i_always_crash_file_not_found(*args, **kwargs):
     raise FileNotFoundError()
 
 
+def successful_extraction(files, meta_data):
+    assert files
+    content = Path(files[0]).read_bytes()
+    assert b'Hello world.' in content
+    assert 'Success' in meta_data['output']
+
+
 class TestMotorolaSrecord(TestUnpackerBase):
 
     def test_unpacker_selection_generic(self):
@@ -29,10 +36,7 @@ class TestMotorolaSrecord(TestUnpackerBase):
         for srec_file in ['testfile.srec', 'testfile_noS0.srec']:
             files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, srec_file),
                                                                      self.tmp_dir.name)
-        assert files
-        content = Path(files[0]).read_bytes()
-        assert b'Hello world.' in content
-        assert 'Success' in meta_data['output']
+            successful_extraction(files, meta_data)
 
     @staticmethod
     def test_extraction_bad_file():
