@@ -3,17 +3,11 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from bincopy import Error
-
 from helperFunctions.file_system import get_test_data_dir
 from plugins.unpacking.srec.code.srec import unpack_function
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
-
-
-def i_always_crash_bincopy(*args, **kwargs):
-    raise Error()
 
 
 def i_always_crash_file_not_found(*args, **kwargs):
@@ -48,14 +42,14 @@ class TestMotorolaSrecord(TestUnpackerBase):
         assert 'not starting with an \'S\'' in meta_data['output']
 
     @staticmethod
-    @patch('bincopy.unpack_srec', i_always_crash_bincopy)
     def test_extraction_decoding_error():
-        file_path = Path(TEST_DATA_DIR, 'testfile.srec')
+        for srec_file in ['bad_testfile.srec', 'bad_testfile2.srec']:
+            file_path = Path(TEST_DATA_DIR, srec_file)
 
-        with TemporaryDirectory() as tmp_dir:
-            meta_data = unpack_function(file_path, tmp_dir)
+            with TemporaryDirectory() as tmp_dir:
+                meta_data = unpack_function(file_path, tmp_dir)
 
-        assert 'Unknown' in meta_data['output']
+            assert 'Unknown' in meta_data['output']
 
     @staticmethod
     @patch('pathlib.Path.open', i_always_crash_file_not_found)
