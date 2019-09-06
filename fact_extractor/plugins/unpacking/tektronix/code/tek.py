@@ -49,7 +49,7 @@ def is_valid_crc(rec, data):
     expected_crc1 = sum(int(i, 16) for i in rec[1:7]) & 0xff
     expected_crc2 = sum(int(i, 16) for i in data) & 0xff
 
-    return _crc1 == expected_crc1 or _crc2 == expected_crc2
+    return _crc1 == expected_crc1 and _crc2 == expected_crc2
 
 
 # ----> Do not edit below this line <----

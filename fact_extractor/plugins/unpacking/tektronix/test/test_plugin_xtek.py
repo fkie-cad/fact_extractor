@@ -45,6 +45,13 @@ class TestTektronixExtendedHex(TestUnpackerBase):
             successful_extraction(files, meta_data)
 
     @staticmethod
+    def _get_meta_data(test_file):
+        file_path = Path(TEST_DATA_DIR, test_file)
+        with TemporaryDirectory() as tmp_dir:
+            meta_data = unpack_function(file_path, tmp_dir)
+        return meta_data
+
+    @staticmethod
     def test_extraction_bad_file():
         file_path = Path(get_test_data_dir(), 'test_data_file.bin')
 
@@ -53,19 +60,27 @@ class TestTektronixExtendedHex(TestUnpackerBase):
         assert 'Invalid characters in record' in meta_data['output']
 
     @staticmethod
+    def test_crc_mismatch():
+        meta_data = TestTektronixExtendedHex._get_meta_data('testfile_crc.xtek')
+
+        assert 'CRC mismatch' in meta_data['output']
+
+    @staticmethod
+    def test_rec_len_mismatch():
+        meta_data = TestTektronixExtendedHex._get_meta_data('testfile_rec_len_mismatch.xtek')
+
+        assert 'Record length mismatch' in meta_data['output']
+
+    @staticmethod
     @patch('binascii.unhexlify', i_always_crash_binascii)
     def test_extraction_decoding_error():
-        file_path = Path(TEST_DATA_DIR, 'testfile.xtek')
-
-        meta_data = meta_data_for_failed_analysis(file_path)
+        meta_data = TestTektronixExtendedHex._get_meta_data('testfile.xtek')
 
         assert 'Unknown' in meta_data['output']
 
     @staticmethod
     @patch('pathlib.Path.open', i_always_crash_file_not_found)
     def test_extraction_filenotfound_error():
-        file_path = Path(TEST_DATA_DIR, 'testfile2.xtek')
-
-        meta_data = meta_data_for_failed_analysis(file_path)
+        meta_data = TestTektronixExtendedHex._get_meta_data('testfile2.xtek')
 
         assert 'Failed to open file' in meta_data['output']
