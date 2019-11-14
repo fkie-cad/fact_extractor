@@ -81,7 +81,7 @@ docker run -v <path_to_shared_folder>:/tmp/extractor -v /dev:/dev --privileged -
 
 ## Contribute
 The easiest way to contribute is writing your own plug-in.
-Our Developers Manual can be found [here](https://github.com/fkie-cad/FACT_core/wiki/).
+Our Developers Manual can be found [here](https://github.com/fkie-cad/fact_extractor/wiki).
 
 ## Acknowledgments
 This project is partly financed by [German Federal Office for Information Security (BSI)](https://www.bsi.bund.de) and others.  
