@@ -27,7 +27,6 @@ Install with:
 
 ```bash
 fact_extractor/install/pre_install.sh
-# reboot your system if docker was not previously installed
 fact_extractor/install.py
 ```
 
