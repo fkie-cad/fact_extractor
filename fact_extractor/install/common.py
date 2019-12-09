@@ -34,4 +34,6 @@ def main(distribution):
     os.makedirs(str(Path(data_folder, 'files')), exist_ok=True)
     os.makedirs(str(Path(data_folder, 'reports')), exist_ok=True)
 
+    pip3_install_packages('flask', 'flask_restful')
+
     return 0

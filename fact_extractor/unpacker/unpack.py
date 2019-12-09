@@ -17,10 +17,11 @@ class Unpacker(UnpackBase):
     FS_FALLBACK_CANDIDATES = ['SquashFS']
     CARVER_FALLBACK_BLACKLIST = ['generic_carver', 'NOP', 'PaTool', 'SFX']
 
-    def __init__(self, config=None):
+    def __init__(self, config, folder):
         super().__init__(config=config)
-        self._file_folder = Path(self.config.get('unpack', 'data_folder'), 'files')
-        self._report_folder = Path(self.config.get('unpack', 'data_folder'), 'reports')
+
+        self._file_folder = Path(self.config.get('unpack', 'data_folder'), folder, 'files')
+        self._report_folder = Path(self.config.get('unpack', 'data_folder'), folder, 'reports')
 
     def unpack(self, file_path):
         binary = Path(file_path).read_bytes()
@@ -72,7 +73,10 @@ class Unpacker(UnpackBase):
         return extracted_files
 
 
-def unpack(file_path, config):
-    extracted_objects = Unpacker(config).unpack(file_path)
+def unpack(file_path, config, folder):
+    extractor = Unpacker(config, folder)
+
+    extracted_objects = extractor.unpack(file_path)
+
     logging.info('{} files extracted'.format(len(extracted_objects)))
     logging.debug('Extracted files:\n{}'.format('\n'.join((str(path) for path in extracted_objects))))
