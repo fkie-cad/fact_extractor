@@ -7,13 +7,14 @@ Supported encodings are:
  - motorola s-record
  - tektronix
  - tektronix extended
+ - file systems
 '''
 from common_helper_extraction import EXTRACTOR_LIST, dump_files
 from common_helper_files import get_binary_from_file
 
 NAME = 'RAW'
-MIME_PATTERNS = ['data/raw']
-VERSION = '0.3'
+MIME_PATTERNS = ['application/octet-stream', 'data/raw']
+VERSION = '0.4'
 
 
 def unpack_function(file_path, tmp_dir):
