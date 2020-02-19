@@ -13,7 +13,8 @@ from helperFunctions.install import (
 def main(distribution):
     # dependencies
     apt_install_packages('libjpeg-dev', 'liblzma-dev', 'liblzo2-dev', 'zlib1g-dev', 'unzip', 'libffi-dev', 'libfuzzy-dev')
-    pip3_install_packages('pluginbase', 'entropy')
+    pip3_install_packages('pluginbase')
+    pip3_install_packages('git+https://github.com/armbues/python-entropy')  # To be checked. Original dependency was deleted.
 
     # removes due to compatibilty reasons
     try:
