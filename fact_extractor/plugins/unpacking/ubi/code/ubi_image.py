@@ -5,7 +5,7 @@ from common_helper_process import execute_shell_command
 
 NAME = 'UBI-Image'
 MIME_PATTERNS = ['firmware/ubi-image']
-VERSION = '0.2'
+VERSION = '0.3'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -13,7 +13,7 @@ def unpack_function(file_path, tmp_dir):
     file_path specifies the input file.
     local_tmp_dir should be used to store the extracted files.
     '''
-    output = execute_shell_command('fakeroot ubireader_extract_images -v --output-dir {} {}'.format(tmp_dir, file_path)) + '\n'
+    output = execute_shell_command('fakeroot ubireader_extract_images -i -w -v --output-dir {} {}'.format(tmp_dir, file_path)) + '\n'
     meta_data = {'output': output}
     return meta_data
 
