@@ -1,8 +1,5 @@
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
-from ..code.avm_kernel_image import _fix_lzma_header, FIXED_LZMA_HEADER
-
-
-TEST_AVM_LZMA_STREAM = b'\x5d\x00\x00\x80\x00\x00\x00\x00Some_data'
+from ..code.avm_kernel_image import FIND_SQUASHFS_TOOL_PATH, UNPACK_KERNEL_TOOL_PATH
 
 
 class TestAvmKernelImage(TestUnpackerBase):
@@ -12,7 +9,7 @@ class TestAvmKernelImage(TestUnpackerBase):
         self.check_unpacker_selection('linux/avm-kernel-image-v2', 'avm_kernel_image')
 
 
-def test_fix_lzma_header():
-    fixed_stream = _fix_lzma_header(TEST_AVM_LZMA_STREAM)
-    assert isinstance(fixed_stream, bytes)
-    assert fixed_stream == FIXED_LZMA_HEADER + b'Some_data'
+def test_tool_pathes_set_correctly():
+    assert FIND_SQUASHFS_TOOL_PATH.exists()
+    assert UNPACK_KERNEL_TOOL_PATH.exists()
+    assert str(FIND_SQUASHFS_TOOL_PATH)[0] == '/'
