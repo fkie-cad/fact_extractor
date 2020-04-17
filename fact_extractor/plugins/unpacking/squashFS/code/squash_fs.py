@@ -38,7 +38,7 @@ def unpack_function(file_path, tmp_dir):
 
 
 def _unpack_success(tmp_dir):
-    return len(get_files_in_dir(tmp_dir)) > 0
+    return len(get_files_in_dir(str(tmp_dir))) > 0
 
 
 # ----> Do not edit below this line <----
