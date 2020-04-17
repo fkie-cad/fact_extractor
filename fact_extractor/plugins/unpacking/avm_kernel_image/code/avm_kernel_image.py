@@ -1,14 +1,15 @@
 from common_helper_process.fail_safe_subprocess import execute_shell_command
 from pathlib import Path
+from helperFunctions.file_system import get_fact_bin_dir
 
 
 NAME = 'avm_kernel_image'
 MIME_PATTERNS = ['linux/avm-kernel-image-v1', 'linux/avm-kernel-image-v2']
 VERSION = '0.2'
 
-BIN_DIR = Path(__file__).parent.parent / 'bin'
-FIND_SQUASHFS_TOOL_PATH = BIN_DIR / 'find-squashfs'
-UNPACK_KERNEL_TOOL_PATH = BIN_DIR / 'unpack-kernel'
+
+FIND_SQUASHFS_TOOL_PATH = Path(get_fact_bin_dir()) / 'find-squashfs'
+UNPACK_KERNEL_TOOL_PATH = Path(get_fact_bin_dir()) / 'unpack-kernel'
 
 
 def unpack_function(file_path, tmp_dir):
