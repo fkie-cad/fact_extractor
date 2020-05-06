@@ -3,7 +3,6 @@
 import hashlib
 import sys
 import binascii
-import struct
 import pathlib
 
 from Crypto.Cipher import AES

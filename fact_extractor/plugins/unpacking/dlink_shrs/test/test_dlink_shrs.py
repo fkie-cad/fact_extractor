@@ -1,8 +1,8 @@
-import os
+from pathlib import Path
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 
-TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+TEST_DATA_DIR = Path(__file__).parent / 'data'
 
 
 class TestDlinkShrs(TestUnpackerBase):
@@ -11,7 +11,10 @@ class TestDlinkShrs(TestUnpackerBase):
         self.check_unpacker_selection('firmware/dlink-shrs', 'D-Link SHRS')
 
     def test_extraction(self):
-        in_file = os.path.join(TEST_DATA_DIR, 'DIR867A1_FW120B10_Beta_for_security_issues_Stackoverflow_20191221.bin')
+        in_file = TEST_DATA_DIR / 'test.dec'
         files, meta_data = self.unpacker.extract_files_from_file(in_file, self.tmp_dir.name)
-        self.assertEqual(len(files), 1, 'decryption failed')
-        self.assertIn('output', meta_data)
+        assert len(files) == 1
+        assert 'output' in meta_data
+        with open(files[0]) as fp:
+            file_content = fp.read()
+        assert 'This is a decrypted test file!' in file_content
