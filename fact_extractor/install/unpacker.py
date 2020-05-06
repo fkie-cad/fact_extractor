@@ -1,14 +1,16 @@
+from common_helper_process import execute_shell_command_get_return_code
+from getpass import getuser
 import logging
 import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from common_helper_process import execute_shell_command_get_return_code
 from helperFunctions.install import (
     InstallationError, apt_install_packages, apt_remove_packages,
     install_github_project, pip2_install_packages, pip2_remove_packages,
     pip3_install_packages, OperateInDirectory
 )
+
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
 
@@ -90,17 +92,26 @@ def _install_unpacker(xenial):
     # firmware-mod-kit
     install_github_project('rampageX/firmware-mod-kit', ['git checkout 5e74fe9dd', '(cd src && sh configure && make)',
                                                          'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
-    # freetz
+    _install_freetz()
+
+
+def _install_freetz():
+    logging.info('Installing FREETZ')
+    current_user = getuser()
     apt_install_packages('bison', 'flex', 'gettext', 'libtool-bin', 'libtool', 'libacl1-dev', 'libcap-dev',
                          'libc6-dev-i386', 'lib32ncurses5-dev', 'gcc-multilib', 'lib32stdc++6', 'gawk', 'pkg-config')
     with TemporaryDirectory(prefix='fact_freetz') as build_directory:
         with OperateInDirectory(build_directory):
-            old_umask = os.umask(0o022)
-            install_github_project('Freetz/freetz', ['make -j$(nproc) tools',
+            os.umask(0o022)
+            install_github_project('Freetz/freetz', ['sudo useradd -M makeuser',
+                                                     'sudo chown -R makeuser {}'.format(build_directory),
+                                                     'sudo su makeuser -c "umask 0022 && make -j$(nproc) tools"',
+                                                     'sudo chmod -R 777 {}'.format(build_directory),
+                                                     'sudo chown -R {} {}'.format(current_user, build_directory),
                                                      'cp tools/find-squashfs tools/unpack-kernel tools/unlzma tools/freetz_bin_functions\
                                                      tools/sfk tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi\
-                                                     {}'.format(BIN_DIR)])
-            os.umask(old_umask)
+                                                     {}'.format(BIN_DIR),
+                                                     'sudo userdel makeuser'])
 
 
 def _install_plugins():
