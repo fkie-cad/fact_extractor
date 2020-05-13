@@ -15,6 +15,5 @@ class TestDlinkShrs(TestUnpackerBase):
         files, meta_data = self.unpacker.extract_files_from_file(in_file, self.tmp_dir.name)
         assert len(files) == 1
         assert 'output' in meta_data
-        with open(files[0]) as fp:
-            file_content = fp.read()
+        file_content = Path(files[0]).read_text()
         assert 'This is a decrypted test file!' in file_content

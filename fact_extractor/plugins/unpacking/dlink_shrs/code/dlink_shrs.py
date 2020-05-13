@@ -13,10 +13,6 @@ TOOL_PATH = Path(__file__).parent.parent / 'internal/DecryptorLink.py'
 
 
 def unpack_function(file_path, tmp_dir):
-    '''
-    file_path specifies the input file.
-    tmp_dir should be used to store the extracted files.
-    '''
     decrypted_file = Path(tmp_dir, 'decrypted_image')
 
     extraction_command = 'python3 {} {} {}'.format(TOOL_PATH, file_path, decrypted_file)
