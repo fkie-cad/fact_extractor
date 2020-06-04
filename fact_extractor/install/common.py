@@ -5,25 +5,84 @@ from pathlib import Path
 
 from helperFunctions.config import load_config
 from helperFunctions.install import (
-    apt_install_packages, apt_update_sources, pip3_install_packages
+    apt_install_packages, apt_update_sources, pip2_install_packages, pip3_install_packages
 )
 
 
-def main(distribution):
-    xenial = distribution == 'xenial'
+DEPENDENCIES = {
+    # Ubuntu
+    'xenial': {
+        'apt': [
+            'python-wheel'
+        ]
+    },
+    'bionib': {
+        'apt': [
+            'python-wheel'
+        ],
+        'pip3': [
+            'testresources'
+        ]
+    },
+    'focal': {
+        'apt': [
+            'python3-wheel',
+            'python-wheel-common'
+        ],
+        'pip3': [
+            'testresources'
+        ]
+    },
+    # Debian
+    'debian': {
+        'apt': [
+            'python-wheel'
+        ],
+        'pip3': [
+            'testresources'
+        ]
+    },
+    # Packages common to all plateforms
+    'common': {
+        'apt': [
+            # Non python dependencies
+            'build-essential',
+            'automake',
+            'autoconf',
+            'libtool',
+            # Python dependencies
+            'python3',
+            'python3-dev',
+            'python',
+            'python-dev',
+            'python-setuptools'
+        ],
+        'pip2': [],
+        'pip3': [
+            'pytest',
+            'pytest-cov',
+            'pytest-flake8'
+        ]
+    }
+}
 
+
+def install_dependencies(dependencies):
+    apt = dependencies.get('apt', [])
+    pip2 = dependencies.get('pip2', [])
+    pip3 = dependencies.get('pip3', [])
+    apt_install_packages(*apt)
+    pip2_install_packages(*pip2)
+    pip3_install_packages(*pip3)
+
+
+def main(distribution):
     logging.info('Updating package lists')
     apt_update_sources()
 
-    # Non python dependencies
-    apt_install_packages('build-essential', 'automake', 'autoconf', 'libtool')
-
-    # python dependencies
-    apt_install_packages('python3', 'python3-dev', 'python', 'python-dev', 'python-wheel', 'python-setuptools')
-
-    pip3_install_packages('pytest', 'pytest-cov', 'pytest-flake8')
-    if not xenial:
-        pip3_install_packages('testresources')
+    # install dependencies
+    install_dependencies(DEPENDENCIES['common'])
+    install_dependencies(DEPENDENCIES[distribution])
 
     # make bin dir
     with suppress(FileExistsError):

@@ -14,13 +14,148 @@ from helperFunctions.install import (
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
 
+DEPENDENCIES = {
+    # Ubuntu
+    'xenial': {
+        'apt': [
+            'python-lzma',
+            # binwalk
+            'cramfsprogs',
+            'libqt4-opengl',
+            'python3-pyqt4',
+            'python3-pyqt4.qtopengl',
+            # patool and unpacking backends
+            'zoo'
+        ]
+    },
+    'bionib': {
+        'apt': [
+            'python-lzma',
+            # binwalk
+            'libqt4-opengl',
+            'python3-pyqt4',
+            'python3-pyqt4.qtopengl'
+        ]
+    },
+    'focal': {
+        'apt': [
+            # binwalk
+            'libqt5opengl5',
+            'python3-pyqt5',
+            'python3-pyqt5.qtopengl'
+        ],
+    },
+    # Debian
+    'debian': {
+        'apt': [
+            'python-lzma',
+            'cramfsprogs',
+            'python3-pyqt4',
+            'python3-pyqt4.qtopengl'
+        ]
+    },
+
+    # Packages common to all plateforms
+    'common': {
+        'apt': [
+            'libjpeg-dev',
+            'liblzma-dev',
+            'liblzo2-dev',
+            'zlib1g-dev',
+            'unzip',
+            'libffi-dev',
+            'libfuzzy-dev',
+            'fakeroot',
+            'python3-opengl',
+            # binwalk
+            'mtd-utils',
+            'gzip',
+            'bzip2',
+            'tar',
+            'arj',
+            'lhasa',
+            'cabextract',
+            'cramfsswap',
+            'squashfs-tools',
+            'zlib1g-dev',
+            'liblzma-dev',
+            'liblzo2-dev',
+            'liblzo2-dev',
+            'xvfb',
+            'libcapstone3',
+            'libcapstone-dev',
+            # patool and unpacking backends
+            'openjdk-8-jdk',
+            'lrzip',
+            'cpio',
+            'unadf',
+            'rpm2cpio',
+            'lzop',
+            'lhasa',
+            'cabextract',
+            'zpaq',
+            'archmage',
+            'arj',
+            'xdms',
+            'rzip',
+            'lzip',
+            'unalz',
+            'unrar',
+            'unzip',
+            'gzip',
+            'nomarch',
+            'flac',
+            'unace',
+            'sharutils',
+            'unar',
+            # Freetz
+            'bison',
+            'flex',
+            'gettext',
+            'libtool-bin',
+            'libtool',
+            'libacl1-dev',
+            'libcap-dev',
+            'libc6-dev-i386',
+            'lib32ncurses5-dev',
+            'gcc-multilib',
+            'lib32stdc++6',
+            'gawk',
+            'pkg-config'
+        ],
+        'pip2': [
+            # ubi_reader
+            'python-lzo',
+            # patool
+            'patool'
+        ],
+        'pip3': [
+            'pluginbase',
+            'git+https://github.com/armbues/python-entropy',  # To be checked. Original dependency was deleted.
+            'git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git',
+            'git+https://github.com/fkie-cad/fact_helper_file.git',
+            # binwalk
+            'pyqtgraph',
+            'capstone',
+            'cstruct',
+            'python-lzo',
+            'numpy',
+            'scipy'
+        ]
+    }
+}
+
+
+def install_dependencies(dependencies):
+    apt = dependencies.get('apt', [])
+    pip2 = dependencies.get('pip2', [])
+    pip3 = dependencies.get('pip3', [])
+    apt_install_packages(*apt)
+    pip2_install_packages(*pip2)
+    pip3_install_packages(*pip3)
+
 
 def main(distribution):
-    # dependencies
-    apt_install_packages('libjpeg-dev', 'liblzma-dev', 'liblzo2-dev', 'zlib1g-dev', 'unzip', 'libffi-dev', 'libfuzzy-dev')
-    pip3_install_packages('pluginbase')
-    pip3_install_packages('git+https://github.com/armbues/python-entropy')  # To be checked. Original dependency was deleted.
-
     # removes due to compatibilty reasons
     try:
         apt_remove_packages('python-lzma')
@@ -28,14 +163,12 @@ def main(distribution):
     except InstallationError:
         logging.debug('python-lzma not removed because present already')
 
-    apt_install_packages('python-lzma')
+    # install dependencies
+    install_dependencies(DEPENDENCIES['common'])
+    install_dependencies(DEPENDENCIES[distribution])
 
     # installing unpacker
-    _install_unpacker(distribution == 'xenial')
-
-    # installing common code modules
-    pip3_install_packages('git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git')
-    pip3_install_packages('git+https://github.com/fkie-cad/fact_helper_file.git')
+    _install_unpacker(distribution)
 
     # install plug-in dependencies
     _install_plugins()
@@ -59,47 +192,28 @@ def _edit_sudoers():
         raise InstallationError('Editing sudoers file did not succeed\n{}\n{}'.format(chown_output, mv_output))
 
 
-def _install_unpacker(xenial):
-    apt_install_packages('fakeroot')
-
+def _install_unpacker(distribution):
     # sasquatch unpacker
     install_github_project('kartone/sasquatch', ['./build.sh'])
 
     # ubi_reader
-    pip2_install_packages('python-lzo')
     install_github_project('jrspruitt/ubi_reader', ['sudo python2 setup.py install --force'])
 
-    # binwalk
-    if xenial:
-        apt_install_packages('cramfsprogs')
-    apt_install_packages('libqt4-opengl', 'python3-opengl', 'python3-pyqt4', 'python3-pyqt4.qtopengl', 'mtd-utils',
-                         'gzip', 'bzip2', 'tar', 'arj', 'lhasa', 'cabextract', 'cramfsswap', 'squashfs-tools',
-                         'zlib1g-dev', 'liblzma-dev', 'liblzo2-dev', 'liblzo2-dev', 'xvfb')
-    apt_install_packages('libcapstone3', 'libcapstone-dev')
-    pip3_install_packages('pyqtgraph', 'capstone', 'cstruct', 'python-lzo', 'numpy', 'scipy')
     install_github_project('sviehb/jefferson', ['sudo python3 setup.py install'])
     _install_stuffit()
     install_github_project('dorpvom/binwalk', ['sudo python3 setup.py install --force'])
-    # patool and unpacking backends
-    pip2_install_packages('patool')
-    apt_install_packages('openjdk-8-jdk')
-    if xenial:
-        apt_install_packages('zoo')
-    apt_install_packages('lrzip', 'cpio', 'unadf', 'rpm2cpio', 'lzop', 'lhasa', 'cabextract', 'zpaq', 'archmage', 'arj',
-                         'xdms', 'rzip', 'lzip', 'unalz', 'unrar', 'unzip', 'gzip', 'nomarch', 'flac', 'unace',
-                         'sharutils')
-    apt_install_packages('unar')
+
     # firmware-mod-kit
-    install_github_project('rampageX/firmware-mod-kit', ['git checkout 5e74fe9dd', '(cd src && sh configure && make)',
+    #install_github_project('rampageX/firmware-mod-kit', ['git checkout 5e74fe9dd', '(cd src && sh configure && make)',
+    #                                                     'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
+    install_github_project('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)',
                                                          'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
-    _install_freetz()
+    _install_freetz(distribution)
 
 
-def _install_freetz():
+def _install_freetz(distribution):
     logging.info('Installing FREETZ')
     current_user = getuser()
-    apt_install_packages('bison', 'flex', 'gettext', 'libtool-bin', 'libtool', 'libacl1-dev', 'libcap-dev',
-                         'libc6-dev-i386', 'lib32ncurses5-dev', 'gcc-multilib', 'lib32stdc++6', 'gawk', 'pkg-config')
     with TemporaryDirectory(prefix='fact_freetz') as build_directory:
         with OperateInDirectory(build_directory):
             os.umask(0o022)
