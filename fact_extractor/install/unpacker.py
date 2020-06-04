@@ -25,7 +25,14 @@ DEPENDENCIES = {
             'python3-pyqt4',
             'python3-pyqt4.qtopengl',
             # patool and unpacking backends
-            'zoo'
+            'zoo',
+            'openjdk-8-jdk'
+        ],
+        'pip2': [
+            # ubi_reader
+            'python-lzo',
+            # patool
+            'patool'
         ]
     },
     'bionib': {
@@ -34,7 +41,15 @@ DEPENDENCIES = {
             # binwalk
             'libqt4-opengl',
             'python3-pyqt4',
-            'python3-pyqt4.qtopengl'
+            'python3-pyqt4.qtopengl',
+            # patool and unpacking backends
+            'openjdk-8-jdk'
+        ],
+        'pip2': [
+            # ubi_reader
+            'python-lzo',
+            # patool
+            'patool'
         ]
     },
     'focal': {
@@ -42,19 +57,46 @@ DEPENDENCIES = {
             # binwalk
             'libqt5opengl5',
             'python3-pyqt5',
-            'python3-pyqt5.qtopengl'
+            'python3-pyqt5.qtopengl',
+            # patool and unpacking backends
+            'openjdk-14-jdk'
         ],
-    },
-    # Debian
-    'debian': {
-        'apt': [
-            'python-lzma',
-            'cramfsprogs',
-            'python3-pyqt4',
-            'python3-pyqt4.qtopengl'
+        'pip2': [
+            # ubi_reader
+            'python-lzo',
+            # patool
+            'patool'
         ]
     },
-
+    # Debian
+    'buster': {
+        'apt': [
+            'python-lzma',
+            # binwalk
+            'libqt4-opengl',
+            'python3-pyqt4',
+            'python3-pyqt4.qtopengl',
+            # patool and unpacking backends
+            'openjdk-8-jdk'
+        ],
+        'pip2': [
+            # ubi_reader
+            'python-lzo',
+            # patool
+            'patool'
+        ]
+    },
+    'bullseye': {
+        'apt': [
+            # binwalk
+            'libqt5opengl5',
+            'python3-pyqt5',
+            'python3-pyqt5.qtopengl',
+            # patool and unpacking backends
+            'patool',
+            'openjdk-14-jdk'
+        ]
+    },
     # Packages common to all plateforms
     'common': {
         'apt': [
@@ -85,7 +127,6 @@ DEPENDENCIES = {
             'libcapstone3',
             'libcapstone-dev',
             # patool and unpacking backends
-            'openjdk-8-jdk',
             'lrzip',
             'cpio',
             'unadf',
@@ -122,12 +163,6 @@ DEPENDENCIES = {
             'lib32stdc++6',
             'gawk',
             'pkg-config'
-        ],
-        'pip2': [
-            # ubi_reader
-            'python-lzo',
-            # patool
-            'patool'
         ],
         'pip3': [
             'pluginbase',

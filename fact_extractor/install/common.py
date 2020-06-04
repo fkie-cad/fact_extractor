@@ -34,9 +34,18 @@ DEPENDENCIES = {
         ]
     },
     # Debian
-    'debian': {
+    'buster': {
         'apt': [
             'python-wheel'
+        ],
+        'pip3': [
+            'testresources'
+        ]
+    },
+    'bullseye': {
+        'apt': [
+            'python3-wheel',
+            'python-wheel-common'
         ],
         'pip3': [
             'testresources'

@@ -39,7 +39,8 @@ PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor in
 
 BIONIC_CODE_NAMES = ['bionic', 'tara', 'tessa', 'tina', 'disco']
 XENIAL_CODE_NAMES = ['xenial', 'yakkety', 'sarah', 'serena', 'sonya', 'sylvia']
-DEBIAN_CODE_NAMES = ['buster', 'stretch', 'kali-rolling']
+BUSTER_CODE_NAMES = ['buster', 'stretch', 'kali-rolling']
+BULLSEYE_CODE_NAMES = ['bullseye']
 FOCAL_CODE_NAMES = ['focal']
 
 
@@ -76,9 +77,12 @@ def check_distribution():
     if codename in FOCAL_CODE_NAMES:
         logging.debug('Ubuntu 20.04 detected')
         return 'focal'
-    if codename in DEBIAN_CODE_NAMES:
-        logging.debug('Debian/Kali detected')
-        return 'debian'
+    if codename in BUSTER_CODE_NAMES:
+        logging.debug('Debian 10/Kali detected')
+        return 'buster'
+    if codename in BULLSEYE_CODE_NAMES:
+        logging.debug('Debian 11 detected')
+        return 'bullseye'
     sys.exit('Your Distribution ({} {}) is not supported. FACT Installer requires Ubuntu 16.04, Ubuntu 18.04 or compatible!'.format(distro.id(), distro.version()))
 
 
