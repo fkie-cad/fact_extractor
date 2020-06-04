@@ -83,7 +83,7 @@ def check_distribution():
     if codename in BULLSEYE_CODE_NAMES:
         logging.debug('Debian 11 detected')
         return 'bullseye'
-    sys.exit('Your Distribution ({} {}) is not supported. FACT Installer requires Ubuntu 16.04, Ubuntu 18.04 or compatible!'.format(distro.id(), distro.version()))
+    sys.exit('Your Distribution ({} {}) is not supported. FACT Extractor Installer requires Ubuntu 16.04, 18.04, 20.04, or compatible!'.format(distro.id(), distro.version()))
 
 
 def main():
