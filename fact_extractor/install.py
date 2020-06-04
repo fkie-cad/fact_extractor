@@ -37,11 +37,14 @@ PROGRAM_NAME = 'FACT_extractor Installer'
 PROGRAM_VERSION = __VERSION__
 PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor installation script'
 
+# Compatible Ubuntu releases
 BIONIC_CODE_NAMES = ['bionic', 'tara', 'tessa', 'tina', 'disco']
 XENIAL_CODE_NAMES = ['xenial', 'yakkety', 'sarah', 'serena', 'sonya', 'sylvia']
+FOCAL_CODE_NAMES = ['focal']
+
+# Compatible Debian/Kali releases
 BUSTER_CODE_NAMES = ['buster', 'stretch', 'kali-rolling']
 BULLSEYE_CODE_NAMES = ['bullseye']
-FOCAL_CODE_NAMES = ['focal']
 
 
 def _setup_argparser():
