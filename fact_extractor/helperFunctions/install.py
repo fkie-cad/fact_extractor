@@ -69,16 +69,25 @@ def apt_clean_system():
 
 
 def apt_install_packages(*args):
+    if not args:
+        return
+
     log_current_packages(args)
     return run_shell_command_raise_on_return_code('sudo -E apt-get install -y {}'.format(' '.join(args)), 'Error in installation of package(s) {}'.format(' '.join(args)), True)
 
 
 def apt_remove_packages(*args):
+    if not args:
+        return
+
     log_current_packages(args, install=False)
     return run_shell_command_raise_on_return_code('sudo -E apt-get remove -y {}'.format(' '.join(args)), 'Error in removal of package(s) {}'.format(' '.join(args)), True)
 
 
 def _pip_install_packages(version, args):
+    if not args:
+        return
+
     log_current_packages(args)
     for packet in args:
         try:
@@ -91,6 +100,9 @@ def _pip_install_packages(version, args):
 
 
 def _pip_remove_packages(version, args):
+    if not args:
+        return
+
     log_current_packages(args, install=False)
     for packet in args:
         try:
