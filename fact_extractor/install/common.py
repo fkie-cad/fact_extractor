@@ -16,7 +16,7 @@ DEPENDENCIES = {
             'python-wheel'
         ]
     },
-    'bionib': {
+    'bionic': {
         'apt': [
             'python-wheel'
         ],

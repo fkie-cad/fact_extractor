@@ -239,8 +239,7 @@ def _install_unpacker(distribution):
     install_github_project('dorpvom/binwalk', ['sudo python3 setup.py install --force'])
 
     # firmware-mod-kit
-    #install_github_project('rampageX/firmware-mod-kit', ['git checkout 5e74fe9dd', '(cd src && sh configure && make)',
-    #                                                     'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
+    # Removed 'git checkout 5e74fe9dd'
     install_github_project('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)',
                                                          'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
     _install_freetz(distribution)
