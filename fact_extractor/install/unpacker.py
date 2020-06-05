@@ -35,7 +35,7 @@ DEPENDENCIES = {
             'patool'
         ]
     },
-    'bionib': {
+    'bionic': {
         'apt': [
             'python-lzma',
             # binwalk
@@ -230,6 +230,7 @@ def _install_unpacker(distribution):
     install_github_project('jrspruitt/ubi_reader', ['sudo python2 setup.py install --force'])
 
     install_github_project('sviehb/jefferson', ['sudo python3 setup.py install'])
+    #install_github_project('svidovich/jefferson-3', ['sudo python3 setup.py install'])
     _install_stuffit()
     install_github_project('dorpvom/binwalk', ['sudo python3 setup.py install --force'])
 
