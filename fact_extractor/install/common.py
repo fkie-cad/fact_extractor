@@ -66,7 +66,6 @@ DEPENDENCIES = {
             'python-dev',
             'python-setuptools'
         ],
-        'pip2': [],
         'pip3': [
             'pytest',
             'pytest-cov',
@@ -78,10 +77,8 @@ DEPENDENCIES = {
 
 def install_dependencies(dependencies):
     apt = dependencies.get('apt', [])
-    pip2 = dependencies.get('pip2', [])
     pip3 = dependencies.get('pip3', [])
     apt_install_packages(*apt)
-    pip2_install_packages(*pip2)
     pip3_install_packages(*pip3)
 
 

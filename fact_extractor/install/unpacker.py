@@ -33,6 +33,10 @@ DEPENDENCIES = {
             'python-lzo',
             # patool
             'patool'
+        ],
+        'github': [
+            ('jrspruitt/ubi_reader', ['sudo python2 setup.py install --force']),
+            ('sviehb/jefferson', ['sudo python3 setup.py install'])
         ]
     },
     'bionic': {
@@ -50,6 +54,10 @@ DEPENDENCIES = {
             'python-lzo',
             # patool
             'patool'
+        ],
+        'github': [
+            ('jrspruitt/ubi_reader', ['sudo python2 setup.py install --force']),
+            ('sviehb/jefferson', ['sudo python3 setup.py install'])
         ]
     },
     'focal': {
@@ -61,6 +69,10 @@ DEPENDENCIES = {
             # patool and unpacking backends
             'patool',
             'openjdk-14-jdk'
+        ],
+        'github': [
+            ('jrspruitt/ubi_reader', ['sudo python3 setup.py install']),
+            ('svidovich/jefferson-3', ['sudo python3 setup.py install'])
         ]
     },
     # Debian
@@ -79,6 +91,10 @@ DEPENDENCIES = {
             'python-lzo',
             # patool
             'patool'
+        ],
+        'github': [
+            ('jrspruitt/ubi_reader', ['sudo python2 setup.py install --force']),
+            ('sviehb/jefferson', ['sudo python3 setup.py install'])
         ]
     },
     'bullseye': {
@@ -90,6 +106,10 @@ DEPENDENCIES = {
             # patool and unpacking backends
             'patool',
             'openjdk-14-jdk'
+        ],
+        'github': [
+            ('jrspruitt/ubi_reader', ['sudo python3 setup.py install']),
+            ('svidovich/jefferson-3', ['sudo python3 setup.py install'])
         ]
     },
     # Packages common to all plateforms
@@ -171,6 +191,11 @@ DEPENDENCIES = {
             'python-lzo',
             'numpy',
             'scipy'
+        ],
+        'github': [
+            ('kartone/sasquatch', ['./build.sh']),
+            ('dorpvom/binwalk', ['sudo python3 setup.py install --force']),
+            ('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
         ]
     }
 }
@@ -180,9 +205,12 @@ def install_dependencies(dependencies):
     apt = dependencies.get('apt', [])
     pip2 = dependencies.get('pip2', [])
     pip3 = dependencies.get('pip3', [])
+    github = dependencies.get('github', [])
     apt_install_packages(*apt)
     pip2_install_packages(*pip2)
     pip3_install_packages(*pip3)
+    for repo in github:
+        install_github_project(*repo)
 
 
 def main(distribution):
@@ -223,21 +251,7 @@ def _edit_sudoers():
 
 
 def _install_unpacker(distribution):
-    # sasquatch unpacker
-    install_github_project('kartone/sasquatch', ['./build.sh'])
-
-    # ubi_reader
-    install_github_project('jrspruitt/ubi_reader', ['sudo python2 setup.py install --force'])
-
-    install_github_project('sviehb/jefferson', ['sudo python3 setup.py install'])
-    #install_github_project('svidovich/jefferson-3', ['sudo python3 setup.py install'])
     _install_stuffit()
-    install_github_project('dorpvom/binwalk', ['sudo python3 setup.py install --force'])
-
-    # firmware-mod-kit
-    # Removed 'git checkout 5e74fe9dd'
-    install_github_project('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)',
-                                                         'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
     _install_freetz(distribution)
 
 
