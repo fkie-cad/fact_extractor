@@ -59,13 +59,8 @@ DEPENDENCIES = {
             'python3-pyqt5',
             'python3-pyqt5.qtopengl',
             # patool and unpacking backends
+            'patool',
             'openjdk-14-jdk'
-        ],
-        'pip2': [
-            # ubi_reader
-            'python-lzo',
-            # patool
-            'patool'
         ]
     },
     # Debian
