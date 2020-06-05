@@ -5,7 +5,7 @@ from pathlib import Path
 
 from helperFunctions.config import load_config
 from helperFunctions.install import (
-    apt_install_packages, apt_update_sources, pip2_install_packages, pip3_install_packages
+    apt_install_packages, apt_update_sources, pip3_install_packages
 )
 
 
