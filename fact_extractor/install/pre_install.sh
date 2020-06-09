@@ -4,7 +4,6 @@ echo "Install Pre-Install Requirements"
 (apt-get update && apt-get install sudo) || true
 
 sudo apt-get update
-(sudo apt-get -y install python-pip || true)
 sudo apt-get -y install python3-pip python3-wheel python3-setuptools
 sudo apt-get -y install git apt-transport-https ca-certificates curl software-properties-common wget libmagic-dev
 

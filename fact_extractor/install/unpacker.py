@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 
 from helperFunctions.install import (
     InstallationError, apt_install_packages, apt_remove_packages,
-    install_github_project, pip2_install_packages, pip2_remove_packages,
+    install_github_project, pip2_remove_packages,
     pip3_install_packages, OperateInDirectory
 )
 
@@ -18,7 +18,6 @@ DEPENDENCIES = {
     # Ubuntu
     'xenial': {
         'apt': [
-            'python-lzma',
             # binwalk
             'cramfsprogs',
             'libqt4-opengl',
@@ -27,37 +26,16 @@ DEPENDENCIES = {
             # patool and unpacking backends
             'zoo',
             'openjdk-8-jdk'
-        ],
-        'pip2': [
-            # ubi_reader
-            'python-lzo',
-            # patool
-            'patool'
-        ],
-        'github': [
-            ('jrspruitt/ubi_reader', ['sudo python2 setup.py install --force']),
-            ('sviehb/jefferson', ['sudo python3 setup.py install'])
         ]
     },
     'bionic': {
         'apt': [
-            'python-lzma',
             # binwalk
             'libqt4-opengl',
             'python3-pyqt4',
             'python3-pyqt4.qtopengl',
             # patool and unpacking backends
             'openjdk-8-jdk'
-        ],
-        'pip2': [
-            # ubi_reader
-            'python-lzo',
-            # patool
-            'patool'
-        ],
-        'github': [
-            ('jrspruitt/ubi_reader', ['sudo python2 setup.py install --force']),
-            ('sviehb/jefferson', ['sudo python3 setup.py install'])
         ]
     },
     'focal': {
@@ -67,34 +45,18 @@ DEPENDENCIES = {
             'python3-pyqt5',
             'python3-pyqt5.qtopengl',
             # patool and unpacking backends
-            'patool',
             'openjdk-14-jdk'
-        ],
-        'github': [
-            ('jrspruitt/ubi_reader', ['sudo python3 setup.py install']),
-            ('svidovich/jefferson-3', ['sudo python3 setup.py install'])
         ]
     },
     # Debian
     'buster': {
         'apt': [
-            'python-lzma',
             # binwalk
             'libqt4-opengl',
             'python3-pyqt4',
             'python3-pyqt4.qtopengl',
             # patool and unpacking backends
             'openjdk-8-jdk'
-        ],
-        'pip2': [
-            # ubi_reader
-            'python-lzo',
-            # patool
-            'patool'
-        ],
-        'github': [
-            ('jrspruitt/ubi_reader', ['sudo python2 setup.py install --force']),
-            ('sviehb/jefferson', ['sudo python3 setup.py install'])
         ]
     },
     'bullseye': {
@@ -104,12 +66,7 @@ DEPENDENCIES = {
             'python3-pyqt5',
             'python3-pyqt5.qtopengl',
             # patool and unpacking backends
-            'patool',
             'openjdk-14-jdk'
-        ],
-        'github': [
-            ('jrspruitt/ubi_reader', ['sudo python3 setup.py install']),
-            ('svidovich/jefferson-3', ['sudo python3 setup.py install'])
         ]
     },
     # Packages common to all plateforms
@@ -184,6 +141,7 @@ DEPENDENCIES = {
             'git+https://github.com/armbues/python-entropy',  # To be checked. Original dependency was deleted.
             'git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git',
             'git+https://github.com/fkie-cad/fact_helper_file.git',
+            'patool',
             # binwalk
             'pyqtgraph',
             'capstone',
@@ -195,6 +153,8 @@ DEPENDENCIES = {
         'github': [
             ('kartone/sasquatch', ['./build.sh']),
             ('dorpvom/binwalk', ['sudo python3 setup.py install --force']),
+            ('jrspruitt/ubi_reader', ['sudo python3 setup.py install']),
+            ('svidovich/jefferson-3', ['sudo python3 setup.py install']),
             ('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
         ]
     }
@@ -203,11 +163,9 @@ DEPENDENCIES = {
 
 def install_dependencies(dependencies):
     apt = dependencies.get('apt', [])
-    pip2 = dependencies.get('pip2', [])
     pip3 = dependencies.get('pip3', [])
     github = dependencies.get('github', [])
     apt_install_packages(*apt)
-    pip2_install_packages(*pip2)
     pip3_install_packages(*pip3)
     for repo in github:
         install_github_project(*repo)

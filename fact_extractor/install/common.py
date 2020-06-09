@@ -11,42 +11,24 @@ from helperFunctions.install import (
 
 DEPENDENCIES = {
     # Ubuntu
-    'xenial': {
-        'apt': [
-            'python-wheel'
-        ]
-    },
+    'xenial': {},
     'bionic': {
-        'apt': [
-            'python-wheel'
-        ],
         'pip3': [
             'testresources'
         ]
     },
     'focal': {
-        'apt': [
-            'python3-wheel',
-            'python-wheel-common'
-        ],
         'pip3': [
             'testresources'
         ]
     },
     # Debian
     'buster': {
-        'apt': [
-            'python-wheel'
-        ],
         'pip3': [
             'testresources'
         ]
     },
     'bullseye': {
-        'apt': [
-            'python3-wheel',
-            'python-wheel-common'
-        ],
         'pip3': [
             'testresources'
         ]
@@ -62,9 +44,7 @@ DEPENDENCIES = {
             # Python dependencies
             'python3',
             'python3-dev',
-            'python',
-            'python-dev',
-            'python-setuptools'
+            'python-wheel-common'
         ],
         'pip3': [
             'pytest',
