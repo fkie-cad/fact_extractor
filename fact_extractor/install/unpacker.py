@@ -220,11 +220,12 @@ def _install_freetz(distribution):
         with OperateInDirectory(build_directory):
             os.umask(0o022)
             install_github_project('Freetz/freetz', ['sudo useradd -M makeuser',
+                                                     'sudo ln -s $(which python3) ./python',
                                                      'sudo chown -R makeuser {}'.format(build_directory),
-                                                     'sudo su makeuser -c "umask 0022 && make -j$(nproc) tools"',
+                                                     'sudo su makeuser -c "export PATH=$(pwd):$PATH && umask 0022 && make -j$(nproc) tools"',
                                                      'sudo chmod -R 777 {}'.format(build_directory),
                                                      'sudo chown -R {} {}'.format(current_user, build_directory),
-                                                     'cp tools/find-squashfs tools/unpack-kernel tools/unlzma tools/freetz_bin_functions\
+                                                     'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions\
                                                      tools/sfk tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi\
                                                      {}'.format(BIN_DIR),
                                                      'sudo userdel makeuser'])
