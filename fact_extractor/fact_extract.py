@@ -17,7 +17,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import os
 import sys
+from pathlib import Path
 
 from helperFunctions.program_setup import setup_argparser, setup_logging, load_config
 from unpacker.unpack import unpack
@@ -28,6 +30,9 @@ def main():
     config = load_config(arguments.config_file)
     setup_logging(arguments.debug, log_file=arguments.log_file, log_level=arguments.log_level)
 
+    # Make sure report folder exists some meta.json can be written
+    report_folder = Path(config.get('unpack', 'data_folder'), 'reports')
+    report_folder.mkdir(parents=True, exist_ok=True)
     unpack(arguments.FILE_PATH, config)
 
     return 0

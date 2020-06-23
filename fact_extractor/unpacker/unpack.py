@@ -39,7 +39,6 @@ class Unpacker(UnpackBase):
 
         self.cleanup(tmp_dir)
 
-        os.makedirs(str(self._report_folder), exist_ok=True)
         Path(self._report_folder, 'meta.json').write_text(json.dumps(meta_data, cls=ReportEncoder, indent=4))
 
         return extracted_files
