@@ -25,7 +25,9 @@ DEPENDENCIES = {
             'python3-pyqt4.qtopengl',
             # patool and unpacking backends
             'zoo',
-            'openjdk-8-jdk'
+            'openjdk-8-jdk',
+            # jffs2
+            'python-lzma'
         ]
     },
     'bionic': {
@@ -35,7 +37,9 @@ DEPENDENCIES = {
             'python3-pyqt4',
             'python3-pyqt4.qtopengl',
             # patool and unpacking backends
-            'openjdk-8-jdk'
+            'openjdk-8-jdk',
+            # jffs2
+            'python-lzma'
         ]
     },
     'focal': {
