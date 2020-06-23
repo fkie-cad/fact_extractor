@@ -2,6 +2,7 @@ import logging
 from os import getgid, getuid
 from subprocess import PIPE, Popen
 from time import time
+import fnmatch
 from typing import Callable, Dict, List, Tuple
 
 from common_helper_files import get_files_in_dir
@@ -17,6 +18,7 @@ class UnpackBase(object):
 
     def __init__(self, config=None):
         self.config = config
+        self.exclude = read_list_from_config(config, 'unpack', 'exclude')
         self._setup_plugins()
 
     def _setup_plugins(self):
@@ -57,6 +59,12 @@ class UnpackBase(object):
             old_meta['0_ERROR_{}'.format(old_meta['plugin_used'])] = old_meta['output']
         return self._extract_files_from_file_using_specific_unpacker(file_path, tmp_dir, fallback_plugin, meta_data=old_meta)
 
+    def _should_ignore(self, file):
+        for pattern in self.exclude:
+            if fnmatch.fnmatchcase(file, pattern):
+                return True
+        return False
+
     def _extract_files_from_file_using_specific_unpacker(self, file_path: str, tmp_dir: str, selected_unpacker, meta_data: dict = None) -> Tuple[List, Dict]:
         unpack_function, name, version = selected_unpacker  # TODO Refactor register method to directly use four parameters instead of three
 
@@ -64,6 +72,11 @@ class UnpackBase(object):
             meta_data = {}
         meta_data['plugin_used'] = name
         meta_data['plugin_version'] = version
+
+        if self._should_ignore(file_path):
+            logging.debug('Ignore unpacking of {}'.format(file_path))
+            return [], meta_data
+
         logging.debug('Try to unpack {} with {} plugin...'.format(file_path, name))
 
         try:
@@ -77,7 +90,13 @@ class UnpackBase(object):
         self.change_owner_back_to_me(directory=tmp_dir)
         meta_data['analysis_date'] = time()
 
-        return get_files_in_dir(tmp_dir), meta_data
+        out = get_files_in_dir(tmp_dir)
+
+        if self.exclude:
+            # Remove paths that should be ignored
+            out = filter(lambda x: not self._should_ignore(x), out)
+
+        return out, meta_data
 
     def change_owner_back_to_me(self, directory: str = None, permissions: str = 'u+r'):
         with Popen('sudo chown -R {}:{} {}'.format(getuid(), getgid(), directory), shell=True, stdout=PIPE, stderr=PIPE) as pl:
