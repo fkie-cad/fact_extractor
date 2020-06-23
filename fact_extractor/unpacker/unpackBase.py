@@ -60,8 +60,9 @@ class UnpackBase(object):
         return self._extract_files_from_file_using_specific_unpacker(file_path, tmp_dir, fallback_plugin, meta_data=old_meta)
 
     def _should_ignore(self, file):
+        path = str(file)
         for pattern in self.exclude:
-            if fnmatch.fnmatchcase(file, pattern):
+            if fnmatch.fnmatchcase(path, pattern):
                 return True
         return False
 
