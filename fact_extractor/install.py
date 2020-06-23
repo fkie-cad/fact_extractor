@@ -37,8 +37,14 @@ PROGRAM_NAME = 'FACT_extractor Installer'
 PROGRAM_VERSION = __VERSION__
 PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor installation script'
 
-BIONIC_CODE_NAMES = ['bionic', 'tara', 'tessa', 'tina']
+# Compatible Ubuntu releases
+BIONIC_CODE_NAMES = ['bionic', 'tara', 'tessa', 'tina', 'disco']
 XENIAL_CODE_NAMES = ['xenial', 'yakkety', 'sarah', 'serena', 'sonya', 'sylvia']
+FOCAL_CODE_NAMES = ['focal']
+
+# Compatible Debian/Kali releases
+BUSTER_CODE_NAMES = ['buster', 'stretch', 'kali-rolling']
+BULLSEYE_CODE_NAMES = ['bullseye']
 
 
 def _setup_argparser():
@@ -71,7 +77,16 @@ def check_distribution():
     if codename in BIONIC_CODE_NAMES:
         logging.debug('Ubuntu 18.04 detected')
         return 'bionic'
-    sys.exit('Your Distribution ({} {}) is not supported. Installer requires Ubuntu 16.04, 18.04 or compatible!'.format(distro.id(), distro.version()))
+    if codename in FOCAL_CODE_NAMES:
+        logging.debug('Ubuntu 20.04 detected')
+        return 'focal'
+    if codename in BUSTER_CODE_NAMES:
+        logging.debug('Debian 10/Kali detected')
+        return 'buster'
+    if codename in BULLSEYE_CODE_NAMES:
+        logging.debug('Debian 11 detected')
+        return 'bullseye'
+    sys.exit('Your Distribution ({} {}) is not supported. FACT Extractor Installer requires Ubuntu 16.04, 18.04, 20.04, or compatible!'.format(distro.id(), distro.version()))
 
 
 def main():
