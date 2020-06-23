@@ -9,21 +9,66 @@ from helperFunctions.install import (
 )
 
 
-def main(distribution):
-    xenial = distribution == 'xenial'
+DEPENDENCIES = {
+    # Ubuntu
+    'xenial': {},
+    'bionic': {
+        'pip3': [
+            'testresources'
+        ]
+    },
+    'focal': {
+        'pip3': [
+            'testresources'
+        ]
+    },
+    # Debian
+    'buster': {
+        'pip3': [
+            'testresources'
+        ]
+    },
+    'bullseye': {
+        'pip3': [
+            'testresources'
+        ]
+    },
+    # Packages common to all plateforms
+    'common': {
+        'apt': [
+            # Non python dependencies
+            'build-essential',
+            'automake',
+            'autoconf',
+            'libtool',
+            # Python dependencies
+            'python3',
+            'python3-dev',
+            'python-wheel-common'
+        ],
+        'pip3': [
+            'pytest',
+            'pytest-cov',
+            'pytest-flake8'
+        ]
+    }
+}
 
+
+def install_dependencies(dependencies):
+    apt = dependencies.get('apt', [])
+    pip3 = dependencies.get('pip3', [])
+    apt_install_packages(*apt)
+    pip3_install_packages(*pip3)
+
+
+def main(distribution):
     logging.info('Updating package lists')
     apt_update_sources()
 
-    # Non python dependencies
-    apt_install_packages('build-essential', 'automake', 'autoconf', 'libtool')
-
-    # python dependencies
-    apt_install_packages('python3', 'python3-dev', 'python', 'python-dev', 'python-wheel', 'python-setuptools')
-
-    pip3_install_packages('pytest', 'pytest-cov', 'pytest-flake8')
-    if not xenial:
-        pip3_install_packages('testresources')
+    # install dependencies
+    install_dependencies(DEPENDENCIES['common'])
+    install_dependencies(DEPENDENCIES[distribution])
 
     # make bin dir
     with suppress(FileExistsError):

@@ -16,6 +16,8 @@ MIME_PATTERNS = [
 ]
 VERSION = '0.5.2'
 
+TOOL_PATH = execute_shell_command('which patool').strip()
+
 
 def unpack_function(file_path, tmp_dir):
     """
@@ -23,7 +25,7 @@ def unpack_function(file_path, tmp_dir):
     tmp_dir should be used to store the extracted files.
     """
     return {
-        'output': execute_shell_command('fakeroot patool extract --outdir {} {}'.format(tmp_dir, file_path), timeout=600)
+        'output': execute_shell_command('fakeroot python3 {} extract --outdir {} {}'.format(TOOL_PATH, tmp_dir, file_path), timeout=600)
     }
 
 
