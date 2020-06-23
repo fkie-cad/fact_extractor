@@ -45,10 +45,10 @@ class Unpacker(UnpackBase):
 
     def _do_fallback_if_necessary(self, extracted_files: List, meta_data: Dict, tmp_dir: str, file_path: str) -> Tuple[List, Dict]:
         if not extracted_files and meta_data['plugin_used'] in self.FS_FALLBACK_CANDIDATES:
-            logging.warning('{} could not extract any files -> generic fs fallback'.format(meta_data['plugin_used']))
+            logging.warning('{} could not extract any file from {} -> generic fs fallback'.format(meta_data['plugin_used'], file_path))
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/fs')
         if not extracted_files and meta_data['plugin_used'] not in self.CARVER_FALLBACK_BLACKLIST:
-            logging.warning('{} could not extract any files -> generic carver fallback'.format(meta_data['plugin_used']))
+            logging.warning('{} could not extract any file from {} -> generic carver fallback'.format(meta_data['plugin_used'], file_path))
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/carver')
         return extracted_files, meta_data
 
