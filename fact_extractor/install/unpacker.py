@@ -10,6 +10,7 @@ from helperFunctions.install import (
     install_github_project, pip2_remove_packages,
     pip3_install_packages, OperateInDirectory
 )
+from contextlib import suppress
 
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
@@ -25,9 +26,7 @@ DEPENDENCIES = {
             'python3-pyqt4.qtopengl',
             # patool and unpacking backends
             'zoo',
-            'openjdk-8-jdk',
-            # jffs2
-            'python-lzma'
+            'openjdk-8-jdk'
         ]
     },
     'bionic': {
@@ -37,9 +36,7 @@ DEPENDENCIES = {
             'python3-pyqt4',
             'python3-pyqt4.qtopengl',
             # patool and unpacking backends
-            'openjdk-8-jdk',
-            # jffs2
-            'python-lzma'
+            'openjdk-8-jdk'
         ]
     },
     'focal': {
@@ -182,6 +179,8 @@ def main(distribution):
         pip2_remove_packages('pyliblzma')
     except InstallationError:
         logging.debug('python-lzma not removed because present already')
+    with suppress(InstallationError):
+        pip2_remove_packages('jefferson')
 
     # install dependencies
     install_dependencies(DEPENDENCIES['common'])
