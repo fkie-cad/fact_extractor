@@ -10,6 +10,7 @@ from helperFunctions.install import (
     install_github_project, pip2_remove_packages,
     pip3_install_packages, OperateInDirectory
 )
+from contextlib import suppress
 
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
@@ -178,6 +179,8 @@ def main(distribution):
         pip2_remove_packages('pyliblzma')
     except InstallationError:
         logging.debug('python-lzma not removed because present already')
+    with suppress(InstallationError):
+        pip2_remove_packages('jefferson')
 
     # install dependencies
     install_dependencies(DEPENDENCIES['common'])

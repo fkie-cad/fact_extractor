@@ -43,7 +43,7 @@ def log_current_packages(packages, install=True):
     logging.info('{} {}'.format(action, ' '.join(packages)))
 
 
-def run_shell_command_raise_on_return_code(command: str, error: str, add_output_on_error=False) -> str:
+def run_shell_command_raise_on_return_code(command: str, error: str, add_output_on_error=False) -> str:  # pylint: disable=invalid-name
     output, return_code = execute_shell_command_get_return_code(command)
     if return_code != 0:
         if add_output_on_error:
@@ -106,7 +106,7 @@ def _pip_remove_packages(version, args):
     log_current_packages(args, install=False)
     for packet in args:
         try:
-            run_shell_command_raise_on_return_code('sudo -EH pip{} uninstall {}'.format(version, packet),
+            run_shell_command_raise_on_return_code('sudo -EH pip{} uninstall -y {}'.format(version, packet),
                                                    'Error in removal of python package {}'.format(packet), True)
         except InstallationError as installation_error:
             if 'is a distutils installed project' in str(installation_error):
