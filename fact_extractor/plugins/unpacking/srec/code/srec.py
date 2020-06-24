@@ -19,8 +19,8 @@ def unpack_function(file_path, tmp_dir):
     decoded = b''
     try:
         srec = Path(file_path).read_text().splitlines()
-        for l in srec:
-            _, _, _, data = bincopy.unpack_srec(l)
+        for line in srec:
+            _, _, _, data = bincopy.unpack_srec(line)
             decoded += data
         Path(target_file).write_bytes(decoded)
 
