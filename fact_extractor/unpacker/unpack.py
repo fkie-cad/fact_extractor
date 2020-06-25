@@ -23,13 +23,6 @@ class Unpacker(UnpackBase):
         self._report_folder = Path(self.config.get('unpack', 'data_folder'), 'reports')
 
     def unpack(self, file_path):
-        compute_stats = self.config.getboolean('ExpertSettings', 'statistics', fallback=True)
-
-        if compute_stats:
-            # Get the data from the initial file to compute statistics after
-            # extracting its content
-            binary = Path(file_path).read_bytes()
-
         logging.debug('Extracting {}'.format(Path(file_path).name))
 
         tmp_dir = TemporaryDirectory(prefix='fact_unpack_')
@@ -39,7 +32,9 @@ class Unpacker(UnpackBase):
 
         extracted_files = self.move_extracted_files(extracted_files, Path(tmp_dir.name))
 
+        compute_stats = self.config.getboolean('ExpertSettings', 'statistics', fallback=True)
         if compute_stats:
+            binary = Path(file_path).read_bytes()
             add_unpack_statistics(self._file_folder, meta_data)
             get_unpack_status(file_path, binary, extracted_files, meta_data, self.config)
 
