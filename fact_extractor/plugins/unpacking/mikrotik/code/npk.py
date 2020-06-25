@@ -4,27 +4,27 @@ Used to extract Mikrotik firmware files
 '''
 from pathlib import Path
 
-from npkpy.common import getFullPktInfo, extractContainer
+from npkpy.common import get_full_pkt_info, extract_container, NPKMagicBytesError
 from npkpy.npk.npk import Npk
-from npkpy.npk.npkConstants import CNT_HANDLER
+from npkpy.npk.npk_constants import CNT_HANDLER
 
-NAME = 'Micotic NPK files'
-MIME_PATTERNS = ['firmware/microtic-npk']
-VERSION = '0.1'
+NAME = 'MikroTik NPK files'
+MIME_PATTERNS = ['firmware/mikrotik-npk']
+VERSION = '0.2'
 
 
 def unpack_function(file_path, tmp_dir):
     try:
         npk_file = Npk(Path(file_path))
-    except RuntimeError:
+    except NPKMagicBytesError:
         return {'error': 'Invalid file. No npk magic found.'}
 
-    meta = {'output': getFullPktInfo(npk_file)}
+    meta = {'output': get_full_pkt_info(npk_file)}
 
-    export_folder = Path(tmp_dir) / '{}'.format(npk_file.file.stem)
+    export_folder = Path(tmp_dir) / f"{npk_file.file.stem}"
     export_folder.mkdir(parents=True, exist_ok=True)
 
-    extractContainer(npk_file, export_folder, CNT_HANDLER.keys())
+    extract_container(npk_file, export_folder, CNT_HANDLER.keys())
 
     return meta
 
