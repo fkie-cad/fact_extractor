@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 '''
     fact_extractor installer
-    Copyright (C) 2015-2019  Fraunhofer FKIE
+    Copyright (C) 2015-2020  Fraunhofer FKIE
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,8 +48,8 @@ BULLSEYE_CODE_NAMES = ['bullseye']
 
 
 def _setup_argparser():
-    parser = argparse.ArgumentParser(description='{} - {}'.format(PROGRAM_NAME, PROGRAM_DESCRIPTION))
-    parser.add_argument('-V', '--version', action='version', version='{} {}'.format(PROGRAM_NAME, PROGRAM_VERSION))
+    parser = argparse.ArgumentParser(description=f'{PROGRAM_NAME} - {PROGRAM_DESCRIPTION}')
+    parser.add_argument('-V', '--version', action='version', version=f'{PROGRAM_NAME} {PROGRAM_VERSION}')
     parser.add_argument('-d', '--debug', action='store_true', help='print debug messages', default=False)
     return parser.parse_args()
 
@@ -65,14 +65,15 @@ def _setup_logging(debug_flag=False):
 
 
 def check_python_version():
-    if sys.version_info.major != 3 or sys.version_info.minor < 5:
-        sys.exit('Error: Incompatible Python version! You need at least version 3.5! Your Version: {}'.format(sys.version))
+    if sys.version_info.major != 3 or sys.version_info.minor < 6:
+        sys.exit(f'Error: Incompatible Python version! You need at least version 3.6! Your Version: {sys.version}')
 
 
 def check_distribution():
     codename = distro.codename().lower()
     if codename in XENIAL_CODE_NAMES:
         logging.debug('Ubuntu 16.04 detected')
+        logging.warning('Ubuntu 16.04 is no longer supported')
         return 'xenial'
     if codename in BIONIC_CODE_NAMES:
         logging.debug('Ubuntu 18.04 detected')
@@ -86,7 +87,7 @@ def check_distribution():
     if codename in BULLSEYE_CODE_NAMES:
         logging.debug('Debian 11 detected')
         return 'bullseye'
-    sys.exit('Your Distribution ({} {}) is not supported. FACT Extractor Installer requires Ubuntu 16.04, 18.04, 20.04, or compatible!'.format(distro.id(), distro.version()))
+    sys.exit(f'Your Distribution ({distro.id()} {distro.version()}) is not supported. FACT Extractor Installer requires Ubuntu 18.04, 20.04, or compatible!')
 
 
 def main():
@@ -95,7 +96,7 @@ def main():
     _setup_logging(debug_flag=args.debug)
     distribution = check_distribution()
 
-    logging.info('{} {}'.format(PROGRAM_NAME, PROGRAM_VERSION))
+    logging.info(f'{PROGRAM_NAME} {PROGRAM_VERSION}')
     installation_directory = str(Path(__file__).parent / 'install')
 
     with OperateInDirectory(installation_directory):
