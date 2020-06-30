@@ -6,6 +6,7 @@ import binascii
 import pathlib
 import argparse
 
+from contextlib import suppress
 from Crypto.Cipher import AES
 
 CIPHERTEXT_OFF = 0x6DC
@@ -51,11 +52,11 @@ class DcryptLink:
 
     @staticmethod
     def verify(calculated, expected):
-        if expected == calculated:
-            print('\t[+] OK!')
-            return 1
-        print('\t[!] Failed!')
-        sys.exit()
+        if expected != calculated:
+            print('\t[!] Failed!')
+            raise ValueError
+        print('\t[+] OK!')
+        return 0
 
     def decrypt_aes128_cbc(self):
         with open(self.enc_fw, 'rb') as enc_fw:
@@ -103,14 +104,14 @@ def main():
 
     dlink = DcryptLink(cli_args.inp, cli_args.out)
 
-    dlink.verify_magic_bytes()
-
-    print('[*] Verifying SHA512 message digest of encrypted payload...')
-    md = dlink.calc_sha512_from_fd_at_offset_of_len(dlink.enc_fw, CIPHERTEXT_OFF, dlink.data_len_dec_fw_no_padding)
-    expected_md = dlink.get_expected_sha512_from_fd_at_offset(dlink.enc_fw, SHA512_ENC_FW)
-    dlink.verify(md, expected_md)
-
     try:
+        dlink.verify_magic_bytes()
+
+        print('[*] Verifying SHA512 message digest of encrypted payload...')
+        md = dlink.calc_sha512_from_fd_at_offset_of_len(dlink.enc_fw, CIPHERTEXT_OFF, dlink.data_len_dec_fw_no_padding)
+        expected_md = dlink.get_expected_sha512_from_fd_at_offset(dlink.enc_fw, SHA512_ENC_FW)
+        dlink.verify(md, expected_md)
+
         dlink.decrypt_aes128_cbc()
 
         print('[*] Verifying SHA512 message digests of decrypted payload...')
@@ -124,8 +125,10 @@ def main():
 
         print(f'[+] Successfully decrypted {pathlib.Path(dlink.enc_fw).name}!')
     except ValueError:
-        pathlib.Path(dlink.dec_fw).unlink()
+        with suppress(FileNotFoundError):
+            pathlib.Path(dlink.dec_fw).unlink()
         print('[!] Failed!')
+        sys.exit(1)
 
 
 if __name__ == '__main__':
