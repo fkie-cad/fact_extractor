@@ -23,21 +23,30 @@ class Unpacker(UnpackBase):
         self._report_folder = Path(self.config.get('unpack', 'data_folder'), 'reports')
 
     def unpack(self, file_path):
-        binary = Path(file_path).read_bytes()
+        if self._should_ignore(file_path):
+            meta_data = {
+                'plugin_used': None,
+                'number_of_unpacked_files': 0,
+                'info': 'File was ignored because it matched the exclude list {}'.format(
+                    self.exclude
+                )
+            }
+            extracted_files = []
+        else:
+            logging.debug('Extracting {}'.format(Path(file_path).name))
 
-        logging.debug('Extracting {}'.format(Path(file_path).name))
+            tmp_dir = TemporaryDirectory(prefix='fact_unpack_')
 
-        tmp_dir = TemporaryDirectory(prefix='fact_unpack_')
+            extracted_files, meta_data = self.extract_files_from_file(file_path, tmp_dir.name)
+            extracted_files, meta_data = self._do_fallback_if_necessary(extracted_files, meta_data, tmp_dir.name, file_path)
 
-        extracted_files, meta_data = self.extract_files_from_file(file_path, tmp_dir.name)
-        extracted_files, meta_data = self._do_fallback_if_necessary(extracted_files, meta_data, tmp_dir.name, file_path)
+            extracted_files = self.move_extracted_files(extracted_files, Path(tmp_dir.name))
 
-        extracted_files = self.move_extracted_files(extracted_files, Path(tmp_dir.name))
+            binary = Path(file_path).read_bytes()
+            add_unpack_statistics(self._file_folder, meta_data)
+            get_unpack_status(file_path, binary, extracted_files, meta_data, self.config)
 
-        add_unpack_statistics(self._file_folder, meta_data)
-        get_unpack_status(file_path, binary, extracted_files, meta_data, self.config)
-
-        self.cleanup(tmp_dir)
+            self.cleanup(tmp_dir)
 
         Path(self._report_folder, 'meta.json').write_text(json.dumps(meta_data, cls=ReportEncoder, indent=4))
 
