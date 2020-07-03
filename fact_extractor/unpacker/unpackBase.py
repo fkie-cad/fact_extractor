@@ -74,10 +74,6 @@ class UnpackBase(object):
         meta_data['plugin_used'] = name
         meta_data['plugin_version'] = version
 
-        if self._should_ignore(file_path):
-            logging.debug('Ignore unpacking of {}'.format(file_path))
-            return [], meta_data
-
         logging.debug('Try to unpack {} with {} plugin...'.format(file_path, name))
 
         try:
