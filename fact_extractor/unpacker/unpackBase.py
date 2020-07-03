@@ -95,7 +95,7 @@ class UnpackBase(object):
 
         if self.exclude:
             # Remove paths that should be ignored
-            out = filter(lambda x: not self._should_ignore(x), out)
+            out = [f for f in out if not self._should_ignore(f)]
 
         return out, meta_data
 
