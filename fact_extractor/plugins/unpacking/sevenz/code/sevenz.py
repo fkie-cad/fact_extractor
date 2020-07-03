@@ -2,6 +2,7 @@
 This plugin uses 7z to extract several formats
 '''
 import os
+import logging
 
 from common_helper_passwords import get_merged_password_set
 from common_helper_process import execute_shell_command
@@ -30,6 +31,11 @@ def unpack_function(file_path, tmp_dir):
             if 'AES' in output:
                 meta['password'] = password
             break
+
+    # Inform the user if not correct password was found
+    if 'Wrong password' in meta['output']:
+        logging.warn('Password for {} not found in fact_extractor/unpacker/passwords directory'.format(file_path))
+
     return meta
 
 

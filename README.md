@@ -30,6 +30,9 @@ fact_extractor/install/pre_install.sh
 fact_extractor/install.py
 ```
 
+:warning: **We no longer support Ubuntu 16.04 and Python 3.5** 
+(It may still work with a bit of tinkering, though)
+
 The tool can then be run with
 
 ```bash

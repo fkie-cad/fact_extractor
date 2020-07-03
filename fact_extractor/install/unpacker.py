@@ -10,6 +10,7 @@ from helperFunctions.install import (
     install_github_project, pip2_remove_packages,
     pip3_install_packages, OperateInDirectory
 )
+from contextlib import suppress
 
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
@@ -152,7 +153,7 @@ DEPENDENCIES = {
         ],
         'github': [
             ('kartone/sasquatch', ['./build.sh']),
-            ('dorpvom/binwalk', ['sudo python3 setup.py install --force']),
+            ('ReFirmLabs/binwalk', ['sudo python3 setup.py install']),
             ('jrspruitt/ubi_reader', ['sudo python3 setup.py install']),
             ('svidovich/jefferson-3', ['sudo python3 setup.py install']),
             ('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
@@ -178,13 +179,15 @@ def main(distribution):
         pip2_remove_packages('pyliblzma')
     except InstallationError:
         logging.debug('python-lzma not removed because present already')
+    with suppress(InstallationError):
+        pip2_remove_packages('jefferson')
 
     # install dependencies
     install_dependencies(DEPENDENCIES['common'])
     install_dependencies(DEPENDENCIES[distribution])
 
-    # installing unpacker
-    _install_unpacker(distribution)
+    # installing freetz
+    _install_freetz()
 
     # install plug-in dependencies
     _install_plugins()
@@ -208,12 +211,7 @@ def _edit_sudoers():
         raise InstallationError('Editing sudoers file did not succeed\n{}\n{}'.format(chown_output, mv_output))
 
 
-def _install_unpacker(distribution):
-    _install_stuffit()
-    _install_freetz(distribution)
-
-
-def _install_freetz(distribution):
+def _install_freetz():
     logging.info('Installing FREETZ')
     current_user = getuser()
     with TemporaryDirectory(prefix='fact_freetz') as build_directory:
@@ -241,15 +239,3 @@ def _install_plugins():
         shell_output, return_code = execute_shell_command_get_return_code(install_script)
         if return_code != 0:
             raise InstallationError('Error in installation of {} plugin\n{}'.format(Path(install_script).parent.name, shell_output))
-
-
-def _install_stuffit():
-    logging.info('Installing stuffit')
-    _, wget_code = execute_shell_command_get_return_code('wget -O - http://my.smithmicro.com/downloads/files/stuffit520.611linux-i386.tar.gz | tar -zxv')
-    if wget_code == 0:
-        _, cp_code = execute_shell_command_get_return_code('sudo cp bin/unstuff /usr/local/bin/')
-    else:
-        cp_code = 255
-    _, rm_code = execute_shell_command_get_return_code('rm -fr bin doc man')
-    if not all(code == 0 for code in (wget_code, cp_code, rm_code)):
-        raise InstallationError('Error in installation of unstuff')

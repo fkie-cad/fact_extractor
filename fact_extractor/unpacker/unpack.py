@@ -44,9 +44,14 @@ class Unpacker(UnpackBase):
 
             extracted_files = self.move_extracted_files(extracted_files, Path(tmp_dir.name))
 
-            binary = Path(file_path).read_bytes()
             add_unpack_statistics(self._file_folder, meta_data)
             get_unpack_status(file_path, binary, extracted_files, meta_data, self.config)
+
+            compute_stats = self.config.getboolean('ExpertSettings', 'statistics', fallback=True)
+            if compute_stats:
+                binary = Path(file_path).read_bytes()
+                add_unpack_statistics(self._file_folder, meta_data)
+                get_unpack_status(file_path, binary, extracted_files, meta_data, self.config)
 
             self.cleanup(tmp_dir)
 
@@ -61,10 +66,10 @@ class Unpacker(UnpackBase):
             return extracted_files, meta_data
 
         if not extracted_files and meta_data['plugin_used'] in self.FS_FALLBACK_CANDIDATES:
-            logging.warning('{} could not extract any files -> generic fs fallback'.format(meta_data['plugin_used']))
+            logging.warning('{} could not extract any file from {} -> generic fs fallback'.format(meta_data['plugin_used'], file_path))
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/fs')
         if not extracted_files and meta_data['plugin_used'] not in self.CARVER_FALLBACK_BLACKLIST:
-            logging.warning('{} could not extract any files -> generic carver fallback'.format(meta_data['plugin_used']))
+            logging.warning('{} could not extract any file from {} -> generic carver fallback'.format(meta_data['plugin_used'], file_path))
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/carver')
         return extracted_files, meta_data
 
