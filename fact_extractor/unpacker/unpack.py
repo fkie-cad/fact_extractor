@@ -27,6 +27,8 @@ class Unpacker(UnpackBase):
             meta_data = {
                 'plugin_used': None,
                 'number_of_unpacked_files': 0,
+                'number_of_unpacked_directories': 0,
+                'number_of_excluded_files': 1,
                 'info': 'File was ignored because it matched the exclude list {}'.format(
                     self.exclude
                 )
@@ -53,6 +55,11 @@ class Unpacker(UnpackBase):
         return extracted_files
 
     def _do_fallback_if_necessary(self, extracted_files: List, meta_data: Dict, tmp_dir: str, file_path: str) -> Tuple[List, Dict]:
+        if meta_data.get('number_of_excluded_files', 0) > 0:
+            # If files have been excluded, extracted_files might be empty, but
+            # that doesn't mean there was an error during unpacking
+            return extracted_files, meta_data
+
         if not extracted_files and meta_data['plugin_used'] in self.FS_FALLBACK_CANDIDATES:
             logging.warning('{} could not extract any files -> generic fs fallback'.format(meta_data['plugin_used']))
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/fs')

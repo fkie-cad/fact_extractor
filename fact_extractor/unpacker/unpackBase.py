@@ -91,8 +91,13 @@ class UnpackBase(object):
 
         if self.exclude:
             # Remove paths that should be ignored
+            excluded_count = len(out)
             out = [f for f in out if not self._should_ignore(f)]
+            excluded_count -= len(out)
+        else:
+            excluded_count = 0
 
+        meta_data['number_of_excluded_files'] = excluded_count
         return out, meta_data
 
     def change_owner_back_to_me(self, directory: str = None, permissions: str = 'u+r'):
