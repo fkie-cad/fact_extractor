@@ -40,7 +40,7 @@ PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor in
 # Compatible Ubuntu releases
 BIONIC_CODE_NAMES = ['bionic', 'tara', 'tessa', 'tina', 'disco']
 XENIAL_CODE_NAMES = ['xenial', 'yakkety', 'sarah', 'serena', 'sonya', 'sylvia']
-FOCAL_CODE_NAMES = ['focal']
+FOCAL_CODE_NAMES = ['focal', 'ulyana']
 
 # Compatible Debian/Kali releases
 BUSTER_CODE_NAMES = ['buster', 'stretch', 'kali-rolling']
