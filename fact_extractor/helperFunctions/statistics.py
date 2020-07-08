@@ -27,7 +27,7 @@ def get_unpack_status(file_path: str, binary: bytes, extracted_files: List[Path]
     meta_data['summary'] = []
     meta_data['entropy'] = avg_entropy(binary)
 
-    if not extracted_files:
+    if not extracted_files and meta_data.get('number_of_excluded_files', 0) == 0:
         if get_file_type_from_path(file_path)['mime'] in read_list_from_config(config, 'ExpertSettings', 'compressed_file_types')\
                 or not is_compressed(binary, compress_entropy_threshold=config.getfloat('ExpertSettings', 'unpack_threshold'), classifier=avg_entropy):
             meta_data['summary'] = ['unpacked']

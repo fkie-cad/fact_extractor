@@ -103,14 +103,30 @@ class TestUnpackerCore(TestUnpackerBase):
 
 class TestUnpackerCoreMain(TestUnpackerBase):
 
-    def main_unpack_check(self, file_path, number_unpacked_files, first_unpacker):
+    def main_unpack_check(self, file_path, number_unpacked_files, number_of_excluded_files, first_unpacker):
         extracted_files = self.unpacker.unpack(file_path)
         meta_data = self.get_unpacker_meta()
 
         self.assertEqual(len(extracted_files), number_unpacked_files, 'not all files found')
         self.assertEqual(meta_data['plugin_used'], first_unpacker, 'Wrong plugin in Meta')
         self.assertEqual(meta_data['number_of_unpacked_files'], number_unpacked_files, 'Number of unpacked files wrong in Meta')
+        self.assertEqual(meta_data['number_of_excluded_files'], number_of_excluded_files, 'Number of excluded files wrong in Meta')
 
     def test_main_unpack_function(self):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
-        self.main_unpack_check(test_file_path, 3, '7z')
+        self.main_unpack_check(test_file_path, 3, 0, '7z')
+
+    def test_main_unpack_exclude_archive(self):
+        test_file_path = Path(get_test_data_dir(), 'container/test.zip')
+        self.unpacker.exclude = ['*test.zip']
+        self.main_unpack_check(test_file_path, 0, 1, None)
+
+    def test_main_unpack_exclude_subdirectory(self):
+        test_file_path = Path(get_test_data_dir(), 'container/test.zip')
+        self.unpacker.exclude = ['*/generic folder/*']
+        self.main_unpack_check(test_file_path, 2, 1, '7z')
+
+    def test_main_unpack_exclude_files(self):
+        test_file_path = Path(get_test_data_dir(), 'container/test.zip')
+        self.unpacker.exclude = ['*/get_files_test/*test*']
+        self.main_unpack_check(test_file_path, 0, 3, '7z')
