@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -84,7 +83,7 @@ class Unpacker(UnpackBase):
                 absolute_path = Path(item)
                 relative_path = absolute_path.relative_to(extraction_dir)
                 target_path = Path(self._file_folder, relative_path)
-                os.makedirs(str(target_path.parent), exist_ok=True)
+                target_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.move(str(absolute_path), str(target_path))
                 extracted_files.append(target_path)
         return extracted_files
