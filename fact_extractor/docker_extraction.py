@@ -16,15 +16,35 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-
+import argparse
+import logging
 from pathlib import Path
+import sys
+
+from common_helper_process import execute_shell_command_get_return_code
 
 from helperFunctions.config import get_config_dir
 from helperFunctions.program_setup import load_config, setup_logging
 from unpacker.unpack import unpack
 
 
-def main():
+def _parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--chown', type=str, default='',
+                        help='change back ownership of output files to <user id>:<group id>')
+    return parser.parse_args()
+
+
+def _change_owner_of_output_files(files_dir: Path, owner: str) -> int:
+    if not len(owner.split(':')) == 2:
+        logging.error('ownership string should have the format <user id>:<group id>')
+        return 1
+
+    _, return_code = execute_shell_command_get_return_code(f'sudo chown -R {owner} {files_dir}')
+    return return_code
+
+
+def main(args):
     config = load_config('{}/main.cfg'.format(get_config_dir()))
     setup_logging(debug=False)
 
@@ -33,8 +53,12 @@ def main():
 
     unpack(input_file, config)
 
+    if args.chown:
+        output_dir = Path(config.get('unpack', 'data_folder'), 'files')
+        return _change_owner_of_output_files(output_dir, args.chown)
+
     return 0
 
 
 if __name__ == '__main__':
-    exit(main())
+    sys.exit(main(_parse_args()))
