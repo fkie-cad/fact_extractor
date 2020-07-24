@@ -1,4 +1,5 @@
 import struct
+from contextlib import suppress
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Dict
@@ -44,7 +45,8 @@ class FirmwareHeader:
     def get_next(self):
         next_header_offset = self.offset + self.header_length + (self.length if self.is_subheader else 0)
         if self._next_header_exists(next_header_offset):
-            return FirmwareHeader(self.file_content, offset=next_header_offset, is_subheader=True)
+            with suppress(KeyError, struct.error):
+                return FirmwareHeader(self.file_content, offset=next_header_offset, is_subheader=True)
         return None
 
     def _next_header_exists(self, next_offset):
