@@ -23,7 +23,7 @@ class TestUnpackerPluginPostscript(TestUnpackerBase):
         self.assertEqual(meta_data['Title'], 'Firmware Update', 'meta data not set correctly')
         self.assertEqual(meta_data['ReleaseVersions'], 'vx=10.80,ps=4.19.0,net=44.38,eng=26.P.1.4.19.0')
         self.assertEqual(meta_data['encoding_overhead'], 0.25, 'encoding overhead not correct')
-        self.assertEqual(len(meta_data.keys()), 10, 'number of found meta data not correct')
+        self.assertEqual(len(meta_data.keys()), 11, 'number of found meta data not correct')
         self.assertEqual(len(files), 3, 'Number of extracted files not correct')
 
     def test_convert_payloads(self):

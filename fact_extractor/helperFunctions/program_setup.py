@@ -32,8 +32,9 @@ def setup_logging(debug, log_file=None, log_level=None):
         file_log.setFormatter(log_format)
         logger.addHandler(file_log)
 
+    log_level = log_level if log_level else logging.INFO
     console_log = logging.StreamHandler()
-    console_log.setLevel(logging.DEBUG if debug else logging.INFO)
+    console_log.setLevel(logging.DEBUG if debug else log_level)
     console_log.setFormatter(log_format)
     logger.addHandler(console_log)
 
