@@ -30,10 +30,11 @@ def drop_underscore_directory(tmp_dir):
     extracted_contents = list(Path(tmp_dir).iterdir())
     if not extracted_contents:
         return
-    if not len(extracted_contents) == 1 or not extracted_contents[0].name.startswith('_'):
+    if not len(extracted_contents) == 1 or not extracted_contents[0].name.endswith('.extracted'):
         return
     for result in extracted_contents[0].iterdir():
         shutil.move(str(result), str(result.parent.parent))
+    shutil.rmtree(str(extracted_contents[0]))
 
 
 # ----> Do not edit below this line <----
