@@ -19,6 +19,7 @@
 import argparse
 import logging
 from pathlib import Path
+from re import match
 import sys
 
 from common_helper_process import execute_shell_command_get_return_code
@@ -36,7 +37,7 @@ def _parse_args():
 
 
 def _change_owner_of_output_files(files_dir: Path, owner: str) -> int:
-    if not len(owner.split(':')) == 2:
+    if not match(r'\d+:\d+', owner):
         logging.error('ownership string should have the format <user id>:<group id>')
         return 1
 
