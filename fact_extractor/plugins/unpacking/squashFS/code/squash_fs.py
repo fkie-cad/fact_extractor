@@ -16,9 +16,8 @@ UNSQUASHFS3_MULTI = Path(get_fact_bin_dir()) / 'unsquashfs3-multi'
 
 NAME = 'SquashFS'
 MIME_PATTERNS = ['filesystem/squashfs']
-VERSION = '0.8'
-SQUASH_UNPACKER = [SASQUATCH, UNSQUASHFS4_AVM_BE,
-                   UNSQUASHFS4_AVM_LE, UNSQUASHFS3_MULTI]
+VERSION = '0.9'
+SQUASH_UNPACKER = [SASQUATCH, UNSQUASHFS4_AVM_BE, UNSQUASHFS4_AVM_LE, UNSQUASHFS3_MULTI]
 
 
 def unpack_function(file_path, tmp_dir):
@@ -28,12 +27,13 @@ def unpack_function(file_path, tmp_dir):
     '''
     unpack_result = dict()
     for unpacker in SQUASH_UNPACKER:
-        output = execute_shell_command('fakeroot {} -d {}/fact_extracted {}'.format(unpacker, tmp_dir, file_path))
+        scan_parameter = '-scan' if '-avm-' in unpacker.name else ''
+        output = execute_shell_command(f'fakeroot {unpacker} {scan_parameter} -d {tmp_dir}/fact_extracted {file_path}')
         if _unpack_success(tmp_dir):
             unpack_result['unpacking_tool'] = unpacker.name
             unpack_result['output'] = output
             break
-        unpack_result['{} - error'.format(unpacker.name)] = output
+        unpack_result[f'{unpacker.name} - error'] = output
     return unpack_result
 
 
