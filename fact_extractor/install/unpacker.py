@@ -149,12 +149,12 @@ DEPENDENCIES = {
             'cstruct',
             'python-lzo',
             'numpy',
-            'scipy'
+            'scipy',
+            'git+https://github.com/jrspruitt/ubi_reader@v0.6.3-master'  # pinned as broken currently
         ],
         'github': [
             ('kartone/sasquatch', ['./build.sh']),
             ('ReFirmLabs/binwalk', ['sudo python3 setup.py install']),
-            ('jrspruitt/ubi_reader', ['sudo python3 setup.py install']),
             ('svidovich/jefferson-3', ['sudo python3 setup.py install']),
             ('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
         ]
