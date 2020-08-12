@@ -149,12 +149,12 @@ DEPENDENCIES = {
             'cstruct',
             'python-lzo',
             'numpy',
-            'scipy'
+            'scipy',
+            'git+https://github.com/jrspruitt/ubi_reader@v0.6.3-master'  # pinned as broken currently
         ],
         'github': [
             ('kartone/sasquatch', ['./build.sh']),
             ('ReFirmLabs/binwalk', ['sudo python3 setup.py install']),
-            ('jrspruitt/ubi_reader', ['sudo python3 setup.py install']),
             ('svidovich/jefferson-3', ['sudo python3 setup.py install']),
             ('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
         ]
@@ -217,16 +217,17 @@ def _install_freetz():
     with TemporaryDirectory(prefix='fact_freetz') as build_directory:
         with OperateInDirectory(build_directory):
             os.umask(0o022)
-            install_github_project('Freetz/freetz', ['sudo useradd -M makeuser',
-                                                     'sudo ln -s $(which python3) ./python',
-                                                     'sudo chown -R makeuser {}'.format(build_directory),
-                                                     'sudo su makeuser -c "export PATH=$(pwd):$PATH && umask 0022 && make -j$(nproc) tools"',
-                                                     'sudo chmod -R 777 {}'.format(build_directory),
-                                                     'sudo chown -R {} {}'.format(current_user, build_directory),
-                                                     'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions\
-                                                     tools/sfk tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi\
-                                                     {}'.format(BIN_DIR),
-                                                     'sudo userdel makeuser'])
+            install_github_project('Freetz/freetz', [
+                'sudo useradd -M makeuser',
+                'sudo ln -s $(which python3) ./python',
+                f'sudo chown -R makeuser {build_directory}',
+                'sudo su makeuser -c "export PATH=$(pwd):$PATH && umask 0022 && make -j$(nproc) tools"',
+                f'sudo chmod -R 777 {build_directory}',
+                f'sudo chown -R {current_user} {build_directory}',
+                'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma tools/sfk '
+                f'tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi {BIN_DIR}',
+                'sudo userdel makeuser'
+            ])
 
 
 def _install_plugins():
