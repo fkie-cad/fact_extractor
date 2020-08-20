@@ -13,7 +13,7 @@ VERSION = '0.1'
 TOOL_PATH = Path(__file__).parent.parent / 'bin' / 'boschfwtool'
 
 
-class FirmwareHeader:
+class FirmwareHeader:  # pylint: disable=too-many-instance-attributes
     header_length = 0x400
     magic_string = b"\x10\x12\x20\x03"
 
@@ -42,14 +42,7 @@ class FirmwareHeader:
             output.append(f'{attribute}: {value}')
         return '\n'.join(output)
 
-    def get_next(self):
-        next_header_offset = self.offset + self.header_length + (self.length if self.is_subheader else 0)
-        if self._next_header_exists(next_header_offset):
-            with suppress(KeyError, struct.error):
-                return FirmwareHeader(self.file_content, offset=next_header_offset, is_subheader=True)
-        return None
-
-    def _next_header_exists(self, next_offset):
+    def next_header_exists(self, next_offset):
         return (
             next_offset > self.offset
             and len(self.file_content) >= next_offset + self.header_length
@@ -60,14 +53,29 @@ class FirmwareHeader:
         return self.file_content[offset:offset + 4] == self.magic_string
 
 
+class FirmwareHeaderIterator:
+    def __init__(self, file_content: bytes):
+        self.header = FirmwareHeader(file_content)
+        self.first_iteration = True
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.first_iteration:
+            self.first_iteration = False
+            return self.header
+        next_header_offset = self.header.offset + self.header.header_length + (self.header.length if self.header.is_subheader else 0)
+        if self.header.next_header_exists(next_header_offset):
+            with suppress(KeyError, IndexError, struct.error):
+                self.header = FirmwareHeader(self.header.file_content, offset=next_header_offset, is_subheader=True)
+                return self.header
+        raise StopIteration
+
+
 def get_header_info(file_path: str) -> str:
     content = Path(file_path).read_bytes()
-    header_info_list = []
-    header = FirmwareHeader(content)
-    while header:
-        header_info_list.append(str(header))
-        header = header.get_next()
-    return '\n'.join(header_info_list)
+    return '\n'.join([str(header) for header in FirmwareHeaderIterator(content)])
 
 
 def unpack_function(file_path: str, tmp_dir: TemporaryDirectory) -> Dict[str, str]:
@@ -77,7 +85,10 @@ def unpack_function(file_path: str, tmp_dir: TemporaryDirectory) -> Dict[str, st
     """
     command = f'{TOOL_PATH} {file_path} -o {tmp_dir}'
     output = execute_shell_command(command, timeout=30)
-    header_info = get_header_info(file_path)
+    try:
+        header_info = get_header_info(file_path)
+    except IndexError:
+        header_info = 'Error during header parsing'
 
     return {'output': output, 'header': header_info}
 
