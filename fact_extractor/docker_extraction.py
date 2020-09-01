@@ -41,8 +41,9 @@ def _change_owner_of_output_files(files_dir: Path, owner: str) -> int:
         logging.error('ownership string should have the format <user id>:<group id>')
         return 1
 
-    _, return_code = execute_shell_command_get_return_code(f'sudo chown -R {owner} {files_dir}')
-    return return_code
+    _, return_code_chown = execute_shell_command_get_return_code(f'sudo chown -R {owner} {files_dir}')
+    _, return_code_chmod = execute_shell_command_get_return_code(f'sudo chmod -R u+rw {files_dir}')
+    return return_code_chmod | return_code_chown
 
 
 def main(args):
