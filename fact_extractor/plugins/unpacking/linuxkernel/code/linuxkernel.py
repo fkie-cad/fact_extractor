@@ -81,9 +81,7 @@ def unpack_function(file_path, tmp_dir):
     """
     output = ''
     extractor = Extractor(file_path, tmp_dir)
-    print('*' * 80)
     for file_data in extractor.extracted_files():
-        print('?' * 80)
         compressed_file = file_data['file_path']
         tool = command_absolute_path(file_data['command'])
         output_file_name = strip_extension(compressed_file)
@@ -99,6 +97,7 @@ def unpack_function(file_path, tmp_dir):
 
         found = check_dir_for_extracted_kernel(tmp_dir)
         if found:
+            output += "Found Kernel {}\n".format(output_file_name)
             break
 
     return {
