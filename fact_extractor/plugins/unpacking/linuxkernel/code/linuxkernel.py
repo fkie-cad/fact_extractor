@@ -67,7 +67,7 @@ def command_absolute_path(cmd):
     if tool not in TOOL_PATHS:
         TOOL_PATHS[tool] = execute_shell_command('which {}'.format(tool)).strip()
     cmd[0] = TOOL_PATHS[tool]
-    return ''.join(cmd)
+    return ' '.join(cmd)
 
 
 def strip_extension(filename):
