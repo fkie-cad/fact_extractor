@@ -18,7 +18,7 @@ class TestPaToolUnpacker(TestUnpackerBase):
         self.check_unpacker_selection('linux/kernel', 'LinuxKernel')
 
     def test_extraction_valid_bzImage(self):
-        input_file = Path(TEST_DATA_DIR, 'bzImage')
+        input_file = TEST_DATA_DIR / 'bzImage'
         files, meta_data = self.unpacker.extract_files_from_file(str(input_file), self.tmp_dir.name)
 
         print('files returned in test: ', files)
