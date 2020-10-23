@@ -7,8 +7,6 @@ header information of different architectures, eg ARM. So we can do better.
 '''
 import os
 import sys
-from os import listdir
-from os.path import isfile, join
 from pathlib import Path
 
 from common_helper_process import execute_shell_command, execute_shell_command_get_return_code
