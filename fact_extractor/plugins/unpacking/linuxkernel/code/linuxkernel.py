@@ -34,8 +34,7 @@ def is_kernel(file_path):
     """
     found_cnt = 0
     for i in KERNEL_STRINGS_TO_MATCH:
-        output, ret_code = execute_shell_command_get_return_code(
-            '{} {}|grep -q "{}"'.format(STRINGS_PATH, file_path, i))
+        output, ret_code = execute_shell_command_get_return_code(f'{STRINGS_PATH} {file_path} | grep -q "{i}"')
         if 0 == ret_code:
             found_cnt += 1
 
@@ -48,13 +47,13 @@ def check_dir_for_extracted_kernel(tmp_dir):
     loop through the tmp_dir, find all files and check if any of them are a kernel
     remove files that aren't valid kernels.
     """
-    files_in_dir = [join(tmp_dir, f) for f in listdir(tmp_dir) if isfile(join(tmp_dir, f))]
+    files_in_dir = [f for f in Path(tmp_dir).iterdir() if f.is_file()]
     found = False
     for file in files_in_dir:
         if is_kernel(file):
             found = True
         else:
-            os.remove(file)
+            file.unlink()
 
     return found
 
@@ -86,9 +85,7 @@ def unpack_function(file_path, tmp_dir):
         tool = command_absolute_path(file_data['command'])
         output_file_name = strip_extension(compressed_file)
 
-        cmd = 'fakeroot cat {compressed_file} | {tool} > {output_file} 2> /dev/null'.format(
-            compressed_file=compressed_file,
-            tool=tool, output_file=os.path.join(tmp_dir, output_file_name))
+        cmd = f'fakeroot cat {compressed_file} | {tool} > {Path(tmp_dir, output_file_name)} 2> /dev/null'
         output += cmd + '\n'
         output += execute_shell_command(cmd, timeout=600)
 

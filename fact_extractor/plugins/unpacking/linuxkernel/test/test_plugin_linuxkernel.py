@@ -7,7 +7,7 @@ from test.unit.unpacker.test_unpacker import TestUnpackerBase
 CODE_DIR = Path(__file__).parent.parent / 'code'
 sys.path.append(str(CODE_DIR))
 
-TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+TEST_DATA_DIR = Path(__file__).parent / 'data'
 
 sample_data = b'####-------\x1f\x8b\x08-------\x1f\x8b\x08$$$$BZh$$$$'
 
