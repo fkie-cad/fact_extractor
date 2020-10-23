@@ -25,6 +25,6 @@ class TestPaToolUnpacker(TestUnpackerBase):
         self.assertEqual([os.path.join(self.tmp_dir.name, 'vmlinux_GZIP_17940')], files)
 
     def test_extraction_invalid_image(self):
-        input_file = Path(TEST_DATA_DIR, 'bogus_image.bin')
+        input_file = TEST_DATA_DIR / 'bogus_image.bin'
         files, meta_data = self.unpacker.extract_files_from_file(str(input_file), self.tmp_dir.name)
         self.assertEqual([], files)
