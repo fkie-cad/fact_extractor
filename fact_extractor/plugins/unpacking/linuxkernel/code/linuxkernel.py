@@ -92,7 +92,7 @@ def unpack_function(file_path, tmp_dir):
 
         found = check_dir_for_extracted_kernel(tmp_dir)
         if found:
-            output += "Found Kernel {}\n".format(output_file_name)
+            output += f'Found Kernel {output_file_name}\n'
             break
 
     return {

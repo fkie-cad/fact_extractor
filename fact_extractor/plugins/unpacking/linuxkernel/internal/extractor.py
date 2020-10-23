@@ -3,7 +3,7 @@ import os
 from pattern_searcher import PatternSearcher
 
 
-class Extractor(object):
+class Extractor:
     def __init__(self, file_path, output_dir):
         self.file_path = file_path
         self.output_dir = output_dir

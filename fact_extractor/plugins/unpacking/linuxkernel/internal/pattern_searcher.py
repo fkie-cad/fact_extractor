@@ -1,4 +1,4 @@
-class PatternSearcher(object):
+class PatternSearcher:
     def __init__(self, rawbytedata):
         self.algorithms = {
             'GZIP': {
