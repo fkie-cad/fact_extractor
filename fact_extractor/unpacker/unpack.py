@@ -14,7 +14,7 @@ from unpacker.unpackBase import UnpackBase
 class Unpacker(UnpackBase):
 
     FS_FALLBACK_CANDIDATES = ['SquashFS']
-    CARVER_FALLBACK_BLACKLIST = ['generic_carver', 'NOP', 'PaTool', 'SFX']
+    CARVER_FALLBACK_BLACKLIST = ['generic_carver', 'NOP', 'PaTool', 'SFX', 'LinuxKernel']
 
     def __init__(self, config=None):
         super().__init__(config=config)

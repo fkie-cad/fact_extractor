@@ -7,7 +7,7 @@ import zlib
 from common_helper_files import get_binary_from_file, write_binary_to_file
 
 NAME = 'Zlib'
-MIME_PATTERNS = ['compression/zlib']
+MIME_PATTERNS = ['compression/zlib', 'application/zlib']
 VERSION = '0.1'
 
 
