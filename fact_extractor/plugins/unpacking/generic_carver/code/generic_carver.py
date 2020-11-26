@@ -2,14 +2,16 @@
 This plugin unpacks all files via carving
 '''
 import logging
+import os
 import shutil
 from pathlib import Path
+import magic
 
 from common_helper_process import execute_shell_command
 
 NAME = 'generic_carver'
 MIME_PATTERNS = ['generic/carver']
-VERSION = '0.7'
+VERSION = '0.8'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -22,8 +24,38 @@ def unpack_function(file_path, tmp_dir):
     output = execute_shell_command('binwalk --extract --carve --signature --directory  {} {}'.format(tmp_dir, file_path))
 
     drop_underscore_directory(tmp_dir)
+    screening_meta = remove_false_positive_archives(file_path, tmp_dir)
+    print(screening_meta)
+    # return {'output': output, 'screening': screening_meta}
 
     return {'output': output}
+
+
+def remove_false_positive_archives(original_filename: str, unpack_directory: str) -> str:
+    binwalk_root = Path(unpack_directory) / f'_{original_filename}.extracted'
+    if not binwalk_root.exists() or not binwalk_root.is_dir():
+        return 'No files extracted, so nothing removed'
+    screening_log = ''
+
+    for file_path in binwalk_root.iterdir():
+        file_type = magic.from_file(str(file_path), mime=True)
+
+        if 'zip' in file_type:
+            output_unzip = execute_shell_command('unzip -l {}'.format(file_path))
+            if 'not a zipfile' in output_unzip.replace('\n ', ''):
+                os.remove(file_path)
+
+        elif 'x-tar' in file_type or 'gzip' in file_type or 'x-lzip' in file_type or 'x-bzip2' in file_type or 'x-xz' in file_type:
+            output_tar = execute_shell_command('tar -tvf {}'.format(file_path))
+            if 'does not look like a tar archive' in output_tar:
+                os.remove(file_path)
+
+        #elif 'x-lrzip' in file_type or or 'rzip' in file_type or 'x-lz4' in file_type:
+
+        elif 'x-7z-compressed' in file_type or 'x-compress' in file_type:
+            output_7z = execute_shell_command('7z l {}'.format(file_path))
+            if 'Is not archive' in output_7z or 'Can not open the file as [7z] archive' in output_7z:
+                os.remove(file_path)
 
 
 def drop_underscore_directory(tmp_dir):
