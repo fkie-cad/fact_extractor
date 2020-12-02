@@ -25,10 +25,8 @@ def unpack_function(file_path, tmp_dir):
 
     drop_underscore_directory(tmp_dir)
     screening_meta = remove_false_positive_archives(file_path, tmp_dir)
-    print(screening_meta)
-    # return {'output': output, 'screening': screening_meta}
 
-    return {'output': output}
+    return {'output': output, 'screening': screening_meta}
 
 
 def remove_false_positive_archives(original_filename: str, unpack_directory: str) -> str:
@@ -44,18 +42,32 @@ def remove_false_positive_archives(original_filename: str, unpack_directory: str
             output_unzip = execute_shell_command('unzip -l {}'.format(file_path))
             if 'not a zipfile' in output_unzip.replace('\n ', ''):
                 os.remove(file_path)
+                screening_log = 'file was not a zipfile and was removed'
+            else:
+                screening_log = 'file seems to be a valid archive'
 
         elif 'x-tar' in file_type or 'gzip' in file_type or 'x-lzip' in file_type or 'x-bzip2' in file_type or 'x-xz' in file_type:
             output_tar = execute_shell_command('tar -tvf {}'.format(file_path))
             if 'does not look like a tar archive' in output_tar:
                 os.remove(file_path)
+                screening_log = 'file does not look like a valid archive and was removed'
+            else:
+                screening_log = 'file seems to be a valid archive'
 
-        #elif 'x-lrzip' in file_type or or 'rzip' in file_type or 'x-lz4' in file_type:
+        # elif 'x-lrzip' in file_type or or 'rzip' in file_type or 'x-lz4' in file_type:
 
         elif 'x-7z-compressed' in file_type or 'x-compress' in file_type:
             output_7z = execute_shell_command('7z l {}'.format(file_path))
             if 'Is not archive' in output_7z or 'Can not open the file as [7z] archive' in output_7z:
                 os.remove(file_path)
+                screening_log = 'file is not a valid archive and was removed'
+            else:
+                screening_log = 'file seems to be a valid archive'
+
+        else:
+            screening_log = 'archive type not supported yet'
+
+    return screening_log
 
 
 def drop_underscore_directory(tmp_dir):
