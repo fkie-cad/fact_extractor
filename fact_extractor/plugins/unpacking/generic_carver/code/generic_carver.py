@@ -24,8 +24,6 @@ def unpack_function(file_path, tmp_dir):
 
     drop_underscore_directory(tmp_dir)
     screening_meta = remove_false_positive_archives(file_path, tmp_dir)
-    print({'output': output, 'screening': screening_meta})
-    print('\n \n \n')
     return {'output': output, 'screening': screening_meta}
 
 
