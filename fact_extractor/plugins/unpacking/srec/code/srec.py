@@ -36,9 +36,8 @@ def unpack_function(file_path: str, tmp_dir: str) -> Dict[str, str]:
     return {'output': 'Successfully decoded srec file'}
 
 
-def _get_unpacked_filename(file_path):
-    file_name = f'{Path(file_path).name}.bin'
-    return file_name.replace('.srec', '')
+def _get_unpacked_filename(file_path: str) -> str:
+    return Path(file_path).with_suffix('.bin').name
 
 
 # ----> Do not edit below this line <----
