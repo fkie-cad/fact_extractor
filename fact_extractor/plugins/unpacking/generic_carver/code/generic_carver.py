@@ -40,7 +40,7 @@ def remove_false_positive_archives(original_filename: str, unpack_directory: str
             screening_logs.append(check_archives_validity(file_path, 'tar -tvf {}', 'does not look like a tar archive'))
 
         elif 'application/x-xz' in file_type:
-            screening_logs.append(check_archives_validity(file_path, 'xz -c -d {} | wc -c', 0))
+            screening_logs.append(check_archives_validity(file_path, 'xz -c -d {} | wc -c', 2048))
 
         elif 'application/gzip' in file_type:
             screening_logs.append(check_archives_validity(file_path, 'gzip - l {}', 'not in gzip format'))
