@@ -52,3 +52,21 @@ def test_remove_false_positives_7z():
         shutil.copyfile(TEST_DATA_DIR / 'fake_7z.7z', test_file_7z)
         remove_false_positive_archives('fake_7z.7z', temp_dir)
         assert test_file_7z.is_file() is False
+
+
+def test_remove_false_positives_xz():
+    with TemporaryDirectory() as temp_dir:
+        test_file_tar = Path(temp_dir) / '_fake_xz.xz.extracted' / 'fake_xz.xz'
+        os.mkdir(test_file_tar.parent)
+        shutil.copyfile(TEST_DATA_DIR / 'fake_xz.xz', test_file_tar)
+        remove_false_positive_archives('fake_xz.xz', temp_dir)
+        assert test_file_tar.is_file() is False
+
+
+def test_remove_false_positives_gzip():
+    with TemporaryDirectory() as temp_dir:
+        test_file_tar = Path(temp_dir) / '_fake_gzip.gzip.extracted' / 'fake_gzip.gzip'
+        os.mkdir(test_file_tar.parent)
+        shutil.copyfile(TEST_DATA_DIR / 'fake_gzip.gzip', test_file_tar)
+        remove_false_positive_archives('fake_gzip.gzip', temp_dir)
+        assert test_file_tar.is_file() is False
