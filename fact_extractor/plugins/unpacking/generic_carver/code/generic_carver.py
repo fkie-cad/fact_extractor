@@ -36,32 +36,37 @@ def remove_false_positive_archives(original_filename: str, unpack_directory: str
     for file_path in binwalk_root.iterdir():
         file_type = magic.from_file(str(file_path), mime=True)
 
-        if 'zip' in file_type:
-            screening_logs.append(check_archives_validity(file_path, 'unzip -l {}', 'not a zipfile'))
-
-        elif 'x-tar' in file_type or 'gzip' in file_type or 'x-lzip' in file_type or 'x-bzip2' in file_type or 'x-xz' in file_type:
+        if 'application/x-tar' in file_type:
             screening_logs.append(check_archives_validity(file_path, 'tar -tvf {}', 'does not look like a tar archive'))
 
-        # elif 'x-lrzip' in file_type or or 'rzip' in file_type or 'x-lz4' in file_type:
+        elif 'application/x-xz' in file_type:
+            screening_logs.append(check_archives_validity(file_path, 'xz -c -d {} | wc -c', 0))
 
-        elif 'x-7z-compressed' in file_type or 'x-compress' in file_type:
-            result_not_archive = check_archives_validity(file_path, '7z l {}', 'Is not archive')
+        elif 'application/gzip' in file_type:
+            screening_logs.append(check_archives_validity(file_path, 'gzip - l {}', 'not in gzip format'))
+
+        elif 'application/zip' in file_type or 'application/x-7z-compressed' in file_type or 'application/x-lzma' in file_type:
+            result_not_archive = check_archives_validity(file_path, '7z l {}', 'ERROR')
             if result_not_archive is not None:
                 screening_logs.append(result_not_archive)
-
-            result_not_7z = check_archives_validity(file_path, '7z l {}', 'Can not open the file as [7z] archive')
-            if result_not_7z is not None:
-                screening_logs.append(result_not_7z)
 
     return screening_logs
 
 
-def check_archives_validity(file_path, command, search_string):
+def check_archives_validity(file_path, command, search_key):
     output = execute_shell_command(command.format(file_path))
-    if search_string in output.replace('\n ', ''):
-        file_path.unlink()
-        screening_log = '{} was removed'.format(str(file_path).rsplit('/', 1)[-1])
-        return screening_log
+
+    if isinstance(search_key, str):
+        if search_key in output.replace('\n ', ''):
+            file_path.unlink()
+            screening_log = '{} was removed'.format(str(file_path).rsplit('/', 1)[-1])
+            return screening_log
+
+    elif isinstance(search_key, int):
+        if search_key != output:
+            file_path.unlink()
+            screening_log = '{} was removed'.format(str(file_path).rsplit('/', 1)[-1])
+            return screening_log
 
 
 def drop_underscore_directory(tmp_dir):
