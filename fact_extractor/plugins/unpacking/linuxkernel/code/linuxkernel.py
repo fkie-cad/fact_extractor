@@ -22,6 +22,7 @@ MIME_PATTERNS = [
 VERSION = '0.0.1'
 
 STRINGS_PATH = execute_shell_command('which strings').strip()
+VMLINUX_TO_ELF_PATH = execute_shell_command('which vmlinux-to-elf').strip()
 TOOL_PATHS = {}
 KERNEL_STRINGS_TO_MATCH = ['Linux version', 'jiffies', 'syscall']
 
@@ -94,6 +95,13 @@ def unpack_function(file_path, tmp_dir):
         if found:
             output += f'Found Kernel {output_file_name}\n'
             break
+
+    # The resulting output could be a variety of formats, what we want to do is rebuild it as a non-stripped ELF
+    # that is then easily analyzable in your favorite tools. Use vmlinux-to-elf for this.
+    if output_file_name:
+        cmd = f'fakeroot {VMLINUX_TO_ELF_PATH} {output_file_name} {output_file_name}.elf'
+        output += cmd + '\n'
+        output += execute_shell_command(cmd, timeout=600)
 
     return {
         'output': output
