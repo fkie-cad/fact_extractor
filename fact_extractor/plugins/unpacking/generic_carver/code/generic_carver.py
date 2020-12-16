@@ -43,7 +43,7 @@ def remove_false_positive_archives(original_filename: str, unpack_directory: str
             screening_logs.append(check_archives_validity(file_path, 'xz -c -d {} | wc -c', 2048))
 
         elif 'application/gzip' in file_type:
-            screening_logs.append(check_archives_validity(file_path, 'gzip - l {}', 'not in gzip format'))
+            screening_logs.append(check_archives_validity(file_path, 'gzip -c -d {} | wc -c', 2560))
 
         elif 'application/zip' in file_type or 'application/x-7z-compressed' in file_type or 'application/x-lzma' in file_type:
             result_not_archive = check_archives_validity(file_path, '7z l {}', 'ERROR')
@@ -55,7 +55,7 @@ def remove_false_positive_archives(original_filename: str, unpack_directory: str
 
 def check_archives_validity(file_path, command, search_key):
     output = execute_shell_command(command.format(file_path))
-
+    print(output)
     if isinstance(search_key, str):
         if search_key in output.replace('\n ', ''):
             file_path.unlink()
@@ -63,7 +63,7 @@ def check_archives_validity(file_path, command, search_key):
             return screening_log
 
     elif isinstance(search_key, int):
-        if search_key != output:
+        if str(search_key) not in output:
             file_path.unlink()
             screening_log = '{} was removed'.format(str(file_path).rsplit('/', 1)[-1])
             return screening_log
