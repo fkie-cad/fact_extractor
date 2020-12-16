@@ -65,8 +65,8 @@ def test_remove_false_positives_xz():
 
 def test_remove_false_positives_gzip():
     with TemporaryDirectory() as temp_dir:
-        test_file_tar = Path(temp_dir) / '_fake_gzip.gzip.extracted' / 'fake_gzip.gzip'
+        test_file_tar = Path(temp_dir) / '_fake_gz.gz.extracted' / 'fake_gz.gz'
         os.mkdir(test_file_tar.parent)
-        shutil.copyfile(TEST_DATA_DIR / 'fake_gzip.gzip', test_file_tar)
-        remove_false_positive_archives('fake_gzip.gzip', temp_dir)
+        shutil.copyfile(TEST_DATA_DIR / 'fake_gz.gz', test_file_tar)
+        remove_false_positive_archives('fake_gz.gz', temp_dir)
         assert test_file_tar.is_file() is False
