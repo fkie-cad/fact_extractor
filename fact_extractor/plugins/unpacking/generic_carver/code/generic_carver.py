@@ -37,36 +37,35 @@ def remove_false_positive_archives(original_filename: str, unpack_directory: str
         file_type = magic.from_file(str(file_path), mime=True)
 
         if 'application/x-tar' in file_type:
-            screening_logs.append(check_archives_validity(file_path, 'tar -tvf {}', 'does not look like a tar archive'))
+            check_archives_validity(file_path, 'tar -tvf {}', 'does not look like a tar archive', screening_logs)
 
         elif 'application/x-xz' in file_type:
-            screening_logs.append(check_archives_validity(file_path, 'xz -c -d {} | wc -c', 2048))
+            check_archives_validity(file_path, 'xz -c -d {} | wc -c', 0, screening_logs)
 
         elif 'application/gzip' in file_type:
-            screening_logs.append(check_archives_validity(file_path, 'gzip -c -d {} | wc -c', 2560))
+            check_archives_validity(file_path, 'gzip -c -d {} | wc -c', 0, screening_logs)
 
         elif 'application/zip' in file_type or 'application/x-7z-compressed' in file_type or 'application/x-lzma' in file_type:
-            result_not_archive = check_archives_validity(file_path, '7z l {}', 'ERROR')
-            if result_not_archive is not None:
-                screening_logs.append(result_not_archive)
+            check_archives_validity(file_path, '7z l {}', 'ERROR', screening_logs)
 
     return screening_logs
 
 
-def check_archives_validity(file_path, command, search_key):
+def check_archives_validity(file_path, command, search_key, screening_logs):
     output = execute_shell_command(command.format(file_path))
-    print(output)
+
     if isinstance(search_key, str):
         if search_key in output.replace('\n ', ''):
             file_path.unlink()
             screening_log = '{} was removed'.format(str(file_path).rsplit('/', 1)[-1])
-            return screening_log
+            screening_logs.append(screening_log)
 
     elif isinstance(search_key, int):
-        if str(search_key) not in output:
+        bytes_to_extract = (output.split())[-1]
+        if search_key == int(bytes_to_extract):
             file_path.unlink()
             screening_log = '{} was removed'.format(str(file_path).rsplit('/', 1)[-1])
-            return screening_log
+            screening_logs.append(screening_log)
 
 
 def drop_underscore_directory(tmp_dir):
