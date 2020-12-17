@@ -23,49 +23,51 @@ def unpack_function(file_path, tmp_dir):
     output = execute_shell_command('binwalk --extract --carve --signature --directory  {} {}'.format(tmp_dir, file_path))
 
     drop_underscore_directory(tmp_dir)
-    screening_meta = remove_false_positive_archives(file_path, tmp_dir)
-    return {'output': output, 'screening': screening_meta}
+    return {'output': output, 'screening': ArchivesFilter(file_path, tmp_dir).remove_false_positive_archives().get_logs()}
 
 
-def remove_false_positive_archives(original_filename: str, unpack_directory: str) -> str:
-    binwalk_root = Path(unpack_directory) / f'_{original_filename}.extracted'
-    if not binwalk_root.exists() or not binwalk_root.is_dir():
-        return 'No files extracted, so nothing removed'
-    screening_logs = []
+class ArchivesFilter:
+    def __init__(self, original_filename, unpack_directory):
+        self.original_filename = original_filename
+        self.unpack_directory = unpack_directory
+        self.binwalk_root = Path(unpack_directory) / f'_{original_filename}.extracted'
+        self.screening_logs = []
 
-    for file_path in binwalk_root.iterdir():
-        file_type = magic.from_file(str(file_path), mime=True)
+    def remove_false_positive_archives(self) -> str:
+        if not self.binwalk_root.exists() or not self.binwalk_root.is_dir():
+            return 'No files extracted, so nothing removed'
 
-        if 'application/x-tar' in file_type:
-            check_archives_validity(file_path, 'tar -tvf {}', 'does not look like a tar archive', screening_logs)
+        for file_path in self.binwalk_root.iterdir():
+            file_type = magic.from_file(str(file_path), mime=True)
 
-        elif 'application/x-xz' in file_type:
-            check_archives_validity(file_path, 'xz -c -d {} | wc -c', 0, screening_logs)
+            if 'application/x-tar' == file_type:
+                self.check_archives_validity(file_path, 'tar -tvf {}', 'does not look like a tar archive')
 
-        elif 'application/gzip' in file_type:
-            check_archives_validity(file_path, 'gzip -c -d {} | wc -c', 0, screening_logs)
+            elif 'application/x-xz' == file_type:
+                self.check_archives_validity(file_path, 'xz -c -d {} | wc -c')
 
-        elif 'application/zip' in file_type or 'application/x-7z-compressed' in file_type or 'application/x-lzma' in file_type:
-            check_archives_validity(file_path, '7z l {}', 'ERROR', screening_logs)
+            elif 'application/gzip' == file_type:
+                self.check_archives_validity(file_path, 'gzip -c -d {} | wc -c')
 
-    return screening_logs
+            elif file_type in ['application/zip', 'application/x-7z-compressed', 'application/x-lzma']:
+                self.check_archives_validity(file_path, '7z l {}', 'ERROR')
 
+    def get_logs(self) -> str:
+        return '\n'.join(self.screening_logs)
 
-def check_archives_validity(file_path, command, search_key, screening_logs):
-    output = execute_shell_command(command.format(file_path))
+    def check_archives_validity(self, file_path: Path, command, search_key=None):
+        output = execute_shell_command(command.format(file_path))
 
-    if isinstance(search_key, str):
-        if search_key in output.replace('\n ', ''):
-            file_path.unlink()
-            screening_log = '{} was removed'.format(str(file_path).rsplit('/', 1)[-1])
-            screening_logs.append(screening_log)
+        if search_key and search_key in output.replace('\n ', ''):
+            self.remove_file(file_path)
 
-    elif isinstance(search_key, int):
-        bytes_to_extract = (output.split())[-1]
-        if search_key == int(bytes_to_extract):
-            file_path.unlink()
-            screening_log = '{} was removed'.format(str(file_path).rsplit('/', 1)[-1])
-            screening_logs.append(screening_log)
+        elif not search_key and int((output.split())[-1]) == 0:
+            self.remove_file(file_path)
+
+    def remove_file(self, file_path):
+        file_path.unlink()
+        screening_log = f'{file_path.name} was removed'
+        self.screening_logs.append(screening_log)
 
 
 def drop_underscore_directory(tmp_dir):
