@@ -3,7 +3,7 @@ import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from plugins.unpacking.generic_carver.code.generic_carver import remove_false_positive_archives
+from plugins.unpacking.generic_carver.code.generic_carver import ArchivesFilter
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 from helperFunctions.file_system import get_test_data_dir
 
@@ -32,7 +32,7 @@ def test_remove_false_positives_zip():
         test_file_zip = Path(temp_dir) / '_fake_zip.zip.extracted' / 'fake_zip.zip'
         os.mkdir(test_file_zip.parent)
         shutil.copyfile(TEST_DATA_DIR / 'fake_zip.zip', test_file_zip)
-        remove_false_positive_archives('fake_zip.zip', temp_dir)
+        ArchivesFilter('fake_zip.zip', temp_dir).remove_false_positive_archives()
         assert test_file_zip.is_file() is False
 
 
@@ -41,7 +41,7 @@ def test_remove_false_positives_tar():
         test_file_tar = Path(temp_dir) / '_fake_tar.tar.extracted' / 'fake_tar.tar'
         os.mkdir(test_file_tar.parent)
         shutil.copyfile(TEST_DATA_DIR / 'fake_tar.tar', test_file_tar)
-        remove_false_positive_archives('fake_tar.tar', temp_dir)
+        ArchivesFilter('fake_tar.tar', temp_dir).remove_false_positive_archives()
         assert test_file_tar.is_file() is False
 
 
@@ -50,7 +50,7 @@ def test_remove_false_positives_7z():
         test_file_7z = Path(temp_dir) / '_fake_7z.7z.extracted' / 'fake_7z.7z'
         os.mkdir(test_file_7z.parent)
         shutil.copyfile(TEST_DATA_DIR / 'fake_7z.7z', test_file_7z)
-        remove_false_positive_archives('fake_7z.7z', temp_dir)
+        ArchivesFilter('fake_7z.7z', temp_dir).remove_false_positive_archives()
         assert test_file_7z.is_file() is False
 
 
@@ -59,7 +59,7 @@ def test_remove_false_positives_xz():
         test_file_tar = Path(temp_dir) / '_fake_xz.xz.extracted' / 'fake_xz.xz'
         os.mkdir(test_file_tar.parent)
         shutil.copyfile(TEST_DATA_DIR / 'fake_xz.xz', test_file_tar)
-        remove_false_positive_archives('fake_xz.xz', temp_dir)
+        ArchivesFilter('fake_xz.xz', temp_dir).remove_false_positive_archives()
         assert test_file_tar.is_file() is False
 
 
@@ -68,5 +68,5 @@ def test_remove_false_positives_gzip():
         test_file_tar = Path(temp_dir) / '_fake_gz.gz.extracted' / 'fake_gz.gz'
         os.mkdir(test_file_tar.parent)
         shutil.copyfile(TEST_DATA_DIR / 'fake_gz.gz', test_file_tar)
-        remove_false_positive_archives('fake_gz.gz', temp_dir)
+        ArchivesFilter('fake_gz.gz', temp_dir).remove_false_positive_archives()
         assert test_file_tar.is_file() is False
