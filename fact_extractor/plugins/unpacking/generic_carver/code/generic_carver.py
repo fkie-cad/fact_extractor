@@ -23,7 +23,7 @@ def unpack_function(file_path, tmp_dir):
     output = execute_shell_command('binwalk --extract --carve --signature --directory  {} {}'.format(tmp_dir, file_path))
 
     drop_underscore_directory(tmp_dir)
-    return {'output': output, 'screening': ArchivesFilter(file_path, tmp_dir).remove_false_positive_archives().get_logs()}
+    return {'output': output, 'screening': ArchivesFilter(file_path, tmp_dir).remove_false_positive_archives()}
 
 
 class ArchivesFilter:
@@ -52,7 +52,6 @@ class ArchivesFilter:
             elif file_type in ['application/zip', 'application/x-7z-compressed', 'application/x-lzma']:
                 self.check_archives_validity(file_path, '7z l {}', 'ERROR')
 
-    def get_logs(self) -> str:
         return '\n'.join(self.screening_logs)
 
     def check_archives_validity(self, file_path: Path, command, search_key=None):
