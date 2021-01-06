@@ -6,6 +6,7 @@ import unittest
 from configparser import ConfigParser
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Union
 from unittest.mock import patch
 
 from helperFunctions.file_system import get_test_data_dir
@@ -25,8 +26,8 @@ class TestUnpackerBase(unittest.TestCase):
         self.config.set('ExpertSettings', 'header_overhead', '256')
 
         self.unpacker = Unpacker(config=self.config)
-        os.makedirs(str(self.unpacker._report_folder), exist_ok=True)
-        os.makedirs(str(self.unpacker._file_folder), exist_ok=True)
+        os.makedirs(str(self.unpacker._report_folder), exist_ok=True)  # pylint: disable=protected-access
+        os.makedirs(str(self.unpacker._file_folder), exist_ok=True)  # pylint: disable=protected-access
 
         self.test_file_path = Path(get_test_data_dir(), 'get_files_test/testfile1')
 
@@ -36,14 +37,14 @@ class TestUnpackerBase(unittest.TestCase):
         gc.collect()
 
     def get_unpacker_meta(self):
-        return json.loads(Path(self.unpacker._report_folder, 'meta.json').read_text())
+        return json.loads(Path(self.unpacker._report_folder, 'meta.json').read_text())  # pylint: disable=protected-access
 
     def check_unpacker_selection(self, mime_type, plugin_name):
         name = self.unpacker.get_unpacker(mime_type)[1]
         self.assertEqual(name, plugin_name, 'wrong unpacker plugin selected')
 
-    def check_unpacking_of_standard_unpack_set(self, in_file, additional_prefix_folder='', output=True):
-        files, meta_data = self.unpacker.extract_files_from_file(in_file, self.tmp_dir.name)
+    def check_unpacking_of_standard_unpack_set(self, in_file: Union[Path, str], additional_prefix_folder='', output=True):
+        files, meta_data = self.unpacker.extract_files_from_file(str(in_file), self.tmp_dir.name)
         files = set(files)
         self.assertEqual(len(files), 3, 'file number incorrect')
         self.assertEqual(files, {
