@@ -1,8 +1,6 @@
-import os
 import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
-
 import pytest
 
 from plugins.unpacking.generic_carver.code.generic_carver import ArchivesFilter
@@ -23,10 +21,16 @@ class TestGenericCarver(TestUnpackerBase):
         in_file = '{}/generic_carver_test'.format(get_test_data_dir())
         files, meta_data = self.unpacker._extract_files_from_file_using_specific_unpacker(in_file, self.tmp_dir.name, self.unpacker.unpacker_plugins['generic/carver'])
         files = set(files)
-        self.assertEqual(len(files), 1, 'file number incorrect')
-        self.assertEqual(files, {'{}/64.zip'.format(self.tmp_dir.name)}, 'not all files found')
-        self.assertIn('output', meta_data)
-        self.assertIn('screening', meta_data)
+        assert len(files) == 1, 'file number incorrect'
+        assert files == {'{}/64.zip'.format(self.tmp_dir.name)}, 'not all files found'
+        assert 'output' in meta_data
+        assert 'filter_log' in meta_data
+
+    def test_extraction_of_filtered_files(self):
+        in_file = str(TEST_DATA_DIR / 'fake_xz.bin')
+        files, meta_data = self.unpacker._extract_files_from_file_using_specific_unpacker(in_file, self.tmp_dir.name, self.unpacker.unpacker_plugins['generic/carver'])
+        assert len(files) == 0
+        assert 'was removed' in meta_data['filter_log']
 
 
 @pytest.mark.parametrize('filename', ['fake_zip.zip', 'fake_tar.tar', 'fake_7z.7z', 'fake_xz.xz', 'fake_gz.gz'])
