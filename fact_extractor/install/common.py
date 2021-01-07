@@ -49,7 +49,6 @@ DEPENDENCIES = {
         'pip3': [
             'pytest',
             'pytest-cov',
-            'pytest-flake8'
         ]
     }
 }
