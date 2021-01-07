@@ -23,14 +23,13 @@ def unpack_function(file_path, tmp_dir):
     output = execute_shell_command('binwalk --extract --carve --signature --directory  {} {}'.format(tmp_dir, file_path))
 
     drop_underscore_directory(tmp_dir)
-    return {'output': output, 'screening': ArchivesFilter(file_path, tmp_dir).remove_false_positive_archives()}
+    return {'output': output, 'filter_log': ArchivesFilter(tmp_dir).remove_false_positive_archives()}
 
 
 class ArchivesFilter:
-    def __init__(self, original_filename, unpack_directory):
-        self.original_filename = original_filename
+    def __init__(self, unpack_directory):
         self.unpack_directory = unpack_directory
-        self.binwalk_root = Path(unpack_directory) / f'_{original_filename}.extracted'
+        self.binwalk_root = Path(unpack_directory)
         self.screening_logs = []
 
     def remove_false_positive_archives(self) -> str:
@@ -60,13 +59,17 @@ class ArchivesFilter:
         if search_key and search_key in output.replace('\n ', ''):
             self.remove_file(file_path)
 
-        elif not search_key and int((output.split())[-1]) == 0:
+        elif not search_key and self.output_is_empty(output):
             self.remove_file(file_path)
 
     def remove_file(self, file_path):
         file_path.unlink()
         screening_log = f'{file_path.name} was removed'
         self.screening_logs.append(screening_log)
+
+    @staticmethod
+    def output_is_empty(output):
+        return int((output.split())[-1]) == 0
 
 
 def drop_underscore_directory(tmp_dir):
