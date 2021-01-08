@@ -4,9 +4,9 @@ This plugin unpacks all files via carving
 import logging
 import shutil
 from pathlib import Path
-import magic
 
 from common_helper_process import execute_shell_command
+from fact_helper_file import get_file_type_from_path
 
 NAME = 'generic_carver'
 MIME_PATTERNS = ['generic/carver']
@@ -37,15 +37,15 @@ class ArchivesFilter:
             return 'No files extracted, so nothing removed'
 
         for file_path in self.binwalk_root.iterdir():
-            file_type = magic.from_file(str(file_path), mime=True)
+            file_type = get_file_type_from_path(file_path)['mime']
 
-            if 'application/x-tar' == file_type:
+            if file_type =='application/x-tar':
                 self.check_archives_validity(file_path, 'tar -tvf {}', 'does not look like a tar archive')
 
-            elif 'application/x-xz' == file_type:
+            elif file_type == 'application/x-xz':
                 self.check_archives_validity(file_path, 'xz -c -d {} | wc -c')
 
-            elif 'application/gzip' == file_type:
+            elif file_type == 'application/gzip':
                 self.check_archives_validity(file_path, 'gzip -c -d {} | wc -c')
 
             elif file_type in ['application/zip', 'application/x-7z-compressed', 'application/x-lzma']:
