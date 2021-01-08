@@ -30,15 +30,11 @@ def unpack_function(file_path, tmp_dir):
 
 class ArchivesFilter:
     def __init__(self, unpack_directory):
-        self.unpack_directory = unpack_directory
-        self.binwalk_root = Path(unpack_directory)
+        self.unpack_directory = Path(unpack_directory)
         self.screening_logs = []
 
     def remove_false_positive_archives(self) -> str:
-        if not self.binwalk_root.exists() or not self.binwalk_root.is_dir():
-            return 'No files extracted, so nothing removed'
-
-        for file_path in self.binwalk_root.iterdir():
+        for file_path in self.unpack_directory.iterdir():
             file_type = get_file_type_from_path(file_path)['mime']
 
             if file_type == 'application/x-tar' or self._is_possible_tar(file_type, file_path):
@@ -57,6 +53,7 @@ class ArchivesFilter:
 
     @staticmethod
     def _is_possible_tar(file_type: str, file_path: Path) -> bool:
+        # broken tar archives may be identified as octet-stream by newer versions of libmagic
         if file_type == 'application/octet-stream':
             with file_path.open(mode='rb') as fp:
                 fp.seek(0x101)
@@ -74,7 +71,7 @@ class ArchivesFilter:
 
     def remove_file(self, file_path):
         file_path.unlink()
-        screening_log = f'{file_path.name} was removed'
+        screening_log = f'{file_path.name} was removed (invalid archive)'
         self.screening_logs.append(screening_log)
 
     @staticmethod
