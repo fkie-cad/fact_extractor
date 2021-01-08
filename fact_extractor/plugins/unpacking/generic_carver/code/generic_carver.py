@@ -12,6 +12,8 @@ NAME = 'generic_carver'
 MIME_PATTERNS = ['generic/carver']
 VERSION = '0.8'
 
+TAR_MAGIC = b'ustar'
+
 
 def unpack_function(file_path, tmp_dir):
     '''
@@ -20,7 +22,7 @@ def unpack_function(file_path, tmp_dir):
     '''
 
     logging.debug('File Type unknown: execute binwalk on {}'.format(file_path))
-    output = execute_shell_command('binwalk --extract --carve --signature --directory  {} {}'.format(tmp_dir, file_path))
+    output = execute_shell_command(f'binwalk --extract --carve --signature --directory  {tmp_dir} {file_path}')
 
     drop_underscore_directory(tmp_dir)
     return {'output': output, 'filter_log': ArchivesFilter(tmp_dir).remove_false_positive_archives()}
@@ -39,7 +41,7 @@ class ArchivesFilter:
         for file_path in self.binwalk_root.iterdir():
             file_type = get_file_type_from_path(file_path)['mime']
 
-            if file_type =='application/x-tar':
+            if file_type == 'application/x-tar' or self._is_possible_tar(file_type, file_path):
                 self.check_archives_validity(file_path, 'tar -tvf {}', 'does not look like a tar archive')
 
             elif file_type == 'application/x-xz':
@@ -52,6 +54,14 @@ class ArchivesFilter:
                 self.check_archives_validity(file_path, '7z l {}', 'ERROR')
 
         return '\n'.join(self.screening_logs)
+
+    @staticmethod
+    def _is_possible_tar(file_type: str, file_path: Path) -> bool:
+        if file_type == 'application/octet-stream':
+            with file_path.open(mode='rb') as fp:
+                fp.seek(0x101)
+                return fp.read(5) == TAR_MAGIC
+        return False
 
     def check_archives_validity(self, file_path: Path, command, search_key=None):
         output = execute_shell_command(command.format(file_path))
