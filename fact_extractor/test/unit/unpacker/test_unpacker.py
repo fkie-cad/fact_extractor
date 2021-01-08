@@ -24,6 +24,7 @@ class TestUnpackerBase(unittest.TestCase):
         self.config.set('unpack', 'blacklist', 'text/plain, image/png')
         self.config.add_section('ExpertSettings')
         self.config.set('ExpertSettings', 'header_overhead', '256')
+        self.config.set('ExpertSettings', 'unpack_threshold', '0.8')
 
         self.unpacker = Unpacker(config=self.config)
         os.makedirs(str(self.unpacker._report_folder), exist_ok=True)  # pylint: disable=protected-access
@@ -64,7 +65,7 @@ class TestUnpackerCore(TestUnpackerBase):
         name = self.unpacker.unpacker_plugins['generic/carver'][1]
         self.assertEqual(name, 'generic_carver', 'generic_carver plugin not found')
 
-    def test_unpacker_selection_unkown(self):
+    def test_unpacker_selection_unknown(self):
         self.check_unpacker_selection('unknown/blah', 'generic_carver')
 
     def test_unpacker_selection_whitelist(self):
@@ -73,8 +74,8 @@ class TestUnpackerCore(TestUnpackerBase):
 
     @patch('unpacker.unpack.shutil.move', shutil.copy2)
     def test_generate_and_store_file_objects_zero_file(self):
-        file_pathes = ['{}/zero_byte'.format(get_test_data_dir()), '{}/get_files_test/testfile1'.format(get_test_data_dir())]
-        moved_files = self.unpacker.move_extracted_files(file_pathes, get_test_data_dir())
+        file_paths = ['{}/zero_byte'.format(get_test_data_dir()), '{}/get_files_test/testfile1'.format(get_test_data_dir())]
+        moved_files = self.unpacker.move_extracted_files(file_paths, get_test_data_dir())
 
         self.assertEqual(len(moved_files), 1, 'number of objects not correct')
         self.assertEqual(moved_files[0].name, 'testfile1', 'wrong object created')
