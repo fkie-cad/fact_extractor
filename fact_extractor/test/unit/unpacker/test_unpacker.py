@@ -6,6 +6,7 @@ import unittest
 from configparser import ConfigParser
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Union
 from unittest.mock import patch
 
 from helperFunctions.file_system import get_test_data_dir
@@ -23,10 +24,11 @@ class TestUnpackerBase(unittest.TestCase):
         self.config.set('unpack', 'blacklist', 'text/plain, image/png')
         self.config.add_section('ExpertSettings')
         self.config.set('ExpertSettings', 'header_overhead', '256')
+        self.config.set('ExpertSettings', 'unpack_threshold', '0.8')
 
         self.unpacker = Unpacker(config=self.config)
-        os.makedirs(str(self.unpacker._report_folder), exist_ok=True)
-        os.makedirs(str(self.unpacker._file_folder), exist_ok=True)
+        os.makedirs(str(self.unpacker._report_folder), exist_ok=True)  # pylint: disable=protected-access
+        os.makedirs(str(self.unpacker._file_folder), exist_ok=True)  # pylint: disable=protected-access
 
         self.test_file_path = Path(get_test_data_dir(), 'get_files_test/testfile1')
 
@@ -36,14 +38,14 @@ class TestUnpackerBase(unittest.TestCase):
         gc.collect()
 
     def get_unpacker_meta(self):
-        return json.loads(Path(self.unpacker._report_folder, 'meta.json').read_text())
+        return json.loads(Path(self.unpacker._report_folder, 'meta.json').read_text())  # pylint: disable=protected-access
 
     def check_unpacker_selection(self, mime_type, plugin_name):
         name = self.unpacker.get_unpacker(mime_type)[1]
         self.assertEqual(name, plugin_name, 'wrong unpacker plugin selected')
 
-    def check_unpacking_of_standard_unpack_set(self, in_file, additional_prefix_folder='', output=True):
-        files, meta_data = self.unpacker.extract_files_from_file(in_file, self.tmp_dir.name)
+    def check_unpacking_of_standard_unpack_set(self, in_file: Union[Path, str], additional_prefix_folder='', output=True):
+        files, meta_data = self.unpacker.extract_files_from_file(str(in_file), self.tmp_dir.name)
         files = set(files)
         self.assertEqual(len(files), 3, 'file number incorrect')
         self.assertEqual(files, {
@@ -63,7 +65,7 @@ class TestUnpackerCore(TestUnpackerBase):
         name = self.unpacker.unpacker_plugins['generic/carver'][1]
         self.assertEqual(name, 'generic_carver', 'generic_carver plugin not found')
 
-    def test_unpacker_selection_unkown(self):
+    def test_unpacker_selection_unknown(self):
         self.check_unpacker_selection('unknown/blah', 'generic_carver')
 
     def test_unpacker_selection_whitelist(self):
@@ -72,8 +74,8 @@ class TestUnpackerCore(TestUnpackerBase):
 
     @patch('unpacker.unpack.shutil.move', shutil.copy2)
     def test_generate_and_store_file_objects_zero_file(self):
-        file_pathes = ['{}/zero_byte'.format(get_test_data_dir()), '{}/get_files_test/testfile1'.format(get_test_data_dir())]
-        moved_files = self.unpacker.move_extracted_files(file_pathes, get_test_data_dir())
+        file_paths = ['{}/zero_byte'.format(get_test_data_dir()), '{}/get_files_test/testfile1'.format(get_test_data_dir())]
+        moved_files = self.unpacker.move_extracted_files(file_paths, get_test_data_dir())
 
         self.assertEqual(len(moved_files), 1, 'number of objects not correct')
         self.assertEqual(moved_files[0].name, 'testfile1', 'wrong object created')

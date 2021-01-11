@@ -12,14 +12,22 @@ from common_helper_process import (
 from fact_helper_file import get_file_type_from_path
 
 NAME = 'genericFS'
-MIME_PATTERNS = ['generic/fs', 'filesystem/cramfs', 'filesystem/romfs', 'filesystem/btrfs', 'filesystem/ext2',
-                 'filesystem/ext3', 'filesystem/ext4', 'filesystem/dosmbr', 'filesystem/hfs',
-                 'filesystem/jfs', 'filesystem/minix', 'filesystem/reiserfs', 'filesystem/udf', 'filesystem/xfs', 'filesystem/fat', 'filesystem/ntfs']
-VERSION = '0.5'
+MIME_PATTERNS = [
+    'filesystem/btrfs', 'filesystem/cramfs', 'filesystem/dosmbr', 'filesystem/ext2', 'filesystem/ext3',
+    'filesystem/ext4', 'filesystem/f2fs', 'filesystem/fat', 'filesystem/hfs', 'filesystem/jfs', 'filesystem/minix',
+    'filesystem/ntfs', 'filesystem/reiserfs', 'filesystem/romfs', 'filesystem/udf', 'filesystem/xfs', 'generic/fs',
+]
+VERSION = '0.6'
 TYPES = {
-    'filesystem/cramfs': 'cramfs', 'filesystem/romfs': 'romfs', 'filesystem/btrfs': 'btrfs',
-    'filesystem/minix': 'minix', 'filesystem/reiserfs': 'reiserfs', 'filesystem/jfs': 'jfs',
-    'filesystem/udf': 'udf', 'filesystem/xfs': 'xfs'
+    'filesystem/btrfs': 'btrfs',
+    'filesystem/cramfs': 'cramfs',
+    'filesystem/f2fs': 'f2fs',
+    'filesystem/jfs': 'jfs',
+    'filesystem/minix': 'minix',
+    'filesystem/reiserfs': 'reiserfs',
+    'filesystem/romfs': 'romfs',
+    'filesystem/udf': 'udf',
+    'filesystem/xfs': 'xfs',
 }
 
 
