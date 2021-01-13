@@ -1,7 +1,6 @@
 '''
 This plugin mounts filesystem images and extracts their content
 '''
-import os
 import re
 from tempfile import TemporaryDirectory
 from time import sleep
@@ -68,8 +67,8 @@ def _mount_from_boot_record(file_path, tmp_dir):
 
         # Bug in kpartx doesn't allow -d to work on long file names (as in /storage/path/<prefix>/<sha_hash>_<length>)
         # thus "host" loop device is used instead of filename
-        k_output, return_code = execute_shell_command_get_return_code('sudo kpartx -d -v {}'.format(_get_host_loop(loop_devices)))
-        execute_shell_command('sudo losetup -d {}'.format(_get_host_loop(loop_devices)))
+        k_output, return_code = execute_shell_command_get_return_code(f'sudo kpartx -d -v {_get_host_loop(loop_devices)}')
+        execute_shell_command(f'sudo losetup -d {_get_host_loop(loop_devices)}')
         return output + k_output
 
     return output
@@ -78,7 +77,7 @@ def _mount_from_boot_record(file_path, tmp_dir):
 def _process_loop_device(loop_device, mount_point, target_directory, index):
     output = execute_shell_command(f'sudo mount -o ro -v /dev/mapper/{loop_device} {mount_point}')
     output += execute_shell_command(f'sudo cp -av {mount_point}/ {target_directory}/partition_{index}/')
-    return output + execute_shell_command('sudo umount -v {}'.format(mount_point))
+    return output + execute_shell_command(f'sudo umount -v {mount_point}')
 
 
 def _extract_loop_devices(kpartx_output):
