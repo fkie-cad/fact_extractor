@@ -86,9 +86,10 @@ class Unpacker(UnpackBase):
                 target_path.parent.mkdir(parents=True, exist_ok=True)
                 try:
                     shutil.move(str(absolute_path), str(target_path))
+                    extracted_files.append(target_path)
                 except OSError as error:
                     logging.error(f'Error occurred during move: {error}')
-                extracted_files.append(target_path)
+
         return extracted_files
 
 
