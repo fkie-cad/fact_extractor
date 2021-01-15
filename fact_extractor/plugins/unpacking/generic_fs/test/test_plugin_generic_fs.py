@@ -90,19 +90,19 @@ class TestGenericFsUnpacker(TestUnpackerBase):
             self.check_unpacking_of_standard_unpack_set(test_file, additional_prefix_folder='get_files_test')
 
     def test_extract_multiple_partitions(self):
-        files, meta_data = self.unpacker.extract_files_from_file(str(TEST_DATA_DIR / 'mbr.img'), self.tmp_dir.name)
-
-        expected = [
-            str(Path(self.tmp_dir.name, *file_path)) for file_path in [
-                ('partition_0', 'test_data_file.bin'),
-                ('partition_1', 'yara_test_file'),
-                ('partition_2', 'testfile1')
+        with decompress_test_file(TEST_DATA_DIR / 'mbr.img.xz') as test_file:
+            files, meta_data = self.unpacker.extract_files_from_file(str(test_file), self.tmp_dir.name)
+            expected = [
+                str(Path(self.tmp_dir.name, *file_path)) for file_path in [
+                    ('partition_0', 'test_data_file.bin'),
+                    ('partition_1', 'yara_test_file'),
+                    ('partition_2', 'testfile1')
+                ]
             ]
-        ]
 
-        assert 'output' in meta_data
-        assert len(files) == 3, 'file number incorrect'
-        assert sorted(files) == sorted(expected), 'wrong files extracted'
+            assert 'output' in meta_data
+            assert len(files) == 3, 'file number incorrect'
+            assert sorted(files) == sorted(expected), 'wrong files extracted'
 
 
 def test_extract_loop_devices():

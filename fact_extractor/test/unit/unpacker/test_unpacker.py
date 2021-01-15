@@ -7,7 +7,7 @@ from configparser import ConfigParser
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Union
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 from helperFunctions.file_system import get_test_data_dir
 from unpacker.unpack import Unpacker
@@ -80,6 +80,35 @@ class TestUnpackerCore(TestUnpackerBase):
         self.assertEqual(len(moved_files), 1, 'number of objects not correct')
         self.assertEqual(moved_files[0].name, 'testfile1', 'wrong object created')
         self.assertIn('/get_files_test/testfile1', str(moved_files[0].absolute()))
+
+    @patch('unpacker.unpack.shutil.move')
+    def test_move_extracted_files(self, mock_shutil):
+        file_paths = [f'{get_test_data_dir()}/fake_file', f'{get_test_data_dir()}/get_files_test/testfile1']
+        moved_files = self.unpacker.move_extracted_files(file_paths, get_test_data_dir())
+
+        self.assertEqual(len(moved_files), 2, 'number of objects not correct')
+        self.assertEqual(moved_files[1].name, 'testfile1', 'wrong object created')
+        self.assertIn('/get_files_test/testfile1', str(moved_files[1].absolute()))
+
+    @patch('unpacker.unpack.shutil.move')
+    def test_move_extracted_files_raise_assert(self, mock_shutil):
+        file_paths = [f'{get_test_data_dir()}/fake_file', f'{get_test_data_dir()}/get_files_test/testfile1']
+        # Raise exception once, so fake_file shouldn't exist is the returned moved_files
+        mock_shutil.side_effect = [OSError('File exists'), '']
+
+        moved_files = self.unpacker.move_extracted_files(file_paths, get_test_data_dir())
+
+        self.assertEqual(len(moved_files), 1, 'number of objects not correct')
+        self.assertEqual(moved_files[0].name, 'testfile1', 'wrong object created')
+        self.assertIn('/get_files_test/testfile1', str(moved_files[0].absolute()))
+
+    def test_clean_up(self):
+        temp_dir = Mock()
+        self.unpacker.cleanup(temp_dir)
+        temp_dir.cleanup.assert_called()
+
+        temp_dir.cleanup.side_effect = OSError('some error')
+        self.unpacker.cleanup(temp_dir)
 
     def test_unpack_failure_generic_carver_fallback(self):
         self.unpacker.CARVER_FALLBACK_BLACKLIST = []
