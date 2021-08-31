@@ -24,6 +24,7 @@ DEPENDENCIES = {
             'libqt4-opengl',
             'python3-pyqt4',
             'python3-pyqt4.qtopengl',
+            'libcapstone3',
             # patool and unpacking backends
             'zoo',
             'openjdk-8-jdk'
@@ -35,6 +36,7 @@ DEPENDENCIES = {
             'libqt4-opengl',
             'python3-pyqt4',
             'python3-pyqt4.qtopengl',
+            'libcapstone3',
             # patool and unpacking backends
             'openjdk-8-jdk'
         ]
@@ -45,6 +47,7 @@ DEPENDENCIES = {
             'libqt5opengl5',
             'python3-pyqt5',
             'python3-pyqt5.qtopengl',
+            'libcapstone3',
             # patool and unpacking backends
             'openjdk-14-jdk'
         ]
@@ -56,6 +59,7 @@ DEPENDENCIES = {
             'libqt4-opengl',
             'python3-pyqt4',
             'python3-pyqt4.qtopengl',
+            'libcapstone3',
             # patool and unpacking backends
             'openjdk-8-jdk'
         ]
@@ -66,8 +70,20 @@ DEPENDENCIES = {
             'libqt5opengl5',
             'python3-pyqt5',
             'python3-pyqt5.qtopengl',
+            'libcapstone3',
             # patool and unpacking backends
             'openjdk-14-jdk'
+        ]
+    },
+    'kali': {
+        'apt': [
+            'p7zip-full',
+            'libqt5opengl5',
+            'python3-pyqt5',
+            'python3-pyqt5.qtopengl',
+            'openjdk-11-jdk',
+            'firmware-mod-kit',
+            'libcapstone4'
         ]
     },
     # Packages common to all plateforms
@@ -96,7 +112,6 @@ DEPENDENCIES = {
             'liblzma-dev',
             'liblzo2-dev',
             'xvfb',
-            'libcapstone3',
             'libcapstone-dev',
             # patool and unpacking backends
             'lrzip',
@@ -153,10 +168,9 @@ DEPENDENCIES = {
             'git+https://github.com/jrspruitt/ubi_reader@v0.6.3-master'  # pinned as broken currently
         ],
         'github': [
-            ('kartone/sasquatch', ['./build.sh']),
+            ('devttys0/sasquatch', ['CFLAGS=-fcommon ./build.sh -y']),
             ('ReFirmLabs/binwalk', ['sudo python3 setup.py install']),
-            ('svidovich/jefferson-3', ['sudo python3 setup.py install']),
-            ('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
+            ('svidovich/jefferson-3', ['sudo python3 setup.py install'])
         ]
     }
 }
@@ -186,8 +200,19 @@ def main(distribution):
     install_dependencies(DEPENDENCIES['common'])
     install_dependencies(DEPENDENCIES[distribution])
 
+    if distribution == "kali" and os.path.isdir("/opt/firmware-mod-kit"):
+        logging.info('Kali Linux - copy binaries from installed firmware-mod-kit ...')
+        os.system('cp /opt/firmware-mod-kit/trunk/src/yaffs2utils/unyaffs2 /opt/firmware-mod-kit/trunk/src/untrx /opt/firmware-mod-kit/trunk/src/tpl-tool/src/tpl-tool ../bin/')
+    else:
+        logging.info('No Kali Linux - install firmware-mod-kit from github')
+        install_github_project('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
+
     # installing freetz
-    _install_freetz()
+    # currently the freetz installation does not work on a recent Kali Linux
+    if distribution != "kali":
+        _install_freetz()
+    else:
+        logging.info("Kali linux detected - Not installing Freetz")
 
     # install plug-in dependencies
     _install_plugins()
@@ -224,7 +249,7 @@ def _install_freetz():
                 'sudo su makeuser -c "export PATH=$(pwd):$PATH && umask 0022 && make -j$(nproc) tools"',
                 f'sudo chmod -R 777 {build_directory}',
                 f'sudo chown -R {current_user} {build_directory}',
-                'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma tools/sfk '
+                'sudo cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma tools/sfk '
                 f'tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi {BIN_DIR}',
                 'sudo userdel makeuser'
             ])

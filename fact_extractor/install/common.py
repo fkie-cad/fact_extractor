@@ -28,6 +28,11 @@ DEPENDENCIES = {
             'testresources'
         ]
     },
+    'kali': {
+        'pip3': [
+            'testresources'
+        ]
+    },
     'bullseye': {
         'pip3': [
             'testresources'

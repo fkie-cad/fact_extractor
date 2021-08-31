@@ -41,9 +41,10 @@ PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor in
 BIONIC_CODE_NAMES = ['bionic', 'tara', 'tessa', 'tina', 'disco']
 XENIAL_CODE_NAMES = ['xenial', 'yakkety', 'sarah', 'serena', 'sonya', 'sylvia']
 FOCAL_CODE_NAMES = ['focal', 'ulyana']
+KALI_CODE_NAMES = ['kali-rolling']
 
 # Compatible Debian/Kali releases
-BUSTER_CODE_NAMES = ['buster', 'stretch', 'kali-rolling']
+BUSTER_CODE_NAMES = ['buster', 'stretch']
 BULLSEYE_CODE_NAMES = ['bullseye']
 
 
@@ -84,6 +85,9 @@ def check_distribution():
     if codename in BUSTER_CODE_NAMES:
         logging.debug('Debian 10/Kali detected')
         return 'buster'
+    if codename in KALI_CODE_NAMES:
+        logging.debug('Kali detected')
+        return 'kali'
     if codename in BULLSEYE_CODE_NAMES:
         logging.debug('Debian 11 detected')
         return 'bullseye'
