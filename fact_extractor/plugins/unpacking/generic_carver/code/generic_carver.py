@@ -23,7 +23,7 @@ def unpack_function(file_path, tmp_dir):
     '''
 
     logging.debug(f'File Type unknown: execute binwalk on {file_path}')
-    output = execute_interactive_shell_command(f'binwalk --extract --carve --signature --directory {tmp_dir} {file_path}', timeout=600)
+    output = execute_interactive_shell_command(f'binwalk --run-as=root --extract --carve --signature --directory {tmp_dir} {file_path}', timeout=600)
     drop_underscore_directory(tmp_dir)
     return {'output': output, 'filter_log': ArchivesFilter(tmp_dir, original_file=file_path).remove_false_positive_archives()}
 
