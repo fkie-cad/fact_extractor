@@ -16,8 +16,8 @@ class Unpacker(UnpackBase):
     FS_FALLBACK_CANDIDATES = ['SquashFS']
     CARVER_FALLBACK_BLACKLIST = ['generic_carver', 'NOP', 'PaTool', 'SFX', 'LinuxKernel']
 
-    def __init__(self, config=None):
-        super().__init__(config=config)
+    def __init__(self, config=None, extract_everything: bool = False):
+        super().__init__(config=config, extract_everything=extract_everything)
         self._file_folder = Path(self.config.get('unpack', 'data_folder'), 'files')
         self._report_folder = Path(self.config.get('unpack', 'data_folder'), 'reports')
 
@@ -28,13 +28,11 @@ class Unpacker(UnpackBase):
                 'number_of_unpacked_files': 0,
                 'number_of_unpacked_directories': 0,
                 'number_of_excluded_files': 1,
-                'info': 'File was ignored because it matched the exclude list {}'.format(
-                    self.exclude
-                )
+                'info': f'File was ignored because it matched the exclude list {self.exclude}'
             }
             extracted_files = []
         else:
-            logging.debug('Extracting {}'.format(Path(file_path).name))
+            logging.debug(f'Extracting {Path(file_path).name}')
 
             tmp_dir = TemporaryDirectory(prefix='fact_unpack_')
 
@@ -62,10 +60,10 @@ class Unpacker(UnpackBase):
             return extracted_files, meta_data
 
         if not extracted_files and meta_data['plugin_used'] in self.FS_FALLBACK_CANDIDATES:
-            logging.warning('{} could not extract any file from {} -> generic fs fallback'.format(meta_data['plugin_used'], file_path))
+            logging.warning(f'''{meta_data['plugin_used']} could not extract any file from {file_path} -> generic fs fallback''')
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/fs')
         if not extracted_files and meta_data['plugin_used'] not in self.CARVER_FALLBACK_BLACKLIST:
-            logging.warning('{} could not extract any file from {} -> generic carver fallback'.format(meta_data['plugin_used'], file_path))
+            logging.warning(f'''{meta_data['plugin_used']} could not extract any file from {file_path} -> generic carver fallback''')
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/carver')
         return extracted_files, meta_data
 
@@ -74,12 +72,12 @@ class Unpacker(UnpackBase):
         try:
             tmp_dir.cleanup()
         except OSError as error:
-            logging.error('Could not CleanUp tmp_dir: {} - {}'.format(type(error), str(error)))
+            logging.error(f'Could not CleanUp tmp_dir: {type(error)} - {str(error)}')
 
     def move_extracted_files(self, file_paths: List[str], extraction_dir: Path) -> List[Path]:
         extracted_files = list()
         for item in file_paths:
-            if not file_is_empty(item):
+            if not file_is_empty(item) or self.extract_everything:
                 absolute_path = Path(item)
                 relative_path = absolute_path.relative_to(extraction_dir)
                 target_path = Path(self._file_folder, relative_path)
@@ -93,7 +91,7 @@ class Unpacker(UnpackBase):
         return extracted_files
 
 
-def unpack(file_path, config):
-    extracted_objects = Unpacker(config).unpack(file_path)
-    logging.info('{} files extracted'.format(len(extracted_objects)))
-    logging.debug('Extracted files:\n{}'.format('\n'.join((str(path) for path in extracted_objects))))
+def unpack(file_path, config, extract_everything=False):
+    extracted_objects = Unpacker(config, extract_everything).unpack(file_path)
+    logging.info(f'{len(extracted_objects)} files extracted'
+    logging.debug(f'Extracted files:\n{'\n'.join((str(path) for path in extracted_objects))}'

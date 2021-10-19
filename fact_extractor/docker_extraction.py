@@ -33,6 +33,8 @@ def _parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--chown', type=str, default='',
                         help='change back ownership of output files to <user id>:<group id>')
+    parser.add_argument('--extract_everything', action='store_true', default=False,
+                        help='change the behavior of the extractor: extract also empty files and duplicates')
     return parser.parse_args()
 
 
@@ -47,13 +49,13 @@ def _change_owner_of_output_files(files_dir: Path, owner: str) -> int:
 
 
 def main(args):
-    config = load_config('{}/main.cfg'.format(get_config_dir()))
+    config = load_config(f'{get_config_dir()}/main.cfg')
     setup_logging(debug=False)
 
     input_dir = Path(config.get('unpack', 'data_folder'), 'input')
     input_file = list(input_dir.iterdir())[0]
 
-    unpack(input_file, config)
+    unpack(input_file, config, args.extract_everything )
 
     if args.chown:
         output_dir = Path(config.get('unpack', 'data_folder'), 'files')
