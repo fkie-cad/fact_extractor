@@ -201,7 +201,7 @@ def main(distribution):
 def _edit_sudoers():
     logging.info('add rules to sudo...')
     username = os.environ['USER']
-    sudoers_content = f'\n'.join(('{username}\tALL=NOPASSWD: {command}' for command in (
+    sudoers_content = '\n'.join((f'{username}\tALL=NOPASSWD: {command}' for command in (
         '/sbin/kpartx', '/sbin/losetup', '/bin/mount', '/bin/umount', '/bin/mknod', '/usr/local/bin/sasquatch', '/bin/rm', '/bin/cp', '/bin/dd', '/bin/chown'
     )))
     Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n')

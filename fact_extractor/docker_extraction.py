@@ -55,7 +55,7 @@ def main(args):
     input_dir = Path(config.get('unpack', 'data_folder'), 'input')
     input_file = list(input_dir.iterdir())[0]
 
-    unpack(input_file, config, args.extract_everything )
+    unpack(input_file, config, args.extract_everything)
 
     if args.chown:
         output_dir = Path(config.get('unpack', 'data_folder'), 'files')
