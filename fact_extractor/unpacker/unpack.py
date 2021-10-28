@@ -93,5 +93,5 @@ class Unpacker(UnpackBase):
 
 def unpack(file_path, config, extract_everything=False):
     extracted_objects = Unpacker(config, extract_everything).unpack(file_path)
-    logging.info(f'{len(extracted_objects)} files extracted'
-    logging.debug(f'Extracted files:\n{'\n'.join((str(path) for path in extracted_objects))}'
+    logging.info(f'{len(extracted_objects)} files extracted')
+    logging.debug(f'''Extracted files:\n{'\n'.join((str(path) for path in extracted_objects))}''')
