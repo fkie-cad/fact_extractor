@@ -34,7 +34,7 @@ def _parse_args():
     parser.add_argument('--chown', type=str, default='',
                         help='change back ownership of output files to <user id>:<group id>')
     parser.add_argument('--extract_everything', action='store_true', default=False,
-                        help='change the behavior of the extractor: extract also empty files and duplicates')
+                        help='change the behavior of the extractor: extract also empty files')
     return parser.parse_args()
 
 

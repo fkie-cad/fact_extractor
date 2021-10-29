@@ -88,7 +88,7 @@ class TestUnpackerCore(TestUnpackerBase):
         moved_files = self.unpacker.move_extracted_files(file_paths, get_test_data_dir())
 
         self.assertEqual(len(moved_files), 2, 'number of objects not correct')
-        self.assertEqual(moved_files[1].name, 'zero_byte', 'empty files should not be discarded')
+        self.assertEqual(moved_files[0].name, 'zero_byte', 'empty files should not be discarded')
 
     @patch('unpacker.unpack.shutil.move')
     def test_move_extracted_files(self, mock_shutil):

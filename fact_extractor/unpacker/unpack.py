@@ -72,7 +72,7 @@ class Unpacker(UnpackBase):
         try:
             tmp_dir.cleanup()
         except OSError as error:
-            logging.error(f'Could not CleanUp tmp_dir: {type(error)} - {str(error)}')
+            logging.error(f'Could not CleanUp tmp_dir: {error}', exc_info=True)
 
     def move_extracted_files(self, file_paths: List[str], extraction_dir: Path) -> List[Path]:
         extracted_files = list()

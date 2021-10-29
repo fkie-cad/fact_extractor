@@ -79,9 +79,9 @@ class UnpackBase(object):
 
         try:
             additional_meta = unpack_function(file_path, tmp_dir)
-        except Exception as e:
-            logging.debug(f'Unpacking of {file_path} failed: {type(e)}: {str(e)}')
-            additional_meta = {f'''error': '{type(e)}: {str(e)}'''}
+        except Exception as error:
+            logging.debug(f'Unpacking of {file_path} failed: {error}', exc_info=True)
+            additional_meta = {'error': f'{type(error)}: {str(error)}'}
         if isinstance(additional_meta, dict):
             meta_data.update(additional_meta)
 
