@@ -2,7 +2,7 @@
 This plugin unpacks JFFS2 filesystem images
 '''
 import logging
-import os
+from pathlib import Path
 
 from common_helper_process import execute_shell_command
 
@@ -17,8 +17,8 @@ def unpack_function(file_path, tmp_dir):
     local_tmp_dir should be used to store the extracted files.
     '''
 
-    extract_dir = os.path.join(tmp_dir, 'jffs-root')
-    output = execute_shell_command('fakeroot jefferson -v -d {} {}'.format(extract_dir, file_path)) + '\n'
+    extract_dir = Path(tmp_dir) / 'jffs-root'
+    output = execute_shell_command(f'fakeroot jefferson -v -d {extract_dir} {file_path}') + '\n'
     meta_data = {'output': output}
     logging.debug(output)
     return meta_data
