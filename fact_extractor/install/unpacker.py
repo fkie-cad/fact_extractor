@@ -154,7 +154,7 @@ DEPENDENCIES = {
         ],
         'github': [
             ('kartone/sasquatch', ['./build.sh']),
-            ('ReFirmLabs/binwalk', ['sudo python3 setup.py install']),
+            ('ReFirmLabs/binwalk@v2.3.2', ['sudo python3 setup.py install']),
             ('svidovich/jefferson-3', ['sudo python3 setup.py install']),
             ('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
         ]
