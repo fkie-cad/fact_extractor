@@ -144,6 +144,7 @@ DEPENDENCIES = {
             'patool',
             'archmage',
             # binwalk
+            'git+https://github.com/ReFirmLabs/binwalk@v2.3.2',
             'pyqtgraph',
             'capstone',
             'cstruct==1.8',
@@ -154,7 +155,6 @@ DEPENDENCIES = {
         ],
         'github': [
             ('kartone/sasquatch', ['./build.sh']),
-            ('ReFirmLabs/binwalk', ['sudo python3 setup.py install']),
             ('svidovich/jefferson-3', ['sudo python3 setup.py install']),
             ('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
         ]
