@@ -91,7 +91,7 @@ def test_handle_report(monkeypatch, capsys, tmpdir):
     [['extract.py', '-o', '/tmp/valid_dir', '-c', 'container_will_succeed', '-r', '/tmp/report', '/bin/bash'], 0, '']
 ])
 def test_main_return_values(arguments, return_code, message, monkeypatch, capsys):
-    monkeypatch.setattr('extract.call_docker', lambda input_file, container, target, report_file, memory_limit: None)
+    monkeypatch.setattr('extract.call_docker', lambda **_: None)
     monkeypatch.setattr('extract.sys.argv', arguments)
     monkeypatch.setattr('extract.subprocess.run', exec_stub)
 

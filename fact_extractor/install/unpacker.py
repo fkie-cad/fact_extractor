@@ -201,14 +201,14 @@ def main(distribution):
 def _edit_sudoers():
     logging.info('add rules to sudo...')
     username = os.environ['USER']
-    sudoers_content = '\n'.join(('{}\tALL=NOPASSWD: {}'.format(username, command) for command in (
+    sudoers_content = '\n'.join((f'{username}\tALL=NOPASSWD: {command}' for command in (
         '/sbin/kpartx', '/sbin/losetup', '/bin/mount', '/bin/umount', '/bin/mknod', '/usr/local/bin/sasquatch', '/bin/rm', '/bin/cp', '/bin/dd', '/bin/chown'
     )))
-    Path('/tmp/fact_overrides').write_text('{}\n'.format(sudoers_content))
+    Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n')
     chown_output, chown_code = execute_shell_command_get_return_code('sudo chown root:root /tmp/fact_overrides')
     mv_output, mv_code = execute_shell_command_get_return_code('sudo mv /tmp/fact_overrides /etc/sudoers.d/fact_overrides')
     if not chown_code == mv_code == 0:
-        raise InstallationError('Editing sudoers file did not succeed\n{}\n{}'.format(chown_output, mv_output))
+        raise InstallationError('Editing sudoers file did not succeed\n{chown_output}\n{mv_output}')
 
 
 def _install_freetz():
@@ -236,7 +236,7 @@ def _install_plugins():
     if return_code != 0:
         raise InstallationError('Error retrieving plugin installation scripts')
     for install_script in find_output.splitlines(keepends=False):
-        logging.info('Running {}'.format(install_script))
+        logging.info(f'Running {install_script}')
         shell_output, return_code = execute_shell_command_get_return_code(install_script)
         if return_code != 0:
-            raise InstallationError('Error in installation of {} plugin\n{}'.format(Path(install_script).parent.name, shell_output))
+            raise InstallationError(f'Error in installation of {Path(install_script).parent.name} plugin\n{shell_output}')
