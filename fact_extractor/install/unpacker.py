@@ -46,7 +46,7 @@ DEPENDENCIES = {
             'python3-pyqt5',
             'python3-pyqt5.qtopengl',
             # patool and unpacking backends
-            'openjdk-11-jdk'
+            'openjdk-16-jdk'
         ]
     },
     # Debian
