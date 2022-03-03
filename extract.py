@@ -13,7 +13,7 @@ from tempfile import TemporaryDirectory
 
 VERSION = '0.1.1'
 NAME = 'FACT_extractor interface'
-DEFAULT_CONTAINER = 'extractor_test'  # 'fkiecad/fact_extractor'
+DEFAULT_CONTAINER = 'fkiecad/fact_extractor'
 
 
 def parse_arguments():
