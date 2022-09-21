@@ -74,12 +74,22 @@ class TestUnpackerCore(TestUnpackerBase):
 
     @patch('unpacker.unpack.shutil.move', shutil.copy2)
     def test_generate_and_store_file_objects_zero_file(self):
-        file_paths = ['{}/zero_byte'.format(get_test_data_dir()), '{}/get_files_test/testfile1'.format(get_test_data_dir())]
+        file_paths = [f'{get_test_data_dir()}/zero_byte', f'{get_test_data_dir()}/get_files_test/testfile1']
         moved_files = self.unpacker.move_extracted_files(file_paths, get_test_data_dir())
 
         self.assertEqual(len(moved_files), 1, 'number of objects not correct')
         self.assertEqual(moved_files[0].name, 'testfile1', 'wrong object created')
         self.assertIn('/get_files_test/testfile1', str(moved_files[0].absolute()))
+
+    @patch('unpacker.unpack.shutil.move', shutil.copy2)
+    def test_extract_everything(self):
+        self.unpacker.extract_everything = True
+        file_paths = [f'{get_test_data_dir()}/zero_byte', f'{get_test_data_dir()}/get_files_test/testfile1']
+        moved_files = self.unpacker.move_extracted_files(file_paths, get_test_data_dir())
+        moved_files.sort()
+
+        self.assertEqual(len(moved_files), 2, 'number of objects not correct')
+        self.assertEqual(moved_files[1].name, 'zero_byte', 'empty files should not be discarded')
 
     @patch('unpacker.unpack.shutil.move')
     def test_move_extracted_files(self, mock_shutil):
@@ -126,7 +136,7 @@ class TestUnpackerCore(TestUnpackerBase):
         meta_data = self.get_unpacker_meta()
 
         self.assertEqual(meta_data['0_ERROR_7z'][0:6], '\n7-Zip')
-        self.assertEqual(meta_data['0_FALLBACK_7z'], '7z (failed) -> {} (fallback)'.format(fallback_mime))
+        self.assertEqual(meta_data['0_FALLBACK_7z'], f'7z (failed) -> {fallback_mime} (fallback)')
         self.assertEqual(meta_data['plugin_used'], fallback_plugin_name)
 
         return meta_data

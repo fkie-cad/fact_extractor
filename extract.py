@@ -11,7 +11,7 @@ from contextlib import suppress
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-VERSION = '0.1'
+VERSION = '0.1.1'
 NAME = 'FACT_extractor interface'
 DEFAULT_CONTAINER = 'fkiecad/fact_extractor'
 
@@ -26,6 +26,7 @@ def parse_arguments():
     parser.add_argument('-o', '--output_directory', help='path to extracted files', default=None)
     parser.add_argument('-r', '--report_file', help='write report to a file', default=None)
     parser.add_argument('-V', '--verbose', action='store_true', default=False, help='increase verbosity')
+    parser.add_argument('-e', '--extract_everything', action='store_true', help='also extract empty files')
     parser.add_argument('FILE', type=str, nargs=1, help='File for extraction')
     return parser.parse_args()
 
@@ -42,13 +43,15 @@ def setup_logging(verbose):
 
 
 def container_exists(container):
-    return subprocess.run('docker history {}'.format(container), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).returncode == 0
+    return subprocess.run(f'docker history {container}', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).returncode == 0
 
 
 def default_container_status():
+    format_parameter = '{{.Tag}},{{.CreatedAt}}'
     try:
         process_result = subprocess.run(
-            'docker image ls {} --format "{{{{.Tag}}}},{{{{.CreatedAt}}}}"'.format(DEFAULT_CONTAINER), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+            f'docker image ls {DEFAULT_CONTAINER} --format "{format_parameter}"',
+            shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )
         tag, creation_time = process_result.stdout.decode().strip().split(',')
     except ValueError:
@@ -59,34 +62,35 @@ def default_container_status():
 def set_version():
     container_tag, container_creation = default_container_status()
 
-    return '{}\nProgramm version:\t{}\nDefault container:\t{}\nContainer tag:\t\t{}\nContainer creation:\t{}'.format(
-        NAME,
-        VERSION,
-        DEFAULT_CONTAINER,
-        container_tag,
-        container_creation
+    return (
+        f'{NAME}\n'
+        f'Programm version:\t{VERSION}\n'
+        f'Default container:\t{DEFAULT_CONTAINER}\n'
+        f'Container tag:\t\t{container_tag}\n'
+        f'Container creation:\t{container_creation}'
     )
 
 
-def call_docker(input_file, container, target, report_file, memory_limit, tmpdir=None):
+def call_docker(input_file, container, target, report_file, memory_limit, tmpdir=None, extract_everything=False):
+    arguments = f'--chown {os.getuid()}:{os.getgid()}'
+    arguments += ' --extract_everything' if extract_everything else ''
     tmpdir = tmpdir if tmpdir else TemporaryDirectory()
 
-    for subpath in ['files', 'reports', 'input']:
-        Path(tmpdir.name, subpath).mkdir(exist_ok=True)
+    try:
+        for subpath in ['files', 'reports', 'input']:
+            Path(tmpdir.name, subpath).mkdir(exist_ok=True)
 
-    shutil.copy(input_file, str(Path(tmpdir.name, 'input', Path(input_file).name)))
+        shutil.copy(input_file, str(Path(tmpdir.name, 'input', Path(input_file).name)))
 
-    subprocess.run('docker run --rm -m {}m -v {}:/tmp/extractor -v /dev:/dev --privileged {}'.format(memory_limit, tmpdir.name, container), shell=True)
+        command = f'docker run --rm -m {memory_limit}m -v {tmpdir.name}:/tmp/extractor -v /dev:/dev --privileged {container} {arguments}'
+        subprocess.run(command, shell=True)
 
-    logging.warning('Now taking ownership of the files. You may need to enter your password.')
+        with suppress(shutil.Error):
+            shutil.copytree(str(Path(tmpdir.name, 'files')), target)
 
-    subprocess.run('sudo chown -R {} {}'.format(os.environ['USER'], tmpdir.name), shell=True)
-    with suppress(shutil.Error):
-        shutil.copytree(str(Path(tmpdir.name, 'files')), target)
-
-    handle_report(report_file, tmpdir.name)
-
-    tmpdir.cleanup()
+        handle_report(report_file, tmpdir.name)
+    finally:
+        tmpdir.cleanup()
 
 
 def handle_report(report_file, tmp):
@@ -103,20 +107,20 @@ def main():
 
     output_directory = arguments.output_directory if arguments.output_directory else str(Path('.') / 'extracted_files')
     if Path(output_directory).exists():
-        logging.error('Target directory exists ({}). Please choose a non-existing directory with -o option.'.format(output_directory))
+        logging.error(f'Target directory exists ({output_directory}). Please choose a non-existing directory with -o option.')
         return 1
 
     if not container_exists(arguments.container):
-        logging.error('Container {} doesn\'t exist. Please specify an existing container with the -c option.'.format(arguments.container))
-        logging.info('You can download the default container with "docker pull {}"'.format(DEFAULT_CONTAINER))
+        logging.error(f'Container {arguments.container} doesn\'t exist. Please specify an existing container with the -c option.')
+        logging.info(f'You can download the default container with "docker pull {DEFAULT_CONTAINER}"')
         return 1
 
     if not Path(arguments.FILE[0]).is_file():
-        logging.error('Given input file {} doesn\'t exist. Please give an existing path.'.format(arguments.FILE[0]))
+        logging.error(f'Given input file {arguments.FILE[0]} doesn\'t exist. Please give an existing path.')
         return 1
 
     if arguments.report_file and not Path(arguments.report_file).parent.is_dir():
-        logging.error('Report file ({}) can not be created. Check if parent directory exists.'.format(arguments.report_file))
+        logging.error(f'Report file ({arguments.report_file}) can not be created. Check if parent directory exists.')
         return 1
 
     if arguments.report_file and Path(arguments.report_file).exists():
@@ -127,7 +131,8 @@ def main():
         container=arguments.container,
         target=output_directory,
         report_file=arguments.report_file,
-        memory_limit=arguments.memory
+        memory_limit=arguments.memory,
+        extract_everything=arguments.extract_everything
     )
 
     return 0
