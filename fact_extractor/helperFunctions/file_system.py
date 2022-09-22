@@ -33,3 +33,10 @@ def file_is_empty(file_path) -> bool:
         return Path(file_path).stat().st_size == 0
     except (FileNotFoundError, PermissionError, OSError, RuntimeError):
         return False
+
+
+def file_name_sanitize(file_path) -> str:
+    '''
+    Returns file path without directory traversal
+    '''
+    return file_path.replace('../', '')

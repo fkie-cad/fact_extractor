@@ -156,7 +156,7 @@ DEPENDENCIES = {
         'github': [
             ('kartone/sasquatch', ['./build.sh']),
             ('svidovich/jefferson-3', ['sudo python3 setup.py install']),
-            ('rampageX/firmware-mod-kit', ['(cd src && sh configure && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
+            ('rampageX/firmware-mod-kit', ['(cd src && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
         ]
     }
 }

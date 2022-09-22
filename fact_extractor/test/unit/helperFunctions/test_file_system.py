@@ -3,7 +3,7 @@ import unittest
 
 from common_helper_files import get_files_in_dir
 from helperFunctions.file_system import (
-    file_is_empty, get_fact_bin_dir, get_src_dir, get_test_data_dir
+    file_is_empty, get_fact_bin_dir, get_src_dir, get_test_data_dir, file_name_sanitize
 )
 
 
@@ -38,6 +38,10 @@ class TestFileSystemHelpers(unittest.TestCase):
         self.assertTrue(file_is_empty('{}/zero_byte'.format(get_test_data_dir())), 'file is empty but stated differently')
         self.assertFalse(file_is_empty('{}/get_files_test/testfile1'.format(get_test_data_dir())), 'file not empty but stated differently')
         self.assertFalse(file_is_empty(os.path.join(get_test_data_dir(), 'broken_link')), 'Broken link is not empty')
+
+    def test_sanitize_file_name(self):
+        self.assertEqual(file_name_sanitize('../../../../a/b/c/d'), 'a/b/c/d', 'file was not sanitized')
+        self.assertEqual(file_name_sanitize('dir/../../../../a/b/c/d'), 'dir/a/b/c/d', 'file was not sanitized')
 
     def test_file_is_zero_broken_link(self):
         self.assertFalse(file_is_empty(os.path.join(get_test_data_dir(), 'broken_link')), 'Broken link is not empty')
