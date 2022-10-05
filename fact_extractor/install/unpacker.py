@@ -12,7 +12,6 @@ from helperFunctions.install import (
 )
 from contextlib import suppress
 
-
 BIN_DIR = Path(__file__).parent.parent / 'bin'
 
 DEPENDENCIES = {
@@ -121,6 +120,9 @@ DEPENDENCIES = {
             'unace',
             'sharutils',
             'unar',
+            'zstd',
+            'liblz4-tool',
+            'p7zip-full',
             # Freetz
             'bison',
             'flex',
@@ -151,10 +153,10 @@ DEPENDENCIES = {
             'python-lzo',
             'numpy',
             'scipy',
+            'lz4',
             'git+https://github.com/jrspruitt/ubi_reader@v0.6.3-master'  # pinned as broken currently
         ],
         'github': [
-            ('kartone/sasquatch', ['./build.sh']),
             ('svidovich/jefferson-3', ['sudo python3 setup.py install']),
             ('rampageX/firmware-mod-kit', ['(cd src && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
         ]

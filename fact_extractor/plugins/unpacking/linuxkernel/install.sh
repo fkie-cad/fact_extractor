@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 echo "------------------------------------"
-echo "     install liblz4-tools, zstd     "
+echo "       install vmlinux-to-elf       "
 echo "------------------------------------"
 
-sudo apt-get install -y liblz4-tool zstd
-sudo pip3 install --upgrade lz4 git+https://github.com/marin-m/vmlinux-to-elf
+sudo pip3 install --upgrade git+https://github.com/marin-m/vmlinux-to-elf
+
 exit 0
