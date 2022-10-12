@@ -26,9 +26,13 @@ poetry install --only main
 UNBLOB_PATH=$(poetry env info --path)
 
 if [[ -f "$UNBLOB_PATH""/bin/unblob" ]]; then
-  sudo ln -s "$UNBLOB_PATH""/bin/unblob" /usr/local/bin/unblob
+  if [[ ! -f "/usr/local/bin/unblob" ]]; then
+    sudo ln -s "$UNBLOB_PATH""/bin/unblob" /usr/local/bin/unblob
+  fi
 else
   echo "Could not install unblob" && exit 1
 fi
+
+rm -r tests
 
 exit 0
