@@ -164,6 +164,13 @@ DEPENDENCIES = {
 }
 
 
+def check_mod_kit_installed() -> bool:
+    return all(
+        (Path(__file__).parent.parent / 'bin' / tool).exists()
+        for tool in ['tpl-tool', 'untrx', 'unyaffs2']
+    )
+
+
 def install_dependencies(dependencies):
     apt = dependencies.get('apt', [])
     pip3 = dependencies.get('pip3', [])
@@ -171,7 +178,11 @@ def install_dependencies(dependencies):
     apt_install_packages(*apt)
     pip3_install_packages(*pip3)
     for repo in github:
-        install_github_project(*repo)
+        if repo[0].endswith('firmware-mod-kit') and check_mod_kit_installed():
+            logging.info('Skipping firmware-mod-kit since it is already installed')
+        else:
+            install_github_project(*repo)
+
 
 
 def main(distribution):
@@ -214,6 +225,16 @@ def _edit_sudoers():
 
 
 def _install_freetz():
+    if all(
+        (Path(__file__).parent.parent / 'bin' / tool).exists()
+        for tool in [
+            'find-squashfs', 'unpack-kernel', 'freetz_bin_functions', 'unlzma', 'sfk', 'unsquashfs4-avm-be',
+            'unsquashfs4-avm-le', 'unsquashfs3-multi'
+        ]
+    ):
+        logging.info('Skipping FREETZ as it is already installed')
+        return
+
     logging.info('Installing FREETZ')
     current_user = getuser()
     with TemporaryDirectory(prefix='fact_freetz') as build_directory:
