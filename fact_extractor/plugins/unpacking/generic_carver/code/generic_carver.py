@@ -13,12 +13,12 @@ VERSION = '0.9'
 
 
 def unpack_function(file_path, tmp_dir):
-    logging.debug('File Type unknown: execute unblob on {}'.format(file_path))
+    logging.debug(f'File type unknown: Execute unblob on {file_path}')
 
     temp_file = Path('/tmp/unblob_report.json')
     temp_file.unlink(missing_ok=True)
     output = execute_shell_command(
-        f'unblob --report {temp_file.absolute()} --entropy-depth 0 --depth 1 --extract-dir {tmp_dir} {file_path}'
+        f'unblob -sk --report {temp_file.absolute()} --entropy-depth 0 --depth 1 --extract-dir {tmp_dir} {file_path}'
     )
     return {'output': output, 'unblob_meta': json.loads(temp_file.read_text())}
 
