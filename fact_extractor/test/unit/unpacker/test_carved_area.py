@@ -50,6 +50,8 @@ class TestCarvedArea(unittest.TestCase):
         for area in expected:
             self.assertIn(area, carved_area.non_carved_areas)
 
+        self.assertEqual('(513:15439) (48258:131583) (1066831:1180159) ', str(carved_area))
+
     def caring_test(self, area_size, carved_and_expected):
         for test_data in carved_and_expected:
             carved_area = CarvedArea(area_size)

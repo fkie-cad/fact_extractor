@@ -2,6 +2,7 @@ import logging
 from os import getgid, getuid
 from subprocess import PIPE, Popen
 from time import time
+import fnmatch
 from typing import Callable, Dict, List, Tuple
 
 from common_helper_files import get_files_in_dir
@@ -15,14 +16,16 @@ class UnpackBase(object):
     The unpacker module unpacks all files included in a file
     '''
 
-    def __init__(self, config=None):
+    def __init__(self, config=None, extract_everything: bool = False):
         self.config = config
+        self.exclude = read_list_from_config(config, 'unpack', 'exclude')
         self._setup_plugins()
+        self.extract_everything = extract_everything
 
     def _setup_plugins(self):
         self.unpacker_plugins = {}
         self.load_plugins()
-        logging.info('Plug-ins available: {}'.format(self.source.list_plugins()))
+        logging.info(f'Plug-ins available: {self.source.list_plugins()}')
         self._set_whitelist()
 
     def load_plugins(self):
@@ -33,7 +36,7 @@ class UnpackBase(object):
 
     def _set_whitelist(self):
         self.blacklist = read_list_from_config(self.config, 'unpack', 'blacklist')
-        logging.debug('Ignore (Blacklist): {}'.format(', '.join(self.blacklist)))
+        logging.debug(f'''Ignore (Blacklist): {', '.join(self.blacklist)}''')
         for item in self.blacklist:
             self.register_plugin(item, self.unpacker_plugins['generic/nop'])
 
@@ -52,10 +55,17 @@ class UnpackBase(object):
 
     def unpacking_fallback(self, file_path, tmp_dir, old_meta, fallback_plugin_mime) -> Tuple[List, Dict]:
         fallback_plugin = self.unpacker_plugins[fallback_plugin_mime]
-        old_meta['0_FALLBACK_{}'.format(old_meta['plugin_used'])] = '{} (failed) -> {} (fallback)'.format(old_meta['plugin_used'], fallback_plugin_mime)
+        old_meta[f'''0_FALLBACK_{old_meta['plugin_used']}'''] = f'''{old_meta['plugin_used']} (failed) -> {fallback_plugin_mime} (fallback)'''
         if 'output' in old_meta.keys():
-            old_meta['0_ERROR_{}'.format(old_meta['plugin_used'])] = old_meta['output']
+            old_meta[f'''0_ERROR_{old_meta['plugin_used']}'''] = old_meta['output']
         return self._extract_files_from_file_using_specific_unpacker(file_path, tmp_dir, fallback_plugin, meta_data=old_meta)
+
+    def _should_ignore(self, file):
+        path = str(file)
+        for pattern in self.exclude:
+            if fnmatch.fnmatchcase(path, pattern):
+                return True
+        return False
 
     def _extract_files_from_file_using_specific_unpacker(self, file_path: str, tmp_dir: str, selected_unpacker, meta_data: dict = None) -> Tuple[List, Dict]:
         unpack_function, name, version = selected_unpacker  # TODO Refactor register method to directly use four parameters instead of three
@@ -64,27 +74,39 @@ class UnpackBase(object):
             meta_data = {}
         meta_data['plugin_used'] = name
         meta_data['plugin_version'] = version
-        logging.debug('Try to unpack {} with {} plugin...'.format(file_path, name))
+
+        logging.debug(f'Try to unpack {file_path} with {name} plugin...')
 
         try:
             additional_meta = unpack_function(file_path, tmp_dir)
-        except Exception as e:
-            logging.debug('Unpacking of {} failed: {}: {}'.format(file_path, type(e), str(e)))
-            additional_meta = {'error': '{}: {}'.format(type(e), str(e))}
+        except Exception as error:
+            logging.debug(f'Unpacking of {file_path} failed: {error}', exc_info=True)
+            additional_meta = {'error': f'{type(error)}: {str(error)}'}
         if isinstance(additional_meta, dict):
             meta_data.update(additional_meta)
 
         self.change_owner_back_to_me(directory=tmp_dir)
         meta_data['analysis_date'] = time()
 
-        return get_files_in_dir(tmp_dir), meta_data
+        out = get_files_in_dir(tmp_dir)
+
+        if self.exclude:
+            # Remove paths that should be ignored
+            excluded_count = len(out)
+            out = [f for f in out if not self._should_ignore(f)]
+            excluded_count -= len(out)
+        else:
+            excluded_count = 0
+
+        meta_data['number_of_excluded_files'] = excluded_count
+        return out, meta_data
 
     def change_owner_back_to_me(self, directory: str = None, permissions: str = 'u+r'):
-        with Popen('sudo chown -R {}:{} {}'.format(getuid(), getgid(), directory), shell=True, stdout=PIPE, stderr=PIPE) as pl:
+        with Popen(f'sudo chown -R {getuid()}:{getgid()} {directory}', shell=True, stdout=PIPE, stderr=PIPE) as pl:
             pl.communicate()
         self.grant_read_permission(directory, permissions)
 
     @staticmethod
     def grant_read_permission(directory: str, permissions: str):
-        with Popen('chmod --recursive {} {}'.format(permissions, directory), shell=True, stdout=PIPE, stderr=PIPE) as pl:
+        with Popen(f'chmod --recursive {permissions} {directory}', shell=True, stdout=PIPE, stderr=PIPE) as pl:
             pl.communicate()

@@ -1,20 +1,13 @@
-import os
+from pathlib import Path
+import pytest
 from tempfile import TemporaryDirectory
 
-import pytest
-
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
-from ..code.squash_fs import _get_unpacker_name, _unpack_success, unpack_function
 
-TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+from ..code.squash_fs import _unpack_success, unpack_function, SQUASH_UNPACKER
 
 
-@pytest.mark.parametrize('unpacker_path, expected', [
-    ('/foo/bar/unpacker', 'unpacker'),
-    ('unpacker', 'unpacker'),
-])
-def test_get_unpacker_name(unpacker_path, expected):
-    assert _get_unpacker_name(unpacker_path) == expected
+TEST_DATA_DIR = Path(__file__).parent / 'data'
 
 
 @pytest.mark.parametrize('unpack_path, expected', [
@@ -26,11 +19,16 @@ def test_unpack_success(unpack_path, expected):
 
 
 def test_not_unpackable_file():
-    empty_test_file = os.path.join(TEST_DATA_DIR, 'empty')
+    empty_test_file = TEST_DATA_DIR / 'empty'
     unpack_dir = TemporaryDirectory(prefix='fact_test_')
     result = unpack_function(empty_test_file, unpack_dir)
     assert 'sasquatch - error' in result.keys()
     assert 'unsquashfs4-avm-be - error' in result.keys()
+
+
+def test_tool_pathes_set_correctly():
+    for unpacker in SQUASH_UNPACKER:
+        assert unpacker.exists()
 
 
 class TestSquashUnpacker(TestUnpackerBase):
@@ -38,5 +36,5 @@ class TestSquashUnpacker(TestUnpackerBase):
         self.check_unpacker_selection('filesystem/squashfs', 'SquashFS')
 
     def test_extraction_sqfs(self):
-        self.check_unpacking_of_standard_unpack_set(os.path.join(TEST_DATA_DIR, 'sqfs.img'),
+        self.check_unpacking_of_standard_unpack_set(TEST_DATA_DIR / 'sqfs.img',
                                                     additional_prefix_folder='fact_extracted')

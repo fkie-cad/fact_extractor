@@ -43,7 +43,7 @@ def log_current_packages(packages, install=True):
     logging.info('{} {}'.format(action, ' '.join(packages)))
 
 
-def run_shell_command_raise_on_return_code(command: str, error: str, add_output_on_error=False) -> str:
+def run_shell_command_raise_on_return_code(command: str, error: str, add_output_on_error=False) -> str:  # pylint: disable=invalid-name
     output, return_code = execute_shell_command_get_return_code(command)
     if return_code != 0:
         if add_output_on_error:
@@ -69,16 +69,25 @@ def apt_clean_system():
 
 
 def apt_install_packages(*args):
+    if not args:
+        return
+
     log_current_packages(args)
     return run_shell_command_raise_on_return_code('sudo -E apt-get install -y {}'.format(' '.join(args)), 'Error in installation of package(s) {}'.format(' '.join(args)), True)
 
 
 def apt_remove_packages(*args):
+    if not args:
+        return
+
     log_current_packages(args, install=False)
     return run_shell_command_raise_on_return_code('sudo -E apt-get remove -y {}'.format(' '.join(args)), 'Error in removal of package(s) {}'.format(' '.join(args)), True)
 
 
 def _pip_install_packages(version, args):
+    if not args:
+        return
+
     log_current_packages(args)
     for packet in args:
         try:
@@ -91,10 +100,13 @@ def _pip_install_packages(version, args):
 
 
 def _pip_remove_packages(version, args):
+    if not args:
+        return
+
     log_current_packages(args, install=False)
     for packet in args:
         try:
-            run_shell_command_raise_on_return_code('sudo -EH pip{} uninstall {}'.format(version, packet),
+            run_shell_command_raise_on_return_code('sudo -EH pip{} uninstall -y {}'.format(version, packet),
                                                    'Error in removal of python package {}'.format(packet), True)
         except InstallationError as installation_error:
             if 'is a distutils installed project' in str(installation_error):
@@ -141,11 +153,11 @@ def install_github_project(project_path: str, commands: List[str]):
 
 def _checkout_github_project(github_path, folder_name):
     clone_url = 'https://www.github.com/{}'.format(github_path)
-    _, return_code = execute_shell_command_get_return_code('git clone {}'.format(clone_url))
+    stdout, return_code = execute_shell_command_get_return_code('git clone {}'.format(clone_url))
     if return_code != 0:
-        raise InstallationError('Cloning from github failed for project {}\n {}'.format(github_path, clone_url))
+        raise InstallationError('Cloning from github failed for project {}: {}\n'.format(github_path, stdout))
     if not Path('.', folder_name).exists():
-        raise InstallationError('Repository creation failed on folder {}\n {}'.format(folder_name, clone_url))
+        raise InstallationError('Repository creation failed on folder {}: {}\n'.format(folder_name, stdout))
 
 
 def load_main_config():

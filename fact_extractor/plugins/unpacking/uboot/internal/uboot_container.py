@@ -98,6 +98,8 @@ class uBootHeader():
             20: 'x86_setupbin_image'}
 
     def __str__(self):
+        if self.image_name is None:
+            return ""
         return self.image_name
 
     def __init__(self):
@@ -145,4 +147,7 @@ class uBootHeader():
         else:
             raise UbootInvalidCompression
 
-        self.image_name = header[11].replace(b'\x00', b'').decode(encoding='UTF-8')
+        try:
+            self.image_name = header[11].replace(b"\x00", b"").decode(encoding="UTF-8")
+        except UnicodeDecodeError:
+            pass

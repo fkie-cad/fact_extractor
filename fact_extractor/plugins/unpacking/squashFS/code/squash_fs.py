@@ -1,20 +1,23 @@
 '''
 This plugin unpacks SquashFS filesystem images
 '''
-import os
-
 from common_helper_files import get_files_in_dir
 from common_helper_process import execute_shell_command
+from pathlib import Path
 
-THIS_FILES_DIR = os.path.dirname(os.path.abspath(__file__))
-BIN_DIR = os.path.join(THIS_FILES_DIR, '../bin')
+from helperFunctions.file_system import get_fact_bin_dir
+
+
+SASQUATCH = Path('/usr/local/bin/sasquatch')
+UNSQUASHFS4_AVM_BE = Path(get_fact_bin_dir()) / 'unsquashfs4-avm-be'
+UNSQUASHFS4_AVM_LE = Path(get_fact_bin_dir()) / 'unsquashfs4-avm-le'
+UNSQUASHFS3_MULTI = Path(get_fact_bin_dir()) / 'unsquashfs3-multi'
 
 
 NAME = 'SquashFS'
 MIME_PATTERNS = ['filesystem/squashfs']
-VERSION = '0.7'
-SQUASH_UNPACKER = ['sasquatch', BIN_DIR + '/unsquashfs4-avm-be',
-                   BIN_DIR + '/unsquashfs4-avm-le', BIN_DIR + '/unsquashfs3-multi']
+VERSION = '0.9'
+SQUASH_UNPACKER = [SASQUATCH, UNSQUASHFS4_AVM_BE, UNSQUASHFS4_AVM_LE, UNSQUASHFS3_MULTI]
 
 
 def unpack_function(file_path, tmp_dir):
@@ -24,22 +27,18 @@ def unpack_function(file_path, tmp_dir):
     '''
     unpack_result = dict()
     for unpacker in SQUASH_UNPACKER:
-        output = execute_shell_command('fakeroot {} -d {}/fact_extracted {}'.format(unpacker, tmp_dir, file_path))
+        scan_parameter = '-scan' if '-avm-' in unpacker.name else ''
+        output = execute_shell_command(f'fakeroot {unpacker} {scan_parameter} -d {tmp_dir}/fact_extracted {file_path}')
         if _unpack_success(tmp_dir):
-            unpack_result['unpacking_tool'] = _get_unpacker_name(unpacker)
+            unpack_result['unpacking_tool'] = unpacker.name
             unpack_result['output'] = output
             break
-        else:
-            unpack_result['{} - error'.format(_get_unpacker_name(unpacker))] = output
+        unpack_result[f'{unpacker.name} - error'] = output
     return unpack_result
 
 
-def _get_unpacker_name(unpacker_path):
-    return unpacker_path.split('/')[-1]
-
-
 def _unpack_success(tmp_dir):
-    return len(get_files_in_dir(tmp_dir)) > 0
+    return len(get_files_in_dir(str(tmp_dir))) > 0
 
 
 # ----> Do not edit below this line <----

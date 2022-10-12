@@ -1,6 +1,9 @@
 import mmap
 import os
 import sys
+from pathlib import Path
+
+from common_helper_process import execute_shell_command
 
 from unpacker.helper.carving import Carver
 
@@ -12,7 +15,8 @@ from uboot_container import uBootHeader  # noqa: E402 pylint: disable=import-err
 
 NAME = 'Uboot'
 MIME_PATTERNS = ['firmware/u-boot']
-VERSION = '0.1'
+VERSION = '0.2'
+DTB_MAGIC = b'\xd0\x0d\xfe\xed'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -22,22 +26,30 @@ def unpack_function(file_path, tmp_dir):
     '''
 
     unpacker = Uboot(file_path)
+    meta = {}
 
-    uboot_path = '{}/uboot.{}'.format(tmp_dir, uBootHeader.COMPRESSION[unpacker.ubootheader.compression_type])
+    uboot_path = f'{tmp_dir}/uboot.{uBootHeader.COMPRESSION[unpacker.ubootheader.compression_type]}'
     with open(uboot_path, 'wb') as uboot:
         uboot.write(unpacker.extract_uboot_image())
 
-    uboot_header_path = '{}/uboot_header.bin'.format(tmp_dir)
+    uboot_header_path = f'{tmp_dir}/uboot_header.bin'
     with open(uboot_header_path, 'wb') as uboot:
         uboot.write(unpacker.extract_uboot_header())
 
     remaining = unpacker.get_remaining_blocks()
-    for offset in remaining:
-        unknown_path = '{}/{}_unknown.bin'.format(tmp_dir, offset)
+    for offset, block in remaining.items():
+        unknown_path = f'{tmp_dir}/{offset}_unknown.bin'
         with open(unknown_path, 'wb') as hdr:
-            hdr.write(remaining[offset])
+            hdr.write(block)
 
-    return {}
+    # scan for device tree blobs
+    if DTB_MAGIC in Path(file_path).read_bytes():
+        cmd = f'''extract-dtb {file_path} -o {Path(tmp_dir) / 'dtb'}'''
+        output = cmd + '\n'
+        output += execute_shell_command(cmd, timeout=10)
+        meta['extract-dtb'] = output
+
+    return meta
 
 
 class Uboot:
