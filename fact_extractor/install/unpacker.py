@@ -134,7 +134,9 @@ DEPENDENCIES = {
             'gcc-multilib',
             'lib32stdc++6',
             'gawk',
-            'pkg-config'
+            'pkg-config',
+            # android sparse image
+            'simg2img',
         ],
         'pip3': [
             'pluginbase',
