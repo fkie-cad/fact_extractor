@@ -18,6 +18,7 @@ def successful_extraction(files, meta_data):
     content = Path(files[0]).read_bytes()
     assert b'Hello world.' in content
     assert 'Success' in meta_data['output']
+    assert files[0].endswith('.bin')
 
 
 class TestMotorolaSRecord(TestUnpackerBase):
@@ -37,7 +38,7 @@ def test_extraction_bad_file():
     with TemporaryDirectory() as tmp_dir:
         meta_data = unpack_function(file_path, tmp_dir)
 
-    assert 'not starting with an \'S\'' in meta_data['output']
+    assert 'Error: no valid srec data found' in meta_data['output']
 
 
 def test_extraction_decoding_error():
