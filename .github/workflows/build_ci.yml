@@ -42,4 +42,4 @@ jobs:
         run: ./fact_extractor/install.py
       - name: Unit Tests
         shell: 'script -q -e -c "bash {0}"'
-        run: sudo -EH pytest
+        run: pytest
