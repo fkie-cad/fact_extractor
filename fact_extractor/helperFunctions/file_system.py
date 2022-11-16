@@ -1,4 +1,7 @@
+import lzma
+from contextlib import contextmanager
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 SRC_DIR_PATH = Path(__file__).parent.parent.absolute()
 
@@ -40,3 +43,12 @@ def file_name_sanitize(file_path) -> str:
     Returns file path without directory traversal
     '''
     return file_path.replace('../', '')
+
+
+@contextmanager
+def decompress_test_file(test_file: Path) -> Path:
+    with TemporaryDirectory() as tmp_dir:
+        target_file = Path(tmp_dir) / 'fs.img'
+        with lzma.open(test_file) as decompressed_file:
+            target_file.write_bytes(decompressed_file.read())
+        yield target_file

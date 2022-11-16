@@ -12,14 +12,12 @@ from fact_helper_file import get_file_type_from_path
 
 NAME = 'genericFS'
 MIME_PATTERNS = [
-    'filesystem/btrfs', 'filesystem/cramfs', 'filesystem/dosmbr', 'filesystem/ext2', 'filesystem/ext3',
-    'filesystem/ext4', 'filesystem/f2fs', 'filesystem/fat', 'filesystem/hfs', 'filesystem/jfs', 'filesystem/minix',
-    'filesystem/ntfs', 'filesystem/reiserfs', 'filesystem/romfs', 'filesystem/udf', 'filesystem/xfs', 'generic/fs',
+    'filesystem/btrfs', 'filesystem/dosmbr', 'filesystem/f2fs', 'filesystem/jfs', 'filesystem/minix',
+    'filesystem/reiserfs', 'filesystem/romfs', 'filesystem/udf', 'filesystem/xfs', 'generic/fs',
 ]
-VERSION = '0.6'
+VERSION = '0.6.1'
 TYPES = {
     'filesystem/btrfs': 'btrfs',
-    'filesystem/cramfs': 'cramfs',
     'filesystem/f2fs': 'f2fs',
     'filesystem/jfs': 'jfs',
     'filesystem/minix': 'minix',
@@ -41,7 +39,7 @@ def unpack_function(file_path, tmp_dir):
 
 
 def _mount_single_filesystem(file_path, mime_type, tmp_dir):
-    type_parameter = '-t {}'.format(TYPES[mime_type]) if mime_type in TYPES else ''
+    type_parameter = f'-t {TYPES[mime_type]}' if mime_type in TYPES else ''
     mount_dir = TemporaryDirectory()
     output = execute_shell_command(f'sudo mount {type_parameter} -v -o ro,loop {file_path} {mount_dir.name}')
     output += execute_shell_command(f'sudo cp -av {mount_dir.name}/* {tmp_dir}/')
@@ -51,7 +49,7 @@ def _mount_single_filesystem(file_path, mime_type, tmp_dir):
 
 
 def _mount_from_boot_record(file_path, tmp_dir):
-    output, return_code = execute_shell_command_get_return_code('sudo kpartx -a -v {}'.format(file_path))
+    output, _ = execute_shell_command_get_return_code(f'sudo kpartx -a -v {file_path}')
     sleep(1)  # Necessary since initialization of special devices seem to take some time
     # kpartx may return an error on one partition but others are still loaded correctly.
     loop_devices = _extract_loop_devices(output)
@@ -67,7 +65,7 @@ def _mount_from_boot_record(file_path, tmp_dir):
 
         # Bug in kpartx doesn't allow -d to work on long file names (as in /storage/path/<prefix>/<sha_hash>_<length>)
         # thus "host" loop device is used instead of filename
-        k_output, return_code = execute_shell_command_get_return_code(f'sudo kpartx -d -v {_get_host_loop(loop_devices)}')
+        k_output, _ = execute_shell_command_get_return_code(f'sudo kpartx -d -v {_get_host_loop(loop_devices)}')
         execute_shell_command(f'sudo losetup -d {_get_host_loop(loop_devices)}')
         return output + k_output
 
