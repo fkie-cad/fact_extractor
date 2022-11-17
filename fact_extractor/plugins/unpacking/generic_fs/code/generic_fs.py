@@ -2,12 +2,11 @@
 This plugin mounts filesystem images and extracts their content
 '''
 import re
+from shlex import split
+from subprocess import run, PIPE, STDOUT
 from tempfile import TemporaryDirectory
 from time import sleep
 
-from common_helper_process import (
-    execute_shell_command, execute_shell_command_get_return_code
-)
 from fact_helper_file import get_file_type_from_path
 
 NAME = 'genericFS'
@@ -41,17 +40,28 @@ def unpack_function(file_path, tmp_dir):
 
 
 def _mount_single_filesystem(file_path, mime_type, tmp_dir):
-    type_parameter = '-t {}'.format(TYPES[mime_type]) if mime_type in TYPES else ''
-    mount_dir = TemporaryDirectory()
-    output = execute_shell_command(f'sudo mount {type_parameter} -v -o ro,loop {file_path} {mount_dir.name}')
-    output += execute_shell_command(f'sudo cp -av {mount_dir.name}/* {tmp_dir}/')
-    output += execute_shell_command(f'sudo umount -v {mount_dir.name}')
-    mount_dir.cleanup()
+    type_parameter = f'-t {TYPES[mime_type]}' if mime_type in TYPES else ''
+    with TemporaryDirectory() as mount_dir:
+        output = _get_output(f'sudo mount {type_parameter} -v -o ro,loop {file_path} {mount_dir}')
+        output += _get_output(f'sudo cp -av {mount_dir}/* {tmp_dir}/')
+        output += _get_output(f'sudo umount -v {mount_dir}')
+
+    if 'unknown filesystem type' in output:
+        output += '\nwarning: you may need to install additional kernel modules'
     return output
 
 
+def _get_output(command: str) -> str:
+    environment = {'LANG': 'en_US.UTF-8'}  # use LANG env variable to get unified localization output
+    return run(command, shell=True, env=environment, check=False, text=True, stdout=PIPE, stderr=STDOUT).stdout
+
+
+def _run(command: str):
+    run(split(command), check=False)
+
+
 def _mount_from_boot_record(file_path, tmp_dir):
-    output, return_code = execute_shell_command_get_return_code('sudo kpartx -a -v {}'.format(file_path))
+    output = _get_output(f'sudo kpartx -a -v {file_path}')
     sleep(1)  # Necessary since initialization of special devices seem to take some time
     # kpartx may return an error on one partition but others are still loaded correctly.
     loop_devices = _extract_loop_devices(output)
@@ -63,21 +73,20 @@ def _mount_from_boot_record(file_path, tmp_dir):
     if loop_devices:
         # Occasionally device mapping isn't removed correctly and results in losetup -d to fail, so remove explicitly
         for loop_dev in loop_devices:
-            execute_shell_command(f'sudo dmsetup remove /dev/mapper/{loop_dev}')
+            _run(f'sudo dmsetup remove /dev/mapper/{loop_dev}')
 
         # Bug in kpartx doesn't allow -d to work on long file names (as in /storage/path/<prefix>/<sha_hash>_<length>)
         # thus "host" loop device is used instead of filename
-        k_output, return_code = execute_shell_command_get_return_code(f'sudo kpartx -d -v {_get_host_loop(loop_devices)}')
-        execute_shell_command(f'sudo losetup -d {_get_host_loop(loop_devices)}')
-        return output + k_output
+        output += _get_output(f'sudo kpartx -d -v {_get_host_loop(loop_devices)}')
+        _run(f'sudo losetup -d {_get_host_loop(loop_devices)}')
 
     return output
 
 
 def _process_loop_device(loop_device, mount_point, target_directory, index):
-    output = execute_shell_command(f'sudo mount -o ro -v /dev/mapper/{loop_device} {mount_point}')
-    output += execute_shell_command(f'sudo cp -av {mount_point}/ {target_directory}/partition_{index}/')
-    return output + execute_shell_command(f'sudo umount -v {mount_point}')
+    output = _get_output(f'sudo mount -o ro -v /dev/mapper/{loop_device} {mount_point}')
+    output += _get_output(f'sudo cp -av {mount_point}/ {target_directory}/partition_{index}/')
+    return output + _get_output(f'sudo umount -v {mount_point}')
 
 
 def _extract_loop_devices(kpartx_output):
@@ -85,7 +94,8 @@ def _extract_loop_devices(kpartx_output):
 
 
 def _get_host_loop(devices):
-    return '/dev/{}'.format(re.findall(r'(loop\d{1,2})', devices[0])[0])
+    device = re.findall(r'(loop\d{1,2})', devices[0])[0]
+    return f'/dev/{device}'
 
 
 # ----> Do not edit below this line <----

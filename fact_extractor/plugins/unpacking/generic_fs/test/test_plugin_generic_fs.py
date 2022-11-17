@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
-from ..code.generic_fs import _extract_loop_devices
+from ..code.generic_fs import _extract_loop_devices, _mount_single_filesystem, TYPES
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 KPARTX_OUTPUT = '''
@@ -109,6 +109,16 @@ def test_extract_loop_devices():
     loop_devices = _extract_loop_devices(KPARTX_OUTPUT)
     assert loop_devices
     assert loop_devices == ['loop7p1', 'loop7p2']
+
+
+def test_unknown_filesystem():
+    try:
+        TYPES['foobar'] = 'foobar'
+        with TemporaryDirectory() as tmp_dir:
+            output = _mount_single_filesystem(TEST_DATA_DIR / 'cramfs.img', 'foobar', tmp_dir)
+        assert 'you may need to install additional kernel modules' in output
+    finally:
+        TYPES.pop('foobar')
 
 
 @contextmanager
