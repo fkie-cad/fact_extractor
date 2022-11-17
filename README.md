@@ -30,8 +30,14 @@ fact_extractor/install/pre_install.sh
 fact_extractor/install.py
 ```
 
-:warning: **We no longer support Ubuntu 16.04 and Python 3.5** 
+:warning: **We no longer support Ubuntu 16.04 and Python <3.7** 
 (It may still work with a bit of tinkering, though)
+
+:warning: For the `generic_fs` unpacker plugin to work with all file system types, you may need to install extra kernel modules
+
+```sh
+sudo apt install linux-modules-extra-$(uname -r)
+```
 
 The tool can then be run with
 
@@ -92,7 +98,7 @@ This project is partly financed by [German Federal Office for Information Securi
 ## License
 ```
     Firmware Analysis and Comparison Tool (FACT) extractor
-    Copyright (C) 2015-2019  Fraunhofer FKIE
+    Copyright (C) 2015-2022  Fraunhofer FKIE
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
