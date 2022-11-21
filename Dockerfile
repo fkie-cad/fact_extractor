@@ -12,4 +12,4 @@ RUN install/pre_install.sh
 
 RUN ./install.py
 
-ENTRYPOINT ["./server_entry.py"]
+ENTRYPOINT ["./docker_extraction.py"]
