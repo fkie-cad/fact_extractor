@@ -11,14 +11,12 @@ from fact_helper_file import get_file_type_from_path
 
 NAME = 'genericFS'
 MIME_PATTERNS = [
-    'filesystem/btrfs', 'filesystem/cramfs', 'filesystem/dosmbr', 'filesystem/ext2', 'filesystem/ext3',
-    'filesystem/ext4', 'filesystem/f2fs', 'filesystem/fat', 'filesystem/hfs', 'filesystem/jfs', 'filesystem/minix',
-    'filesystem/ntfs', 'filesystem/reiserfs', 'filesystem/romfs', 'filesystem/udf', 'filesystem/xfs', 'generic/fs',
+    'filesystem/btrfs', 'filesystem/dosmbr', 'filesystem/f2fs', 'filesystem/jfs', 'filesystem/minix',
+    'filesystem/reiserfs', 'filesystem/romfs', 'filesystem/udf', 'filesystem/xfs', 'generic/fs',
 ]
-VERSION = '0.6'
+VERSION = '0.6.1'
 TYPES = {
     'filesystem/btrfs': 'btrfs',
-    'filesystem/cramfs': 'cramfs',
     'filesystem/f2fs': 'f2fs',
     'filesystem/jfs': 'jfs',
     'filesystem/minix': 'minix',

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import gc
 import json
 import os
@@ -6,8 +8,7 @@ import unittest
 from configparser import ConfigParser
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Union
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 from helperFunctions.file_system import get_test_data_dir
 from unpacker.unpack import Unpacker
@@ -38,30 +39,39 @@ class TestUnpackerBase(unittest.TestCase):
         gc.collect()
 
     def get_unpacker_meta(self):
-        return json.loads(Path(self.unpacker._report_folder, 'meta.json').read_text())  # pylint: disable=protected-access
+        return json.loads(
+            Path(self.unpacker._report_folder, 'meta.json').read_text()
+        )  # pylint: disable=protected-access
 
     def check_unpacker_selection(self, mime_type, plugin_name):
         name = self.unpacker.get_unpacker(mime_type)[1]
         self.assertEqual(name, plugin_name, 'wrong unpacker plugin selected')
 
-    def check_unpacking_of_standard_unpack_set(self, in_file: Union[Path, str], additional_prefix_folder='', output=True):
+    def check_unpacking_of_standard_unpack_set(
+        self,
+        in_file: Path | str,
+        additional_prefix_folder: str = '',
+        output: bool = True,
+        ignore: set[str] | None = None,
+    ):
         files, meta_data = self.unpacker.extract_files_from_file(str(in_file), self.tmp_dir.name)
-        files = set(files)
-        self.assertEqual(len(files), 3, 'file number incorrect')
-        self.assertEqual(files, {
+        files = {f for f in files if not any(rule in f for rule in ignore or set())}
+        assert len(files) == 3, 'file number incorrect'
+        assert files == {
             os.path.join(self.tmp_dir.name, additional_prefix_folder, 'testfile1'),
             os.path.join(self.tmp_dir.name, additional_prefix_folder, 'testfile2'),
-            os.path.join(self.tmp_dir.name, additional_prefix_folder, 'generic folder/test file 3_.txt')
-        }, 'not all files found')
+            os.path.join(self.tmp_dir.name, additional_prefix_folder, 'generic folder/test file 3_.txt'),
+        }, 'not all files found'
         if output:
-            self.assertIn('output', meta_data)
+            assert 'output' in meta_data
         return meta_data
 
 
 class TestUnpackerCore(TestUnpackerBase):
-
     def test_generic_carver_found(self):
-        self.assertTrue('generic/carver' in list(self.unpacker.unpacker_plugins.keys()), 'generic carver plugin not found')
+        self.assertTrue(
+            'generic/carver' in list(self.unpacker.unpacker_plugins.keys()), 'generic carver plugin not found'
+        )
         name = self.unpacker.unpacker_plugins['generic/carver'][1]
         self.assertEqual(name, 'generic_carver', 'generic_carver plugin not found')
 
@@ -143,15 +153,18 @@ class TestUnpackerCore(TestUnpackerBase):
 
 
 class TestUnpackerCoreMain(TestUnpackerBase):
-
     def main_unpack_check(self, file_path, number_unpacked_files, number_of_excluded_files, first_unpacker):
         extracted_files = self.unpacker.unpack(file_path)
         meta_data = self.get_unpacker_meta()
 
         self.assertEqual(len(extracted_files), number_unpacked_files, 'not all files found')
         self.assertEqual(meta_data['plugin_used'], first_unpacker, 'Wrong plugin in Meta')
-        self.assertEqual(meta_data['number_of_unpacked_files'], number_unpacked_files, 'Number of unpacked files wrong in Meta')
-        self.assertEqual(meta_data['number_of_excluded_files'], number_of_excluded_files, 'Number of excluded files wrong in Meta')
+        self.assertEqual(
+            meta_data['number_of_unpacked_files'], number_unpacked_files, 'Number of unpacked files wrong in Meta'
+        )
+        self.assertEqual(
+            meta_data['number_of_excluded_files'], number_of_excluded_files, 'Number of excluded files wrong in Meta'
+        )
 
     def test_main_unpack_function(self):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
