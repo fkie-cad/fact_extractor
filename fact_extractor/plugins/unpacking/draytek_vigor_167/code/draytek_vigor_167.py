@@ -9,8 +9,8 @@ NAME = 'Draytek Vigor 167'
 MIME_PATTERNS = ['firmware/draytek-vigor-167']
 VERSION = '0.1'
 
-header_layout = '> 4s I I I 64x I I 49x I I 117x'
-header = struct.Struct(header_layout)
+HEADER_LAYOUT = '> 4s I I I 64x I I 49x I I 117x'
+HEADER = struct.Struct(HEADER_LAYOUT)
 
 
 def unpack_function(file_path, tmp_dir):
@@ -20,7 +20,7 @@ def unpack_function(file_path, tmp_dir):
     Optional: Return a dict with meta information
     '''
     with open(file_path, 'rb') as f:
-        signature = header.unpack(f.read(header.size))
+        signature = HEADER.unpack(f.read(HEADER.size))
         f.seek(signature[1] + signature[4])
         squashfs = f.read(signature[5])
 
