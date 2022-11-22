@@ -11,6 +11,19 @@ VERSION = '0.1'
 
 HEADER_LAYOUT = '> 4s I I I 64x I I 49x I I 117x'
 HEADER = struct.Struct(HEADER_LAYOUT)
+# ┌─Draytek Vigor 167 - firmware container (big endian)─┐
+# │  4 bytes    // Magic field, expected '2RHD'         │
+# │  uint32     // Header size, expected 256 bytes      │
+# │  uint32     // File size without footer             │
+# │  uint32     // CRC32 checksum                       │
+# │  64 bytes   // First padding                        │
+# │  uint32     // Kernel blob size                     │
+# │  uint32     // Squashfs blob size                   │
+# │  49 bytes   // Second padding                       │
+# │  uint8      // First unknown                        │
+# │  uint8      // Second unknown                       │
+# │  117 bytes  // Third padding                        │
+# └─────────────────────────────────────────────────────┘
 
 
 def unpack_function(file_path, tmp_dir):
