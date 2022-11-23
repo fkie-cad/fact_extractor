@@ -47,6 +47,9 @@ DEPENDENCIES = {
             'python-wheel-common'
         ],
         'pip3': [
+            'flask',
+            'flask_restful',
+            'gunicorn',
             'pytest',
             'pytest-cov',
         ]
@@ -77,7 +80,5 @@ def main(distribution):
     data_folder = config.get('unpack', 'data_folder')
     os.makedirs(str(Path(data_folder, 'files')), exist_ok=True)
     os.makedirs(str(Path(data_folder, 'reports')), exist_ok=True)
-
-    pip3_install_packages('flask', 'flask_restful')
 
     return 0

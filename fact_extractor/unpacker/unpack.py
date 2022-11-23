@@ -18,12 +18,13 @@ class Unpacker(UnpackBase):
 
     def __init__(self, config=None, extract_everything: bool = False, folder: str = None):
         super().__init__(config=config, extract_everything=extract_everything)
+        data_folder = Path(self.config.get('unpack', 'data_folder'))
         if folder:
-            self._file_folder = Path(self.config.get('unpack', 'data_folder'), folder, 'files')
-            self._report_folder = Path(self.config.get('unpack', 'data_folder'), folder, 'reports')
+            self._file_folder = data_folder / folder / 'files'
+            self._report_folder = data_folder / folder / 'reports'
         else:
-            self._file_folder = Path(self.config.get('unpack', 'data_folder'), 'files')
-            self._report_folder = Path(self.config.get('unpack', 'data_folder'), 'reports')
+            self._file_folder = data_folder / 'files'
+            self._report_folder = data_folder / 'reports'
 
     def unpack(self, file_path):
         if self._should_ignore(file_path):
@@ -32,7 +33,7 @@ class Unpacker(UnpackBase):
                 'number_of_unpacked_files': 0,
                 'number_of_unpacked_directories': 0,
                 'number_of_excluded_files': 1,
-                'info': f'File was ignored because it matched the exclude list {self.exclude}'
+                'info': f'File was ignored because it matched the exclude list {self.exclude}',
             }
             extracted_files = []
         else:
@@ -41,7 +42,9 @@ class Unpacker(UnpackBase):
             tmp_dir = TemporaryDirectory(prefix='fact_unpack_')
 
             extracted_files, meta_data = self.extract_files_from_file(file_path, tmp_dir.name)
-            extracted_files, meta_data = self._do_fallback_if_necessary(extracted_files, meta_data, tmp_dir.name, file_path)
+            extracted_files, meta_data = self._do_fallback_if_necessary(
+                extracted_files, meta_data, tmp_dir.name, file_path
+            )
 
             extracted_files = self.move_extracted_files(extracted_files, Path(tmp_dir.name))
 
@@ -57,17 +60,23 @@ class Unpacker(UnpackBase):
 
         return extracted_files
 
-    def _do_fallback_if_necessary(self, extracted_files: List, meta_data: Dict, tmp_dir: str, file_path: str) -> Tuple[List, Dict]:
+    def _do_fallback_if_necessary(
+        self, extracted_files: List, meta_data: Dict, tmp_dir: str, file_path: str
+    ) -> Tuple[List, Dict]:
         if meta_data.get('number_of_excluded_files', 0) > 0:
             # If files have been excluded, extracted_files might be empty, but
             # that doesn't mean there was an error during unpacking
             return extracted_files, meta_data
 
         if not extracted_files and meta_data['plugin_used'] in self.FS_FALLBACK_CANDIDATES:
-            logging.warning(f'''{meta_data['plugin_used']} could not extract any file from {file_path} -> generic fs fallback''')
+            logging.warning(
+                f'''{meta_data['plugin_used']} could not extract any file from {file_path} -> generic fs fallback'''
+            )
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/fs')
         if not extracted_files and meta_data['plugin_used'] not in self.CARVER_FALLBACK_BLACKLIST:
-            logging.warning(f'''{meta_data['plugin_used']} could not extract any file from {file_path} -> generic carver fallback''')
+            logging.warning(
+                f'''{meta_data['plugin_used']} could not extract any file from {file_path} -> generic carver fallback'''
+            )
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/carver')
         return extracted_files, meta_data
 
