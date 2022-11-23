@@ -32,10 +32,15 @@ def unpack_function(file_path, tmp_dir):
     tmp_dir must be used to store the extracted files.
     Optional: Return a dict with meta information
     '''
-    with open(file_path, 'rb') as f:
-        signature = HEADER.unpack(f.read(HEADER.size))
-        f.seek(signature[1] + signature[4])
-        squashfs = f.read(signature[5])
+    try:
+        with open(file_path, 'rb') as f:
+            signature = HEADER.unpack(f.read(HEADER.size))
+            f.seek(signature[1] + signature[4])
+            squashfs = f.read(signature[5])
+    except IOError as io_error:
+        return {'output': 'failed to read file: {}'.format(str(io_error))}
+    except struct.error as struct_error:
+        return {'output': 'failed to extract header: {}'.format(str(struct_error))}
 
     output_file_path = Path(tmp_dir) / 'squashfs_root'
     write_binary_to_file(squashfs, output_file_path)

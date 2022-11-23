@@ -12,7 +12,7 @@ class TestDraytekVigor167Unpacker(TestUnpackerBase):
         self.check_unpacker_selection('firmware/draytek-vigor-167', 'Draytek Vigor 167')
 
     def test_extraction(self):
-        input_file = Path(TEST_DATA_DIR, 'test.draytekvigor167')
+        input_file = Path(TEST_DATA_DIR, 'valid_draytekvigor167_image.bin')
         unpacked_files, meta_data = self.unpacker.extract_files_from_file(input_file, self.tmp_dir.name)
 
         self.assertEqual(meta_data['output'], 'successfully unpacked image')
@@ -21,3 +21,8 @@ class TestDraytekVigor167Unpacker(TestUnpackerBase):
         squashfs_binary = get_binary_from_file(unpacked_files[0])
         squashfs_hash = get_sha256(squashfs_binary)
         self.assertEqual(squashfs_hash, '73b648f484ab0a34ce00729ce8b7ef183885b4b5c540344a8451d18fe94cc2fa')
+
+        input_file = Path(TEST_DATA_DIR, 'invalid_draytekvigor167_image_struct_error.bin')
+        unpacked_files, meta_data = self.unpacker.extract_files_from_file(input_file, self.tmp_dir.name)
+
+        self.assertIn('failed to extract header', meta_data['output'])
