@@ -44,7 +44,17 @@ def unpack_function(file_path, tmp_dir):
 
     output_file_path = Path(tmp_dir) / 'squashfs_root'
     write_binary_to_file(squashfs, output_file_path)
-    return {'output': 'successfully unpacked image'}
+    return {
+        'output': 'successfully unpacked image',
+        'file_header': {
+            'magic_field': signature[0],
+            'header_size': signature[1],
+            'file_size': signature[2],
+            'crc32': signature[3],
+            'kernel_size': signature[4],
+            'squashfs_size': signature[5]
+        },
+    }
 
 
 # ----> Do not edit below this line <----
