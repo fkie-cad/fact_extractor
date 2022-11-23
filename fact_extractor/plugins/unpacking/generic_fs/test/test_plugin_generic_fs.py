@@ -1,10 +1,9 @@
-import lzma
-from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+from helperFunctions.file_system import decompress_test_file
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
-from ..code.generic_fs import _extract_loop_devices
+from ..code.generic_fs import _extract_loop_devices, _mount_single_filesystem, TYPES
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 KPARTX_OUTPUT = '''
@@ -17,13 +16,8 @@ class TestGenericFsUnpacker(TestUnpackerBase):
 
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('filesystem/btrfs', 'genericFS')
-        self.check_unpacker_selection('filesystem/cramfs', 'genericFS')
         self.check_unpacker_selection('filesystem/dosmbr', 'genericFS')
-        self.check_unpacker_selection('filesystem/ext2', 'genericFS')
-        self.check_unpacker_selection('filesystem/ext3', 'genericFS')
-        self.check_unpacker_selection('filesystem/ext4', 'genericFS')
         self.check_unpacker_selection('filesystem/f2fs', 'genericFS')
-        self.check_unpacker_selection('filesystem/hfs', 'genericFS')
         self.check_unpacker_selection('filesystem/jfs', 'genericFS')
         self.check_unpacker_selection('filesystem/minix', 'genericFS')
         self.check_unpacker_selection('filesystem/reiserfs', 'genericFS')
@@ -31,38 +25,11 @@ class TestGenericFsUnpacker(TestUnpackerBase):
         self.check_unpacker_selection('filesystem/udf', 'genericFS')
         self.check_unpacker_selection('filesystem/xfs', 'genericFS')
 
-    def test_extraction_cramfs(self):
-        self.check_unpacking_of_standard_unpack_set(TEST_DATA_DIR / 'cramfs.img')
-
     def test_extraction_romfs(self):
         self.check_unpacking_of_standard_unpack_set(TEST_DATA_DIR / 'romfs.img')
 
     def test_extraction_btrfs(self):
         with decompress_test_file(TEST_DATA_DIR / 'btrfs.img.xz') as test_file:
-            self.check_unpacking_of_standard_unpack_set(test_file, additional_prefix_folder='get_files_test')
-
-    def test_extraction_ext2(self):
-        with decompress_test_file(TEST_DATA_DIR / 'ext2.img.xz') as test_file:
-            self.check_unpacking_of_standard_unpack_set(test_file, additional_prefix_folder='get_files_test')
-
-    def test_extraction_ext3(self):
-        with decompress_test_file(TEST_DATA_DIR / 'ext3.img.xz') as test_file:
-            self.check_unpacking_of_standard_unpack_set(test_file, additional_prefix_folder='get_files_test')
-
-    def test_extraction_ext4(self):
-        with decompress_test_file(TEST_DATA_DIR / 'ext4.img.xz') as test_file:
-            self.check_unpacking_of_standard_unpack_set(test_file, additional_prefix_folder='get_files_test')
-
-    def test_extraction_fat(self):
-        with decompress_test_file(TEST_DATA_DIR / 'fat.img.xz') as test_file:
-            self.check_unpacking_of_standard_unpack_set(test_file, additional_prefix_folder='get_files_test')
-
-    def test_extraction_ntfs(self):
-        with decompress_test_file(TEST_DATA_DIR / 'ntfs.img.xz') as test_file:
-            self.check_unpacking_of_standard_unpack_set(test_file, additional_prefix_folder='get_files_test')
-
-    def test_extraction_hfs(self):
-        with decompress_test_file(TEST_DATA_DIR / 'hfs.img.xz') as test_file:
             self.check_unpacking_of_standard_unpack_set(test_file, additional_prefix_folder='get_files_test')
 
     def test_extraction_jfs(self):
@@ -111,10 +78,11 @@ def test_extract_loop_devices():
     assert loop_devices == ['loop7p1', 'loop7p2']
 
 
-@contextmanager
-def decompress_test_file(test_file: Path) -> Path:
-    with TemporaryDirectory() as tmp_dir:
-        target_file = Path(tmp_dir) / 'fs.img'
-        with lzma.open(test_file) as decompressed_file:
-            target_file.write_bytes(decompressed_file.read())
-        yield target_file
+def test_unknown_filesystem():
+    try:
+        TYPES['foobar'] = 'foobar'
+        with TemporaryDirectory() as tmp_dir:
+            output = _mount_single_filesystem(TEST_DATA_DIR / 'romfs.img', 'foobar', tmp_dir)
+        assert 'you may need to install additional kernel modules' in output
+    finally:
+        TYPES.pop('foobar')
