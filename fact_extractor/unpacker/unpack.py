@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import logging
 import shutil
@@ -104,7 +106,7 @@ class Unpacker(UnpackBase):
         return extracted_files
 
 
-def unpack(file_path, config, extract_everything: bool = False, folder: str = None):
+def unpack(file_path: str, config, extract_everything: bool = False, folder: str | None = None):
     extracted_objects = Unpacker(config, extract_everything, folder).unpack(file_path)
     logging.info(f'{len(extracted_objects)} files extracted')
     path_extracted_files = '\n'.join((str(path) for path in extracted_objects))
