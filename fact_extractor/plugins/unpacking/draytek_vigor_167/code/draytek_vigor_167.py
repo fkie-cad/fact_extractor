@@ -7,7 +7,7 @@ from common_helper_files import write_binary_to_file
 
 NAME = 'Draytek Vigor 167'
 MIME_PATTERNS = ['firmware/draytek-vigor-167']
-VERSION = '0.1'
+VERSION = '0.2'
 
 HEADER_LAYOUT = '> 4s I I I 64x I I 49x b b 117x'
 HEADER = struct.Struct(HEADER_LAYOUT)
