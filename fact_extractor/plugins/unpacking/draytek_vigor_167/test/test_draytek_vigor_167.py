@@ -19,7 +19,7 @@ class TestDraytekVigor167Unpacker(TestUnpackerBase):
         self.assertEqual(len(unpacked_files), 2, 'number of extracted files not correct')
         self.assertIn(str(Path(self.tmp_dir.name) / 'kernel_image'), unpacked_files, 'kernel image not extracted')
         self.assertIn(str(Path(self.tmp_dir.name) / 'squashfs_root'), unpacked_files, 'squashfs not extracted')
-        squashfs_binary = get_binary_from_file(unpacked_files[1])
+        squashfs_binary = get_binary_from_file(Path(self.tmp_dir.name) / 'squashfs_root')
         squashfs_hash = get_sha256(squashfs_binary)
         self.assertEqual(squashfs_hash, '73b648f484ab0a34ce00729ce8b7ef183885b4b5c540344a8451d18fe94cc2fa')
 
