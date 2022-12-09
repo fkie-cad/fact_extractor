@@ -7,23 +7,31 @@ from common_helper_files import write_binary_to_file
 
 NAME = 'Draytek Vigor 167'
 MIME_PATTERNS = ['firmware/draytek-vigor-167']
-VERSION = '0.1'
+VERSION = '0.2'
 
-HEADER_LAYOUT = '> 4s I I I 64x I I 49x I I 117x'
+HEADER_LAYOUT = '> 4s I I I 64x I I 49x b b 117x'
 HEADER = struct.Struct(HEADER_LAYOUT)
-# ┌─Draytek Vigor 167 - firmware container (big endian)─┐
-# │  4 bytes    // Magic field, expected '2RHD'         │
-# │  uint32     // Header size, expected 256 bytes      │
-# │  uint32     // File size without footer             │
-# │  uint32     // CRC32 checksum                       │
-# │  64 bytes   // First padding                        │
-# │  uint32     // Kernel blob size                     │
-# │  uint32     // Squashfs blob size                   │
-# │  49 bytes   // Second padding                       │
-# │  uint8      // First unknown                        │
-# │  uint8      // Second unknown                       │
-# │  117 bytes  // Third padding                        │
-# └─────────────────────────────────────────────────────┘
+
+FOOTER_LAYOUT = '> 16s 33s'
+FOOTER = struct.Struct(FOOTER_LAYOUT)
+
+# ┌─Draytek Vigor 167 - firmware container (big endian)─────────┐
+# │  4 bytes    // Magic field, expected '2RHD'                 │
+# │  uint32     // Header size, expected 256 bytes              │
+# │  uint32     // File size without footer                     │
+# │  uint32     // CRC32 checksum                               │
+# │  64 bytes   // First padding                                │
+# │  uint32     // Kernel blob size                             │
+# │  uint32     // Squashfs blob size                           │
+# │  49 bytes   // Second padding                               │
+# │  uint8      // First unknown                                │
+# │  uint8      // Second unknown                               │
+# │  117 bytes  // Third padding                                │
+# │  <x> bytes  // kernel image                                 │
+# │  <x> bytes  // squashfs image                               │
+# │  16 bytes   // Magic field, expected 'DrayTekImageMD5\n'    │
+# │  33 bytes   // Hex-encoded MD5 checksum (null-terminated)   │
+# └─────────────────────────────────────────────────────────────┘
 
 
 def unpack_function(file_path, tmp_dir):
@@ -35,24 +43,31 @@ def unpack_function(file_path, tmp_dir):
     try:
         with open(file_path, 'rb') as f:
             signature = HEADER.unpack(f.read(HEADER.size))
-            f.seek(signature[1] + signature[4])
+            kernel_image = f.read(signature[4])
             squashfs = f.read(signature[5])
+            footer = FOOTER.unpack(f.read(FOOTER.size))
     except IOError as io_error:
         return {'output': 'failed to read file: {}'.format(str(io_error))}
     except struct.error as struct_error:
-        return {'output': 'failed to extract header: {}'.format(str(struct_error))}
+        return {'output': 'failed to recognize firmware container: {}'.format(str(struct_error))}
 
-    output_file_path = Path(tmp_dir) / 'squashfs_root'
-    write_binary_to_file(squashfs, output_file_path)
+    output_file_path_kernel = Path(tmp_dir) / 'kernel_image'
+    write_binary_to_file(kernel_image, output_file_path_kernel)
+
+    output_file_path_squashfs = Path(tmp_dir) / 'squashfs_root'
+    write_binary_to_file(squashfs, output_file_path_squashfs)
+
     return {
         'output': 'successfully unpacked image',
         'file_header': {
-            'magic_field': signature[0],
+            'magic_field_header': signature[0],
             'header_size': signature[1],
             'file_size': signature[2],
             'crc32': signature[3],
             'kernel_size': signature[4],
-            'squashfs_size': signature[5]
+            'squashfs_size': signature[5],
+            'magic_field_footer': footer[0],
+            'md5_checksum': footer[1]
         },
     }
 
