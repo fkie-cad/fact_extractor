@@ -41,6 +41,7 @@ def test_remove_false_positives(filename):
         ArchivesFilter(temp_dir).remove_false_positive_archives()
         assert test_file.is_file() is False
 
+
 def test_remove_trailing_data():
     filename = 'trailing_data.zip'
     with TemporaryDirectory() as temp_dir:
