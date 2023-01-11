@@ -18,11 +18,11 @@ class TestGenericCarver(TestUnpackerBase):
         self.check_unpacker_selection('generic/carver', 'generic_carver')
 
     def test_extraction(self):
-        in_file = '{}/generic_carver_test'.format(get_test_data_dir())
+        in_file = f'{get_test_data_dir()}/generic_carver_test'
         files, meta_data = self.unpacker._extract_files_from_file_using_specific_unpacker(in_file, self.tmp_dir.name, self.unpacker.unpacker_plugins['generic/carver'])
         files = set(files)
         assert len(files) == 1, 'file number incorrect'
-        assert files == {'{}/64.zip'.format(self.tmp_dir.name)}, 'not all files found'
+        assert files == {f'{self.tmp_dir.name}/64.zip'}, 'not all files found'
         assert 'output' in meta_data
         assert 'filter_log' in meta_data
 
@@ -40,3 +40,15 @@ def test_remove_false_positives(filename):
         shutil.copyfile(TEST_DATA_DIR / filename, test_file)
         ArchivesFilter(temp_dir).remove_false_positive_archives()
         assert test_file.is_file() is False
+
+def test_remove_trailing_data():
+    filename = 'trailing_data.zip'
+    with TemporaryDirectory() as temp_dir:
+        test_file = Path(temp_dir) / filename
+        source_file = TEST_DATA_DIR / filename
+        shutil.copyfile(source_file, test_file)
+        arch_filter = ArchivesFilter(temp_dir)
+        arch_filter._remove_trailing_data(test_file)
+
+        assert arch_filter.screening_logs == ['Removed trailing data at the end of trailing_data.zip']
+        assert test_file.stat().st_size < source_file.stat().st_size

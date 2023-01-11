@@ -2,6 +2,7 @@
 This plugin unpacks all files via carving
 '''
 import logging
+import re
 import shutil
 from pathlib import Path
 
@@ -21,7 +22,7 @@ def unpack_function(file_path, tmp_dir):
     tmp_dir should be used to store the extracted files.
     '''
 
-    logging.debug('File Type unknown: execute binwalk on {}'.format(file_path))
+    logging.debug(f'File Type unknown: execute binwalk on {file_path}')
     output = execute_shell_command(f'binwalk --extract --carve --signature --directory  {tmp_dir} {file_path}')
 
     drop_underscore_directory(tmp_dir)
@@ -38,16 +39,23 @@ class ArchivesFilter:
             file_type = get_file_type_from_path(file_path)['mime']
 
             if file_type == 'application/x-tar' or self._is_possible_tar(file_type, file_path):
-                self.check_archives_validity(file_path, 'tar -tvf {}', 'does not look like a tar archive')
+                self._remove_invalid_archives(file_path, 'tar -tvf {}', 'does not look like a tar archive')
 
             elif file_type == 'application/x-xz':
-                self.check_archives_validity(file_path, 'xz -c -d {} | wc -c')
+                self._remove_invalid_archives(file_path, 'xz -c -d {} | wc -c')
 
             elif file_type == 'application/gzip':
-                self.check_archives_validity(file_path, 'gzip -c -d {} | wc -c')
+                self._remove_invalid_archives(file_path, 'gzip -c -d {} | wc -c')
 
-            elif file_type in ['application/zip', 'application/x-7z-compressed', 'application/x-lzma']:
-                self.check_archives_validity(file_path, '7z l {}', 'ERROR')
+            elif file_path.suffix == '7z' or file_type in [
+                'application/zip',
+                'application/x-7z-compressed',
+                'application/x-lzma',
+                'application/zlib',
+            ]:
+                self._remove_invalid_archives(file_path, '7z l {}', 'ERROR')
+                if file_path.is_file():
+                    self._remove_trailing_data(file_path)
 
         return '\n'.join(self.screening_logs)
 
@@ -60,23 +68,39 @@ class ArchivesFilter:
                 return fp.read(5) == TAR_MAGIC
         return False
 
-    def check_archives_validity(self, file_path: Path, command, search_key=None):
+    def _remove_invalid_archives(self, file_path: Path, command, search_key=None):
         output = execute_shell_command(command.format(file_path))
 
         if search_key and search_key in output.replace('\n ', ''):
-            self.remove_file(file_path)
+            self._remove_file(file_path)
 
-        elif not search_key and self.output_is_empty(output):
-            self.remove_file(file_path)
+        elif not search_key and self._output_is_empty(output):
+            self._remove_file(file_path)
 
-    def remove_file(self, file_path):
+    def _remove_file(self, file_path):
         file_path.unlink()
-        screening_log = f'{file_path.name} was removed (invalid archive)'
-        self.screening_logs.append(screening_log)
+        self.screening_logs.append(f'{file_path.name} was removed (invalid archive)')
 
     @staticmethod
-    def output_is_empty(output):
+    def _output_is_empty(output):
         return int((output.split())[-1]) == 0
+
+    REAL_SIZE_REGEX = re.compile(r'Physical Size = (\d+)')
+
+    def _remove_trailing_data(self, file_path: Path):
+        '''Archives carved by binwalk often have trailing data at the end. 7z can determine the actual file size.'''
+        output = execute_shell_command(f'7z l {file_path}')
+        if 'There are data after the end of archive' in output:
+            match = self.REAL_SIZE_REGEX.search(output)
+            if match:
+                actual_size = int(match.groups()[0])
+                self._resize_file(actual_size, file_path)
+
+    def _resize_file(self, actual_size: int, file_path: Path):
+        with file_path.open('rb') as fp:
+            actual_content = fp.read(actual_size)
+        file_path.write_bytes(actual_content)
+        self.screening_logs.append(f'Removed trailing data at the end of {file_path.name}')
 
 
 def drop_underscore_directory(tmp_dir):
