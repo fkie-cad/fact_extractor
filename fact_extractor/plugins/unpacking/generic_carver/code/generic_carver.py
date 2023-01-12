@@ -14,6 +14,10 @@ MIME_PATTERNS = ['generic/carver']
 VERSION = '0.8'
 
 TAR_MAGIC = b'ustar'
+BZ2_EOF_MAGIC = [  # the magic string is only aligned to half bytes -> two possible strings
+    b'\x17\x72\x45\x38\x50\x90',
+    b'\x77\x24\x53\x85\x09',
+]
 
 
 def unpack_function(file_path, tmp_dir):
@@ -48,14 +52,18 @@ class ArchivesFilter:
                 self._remove_invalid_archives(file_path, 'gzip -c -d {} | wc -c')
 
             elif file_path.suffix == '7z' or file_type in [
-                'application/zip',
                 'application/x-7z-compressed',
                 'application/x-lzma',
+                'application/zip',
                 'application/zlib',
             ]:
                 self._remove_invalid_archives(file_path, '7z l {}', 'ERROR')
-                if file_path.is_file():
-                    self._remove_trailing_data(file_path)
+                if file_type in ['application/zip', 'application/zlib'] and file_path.is_file():
+                    self._remove_trailing_data_7z(file_path)
+
+            elif file_type == 'application/x-bzip2':
+                # because of the complex magic string situation in bzip2 there should be no invalid archives
+                self._remove_trailing_data_bzip2(file_path)
 
         return '\n'.join(self.screening_logs)
 
@@ -87,7 +95,7 @@ class ArchivesFilter:
 
     REAL_SIZE_REGEX = re.compile(r'Physical Size = (\d+)')
 
-    def _remove_trailing_data(self, file_path: Path):
+    def _remove_trailing_data_7z(self, file_path: Path):
         '''Archives carved by binwalk often have trailing data at the end. 7z can determine the actual file size.'''
         output = execute_shell_command(f'7z l {file_path}')
         if 'There are data after the end of archive' in output:
@@ -95,6 +103,19 @@ class ArchivesFilter:
             if match:
                 actual_size = int(match.groups()[0])
                 self._resize_file(actual_size, file_path)
+
+    def _remove_trailing_data_bzip2(self, file_path: Path):
+        output = execute_shell_command(f'bzip2 -t {file_path}')
+        if not 'trailing garbage' in output:
+            return
+
+        file_content = file_path.read_bytes()
+        matches = sorted(o for magic in BZ2_EOF_MAGIC if (o := file_content.find(magic)) != -1)
+        # there may be multiple matches, but we want the first one (but also not -1 == no match)
+        if matches:
+            # 10 is magic string + CRC 32 checksum + padding (see https://en.wikipedia.org/wiki/Bzip2#File_format)
+            offset = matches[0] + 10
+            self._resize_file(offset, file_path)
 
     def _resize_file(self, actual_size: int, file_path: Path):
         with file_path.open('rb') as fp:

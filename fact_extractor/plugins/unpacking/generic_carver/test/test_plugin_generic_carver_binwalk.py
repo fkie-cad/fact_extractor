@@ -49,7 +49,7 @@ def test_remove_trailing_data():
         source_file = TEST_DATA_DIR / filename
         shutil.copyfile(source_file, test_file)
         arch_filter = ArchivesFilter(temp_dir)
-        arch_filter._remove_trailing_data(test_file)
+        arch_filter._remove_trailing_data_7z(test_file)
 
         assert arch_filter.screening_logs == ['Removed trailing data at the end of trailing_data.zip']
         assert test_file.stat().st_size < source_file.stat().st_size
