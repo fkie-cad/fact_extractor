@@ -1,7 +1,9 @@
 import shutil
+from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import pytest
+from contextlib import contextmanager
 
 from plugins.unpacking.generic_carver.code.generic_carver import ArchivesFilter
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
@@ -33,23 +35,34 @@ class TestGenericCarver(TestUnpackerBase):
         assert 'was removed' in meta_data['filter_log']
 
 
-@pytest.mark.parametrize('filename', ['fake_zip.zip', 'fake_tar.tar', 'fake_7z.7z', 'fake_xz.xz', 'fake_gz.gz'])
-def test_remove_false_positives(filename):
-    with TemporaryDirectory() as temp_dir:
-        test_file = Path(temp_dir) / filename
-        shutil.copyfile(TEST_DATA_DIR / filename, test_file)
-        ArchivesFilter(temp_dir).remove_false_positive_archives()
-        assert test_file.is_file() is False
+@dataclass
+class FilterTest:
+    test_file: Path
+    source_file: Path
+    filter: ArchivesFilter
 
 
-def test_remove_trailing_data():
-    filename = 'trailing_data.zip'
+@contextmanager
+def filter_test_setup(filename) -> FilterTest:
     with TemporaryDirectory() as temp_dir:
         test_file = Path(temp_dir) / filename
         source_file = TEST_DATA_DIR / filename
         shutil.copyfile(source_file, test_file)
         arch_filter = ArchivesFilter(temp_dir)
-        arch_filter._remove_trailing_data_7z(test_file)
+        yield FilterTest(test_file, source_file, arch_filter)
 
-        assert arch_filter.screening_logs == ['Removed trailing data at the end of trailing_data.zip']
-        assert test_file.stat().st_size < source_file.stat().st_size
+
+
+@pytest.mark.parametrize('filename', ['fake_zip.zip', 'fake_tar.tar', 'fake_7z.7z', 'fake_xz.xz', 'fake_gz.gz'])
+def test_remove_false_positives(filename):
+    with filter_test_setup(filename) as setup:
+        setup.filter.remove_false_positive_archives()
+        assert setup.test_file.is_file() is False
+
+
+@pytest.mark.parametrize('filename', ['trailing_data.zip', 'trailing_data.bz2'])
+def test_remove_trailing_data(filename):
+    with filter_test_setup(filename) as setup:
+        setup.filter.remove_false_positive_archives()
+        assert setup.filter.screening_logs == [f'Removed trailing data at the end of {filename}']
+        assert setup.test_file.stat().st_size < setup.source_file.stat().st_size
