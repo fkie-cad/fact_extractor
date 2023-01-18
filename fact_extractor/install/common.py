@@ -47,6 +47,9 @@ DEPENDENCIES = {
             'python-wheel-common'
         ],
         'pip3': [
+            'flask',
+            'flask_restful',
+            'gunicorn',
             'pytest',
             'pytest-cov',
         ]
