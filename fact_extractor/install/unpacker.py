@@ -12,7 +12,6 @@ from helperFunctions.install import (
 )
 from contextlib import suppress
 
-
 BIN_DIR = Path(__file__).parent.parent / 'bin'
 
 DEPENDENCIES = {
@@ -121,6 +120,9 @@ DEPENDENCIES = {
             'unace',
             'sharutils',
             'unar',
+            'zstd',
+            'liblz4-tool',
+            'p7zip-full',
             # Freetz
             'bison',
             'flex',
@@ -153,15 +155,22 @@ DEPENDENCIES = {
             'python-lzo',
             'numpy',
             'scipy',
+            'lz4',
             'git+https://github.com/jrspruitt/ubi_reader@v0.6.3-master'  # pinned as broken currently
         ],
         'github': [
-            ('kartone/sasquatch', ['./build.sh']),
             ('svidovich/jefferson-3', ['sudo python3 setup.py install']),
             ('rampageX/firmware-mod-kit', ['(cd src && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
         ]
     }
 }
+
+
+def check_mod_kit_installed() -> bool:
+    return all(
+        (Path(__file__).parent.parent / 'bin' / tool).exists()
+        for tool in ['tpl-tool', 'untrx', 'unyaffs2']
+    )
 
 
 def install_dependencies(dependencies):
@@ -171,7 +180,10 @@ def install_dependencies(dependencies):
     apt_install_packages(*apt)
     pip3_install_packages(*pip3)
     for repo in github:
-        install_github_project(*repo)
+        if repo[0].endswith('firmware-mod-kit') and check_mod_kit_installed():
+            logging.info('Skipping firmware-mod-kit since it is already installed')
+        else:
+            install_github_project(*repo)
 
 
 def main(distribution):
@@ -206,14 +218,24 @@ def _edit_sudoers():
     sudoers_content = '\n'.join((f'{username}\tALL=NOPASSWD: {command}' for command in (
         '/sbin/kpartx', '/sbin/losetup', '/bin/mount', '/bin/umount', '/bin/mknod', '/usr/local/bin/sasquatch', '/bin/rm', '/bin/cp', '/bin/dd', '/bin/chown'
     )))
-    Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n')
-    chown_output, chown_code = execute_shell_command_get_return_code('sudo chown root:root /tmp/fact_overrides')
-    mv_output, mv_code = execute_shell_command_get_return_code('sudo mv /tmp/fact_overrides /etc/sudoers.d/fact_overrides')
+    Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n', encoding='utf-8')
+    _, chown_code = execute_shell_command_get_return_code('sudo chown root:root /tmp/fact_overrides')
+    _, mv_code = execute_shell_command_get_return_code('sudo mv /tmp/fact_overrides /etc/sudoers.d/fact_overrides')
     if not chown_code == mv_code == 0:
         raise InstallationError('Editing sudoers file did not succeed\n{chown_output}\n{mv_output}')
 
 
 def _install_freetz():
+    if all(
+        (Path(__file__).parent.parent / 'bin' / tool).exists()
+        for tool in [
+            'find-squashfs', 'unpack-kernel', 'freetz_bin_functions', 'unlzma', 'sfk', 'unsquashfs4-avm-be',
+            'unsquashfs4-avm-le', 'unsquashfs3-multi'
+        ]
+    ):
+        logging.info('Skipping FREETZ as it is already installed')
+        return
+
     logging.info('Installing FREETZ')
     current_user = getuser()
     with TemporaryDirectory(prefix='fact_freetz') as build_directory:
