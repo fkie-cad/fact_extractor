@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import logging
 import re
+import shutil
 from pathlib import Path
 
 from common_helper_process import execute_shell_command
@@ -34,11 +35,28 @@ def unpack_function(file_path, tmp_dir):
     output = execute_shell_command(
         f'unblob -sk --report {temp_file.absolute()} --entropy-depth 0 --depth 1 --extract-dir {tmp_dir} {file_path}'
     )
+    meta = temp_file.read_text(encoding='utf-8')
+    temp_file.unlink(missing_ok=True)
+
+    drop_underscore_directory(tmp_dir)
+    filter_log = ArchivesFilter(tmp_dir).remove_false_positive_archives()
+
     return {
         'output': output,
-        'unblob_meta': temp_file.read_text(encoding='utf-8'),
-        'filter_log': ArchivesFilter(tmp_dir).remove_false_positive_archives()
+        'unblob_meta': meta,
+        'filter_log': filter_log
     }
+
+
+def drop_underscore_directory(tmp_dir):
+    extracted_contents = list(Path(tmp_dir).iterdir())
+    if not extracted_contents:
+        return
+    if not len(extracted_contents) == 1 or not extracted_contents[0].name.endswith('_extract'):
+        return
+    for result in extracted_contents[0].iterdir():
+        shutil.move(str(result), str(result.parent.parent))
+    shutil.rmtree(str(extracted_contents[0]))
 
 
 class ArchivesFilter:
