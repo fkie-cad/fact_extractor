@@ -1,40 +1,26 @@
-from common_helper_process import execute_shell_command_get_return_code
-from getpass import getuser
 import logging
 import os
+from getpass import getuser
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from helperFunctions.install import (
-    InstallationError, apt_install_packages, apt_remove_packages,
-    install_github_project, pip2_remove_packages,
-    pip3_install_packages, OperateInDirectory
-)
-from contextlib import suppress
+from common_helper_process import execute_shell_command_get_return_code
 
+from helperFunctions.install import (apt_install_packages, apt_remove_packages, gcc_is_new, install_github_project,
+                                     InstallationError, is_virtualenv, OperateInDirectory, pip_install_packages)
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
 
+CFLAGS = '-fcommon' if gcc_is_new() else ''
 DEPENDENCIES = {
     # Ubuntu
-    'xenial': {
-        'apt': [
-            # binwalk
-            'cramfsprogs',
-            'libqt4-opengl',
-            'python3-pyqt4',
-            'python3-pyqt4.qtopengl',
-            # patool and unpacking backends
-            'zoo',
-            'openjdk-8-jdk'
-        ]
-    },
     'bionic': {
         'apt': [
             # binwalk
             'libqt4-opengl',
             'python3-pyqt4',
             'python3-pyqt4.qtopengl',
+            'libcapstone3',
             # patool and unpacking backends
             'openjdk-8-jdk'
         ]
@@ -45,8 +31,20 @@ DEPENDENCIES = {
             'libqt5opengl5',
             'python3-pyqt5',
             'python3-pyqt5.qtopengl',
+            'libcapstone3',
             # patool and unpacking backends
             'openjdk-16-jdk'
+        ]
+    },
+    'jammy': {
+        'apt': [
+            # binwalk
+            'libqt5opengl5',
+            'python3-pyqt5',
+            'python3-pyqt5.qtopengl',
+            'libcapstone4',
+            # patool and unpacking backends
+            'openjdk-19-jdk'
         ]
     },
     # Debian
@@ -56,6 +54,7 @@ DEPENDENCIES = {
             'libqt4-opengl',
             'python3-pyqt4',
             'python3-pyqt4.qtopengl',
+            'libcapstone3',
             # patool and unpacking backends
             'openjdk-8-jdk'
         ]
@@ -66,11 +65,12 @@ DEPENDENCIES = {
             'libqt5opengl5',
             'python3-pyqt5',
             'python3-pyqt5.qtopengl',
+            'libcapstone3',
             # patool and unpacking backends
             'openjdk-14-jdk'
         ]
     },
-    # Packages common to all plateforms
+    # Packages common to all platforms
     'common': {
         'apt': [
             'libjpeg-dev',
@@ -96,7 +96,6 @@ DEPENDENCIES = {
             'liblzma-dev',
             'liblzo2-dev',
             'xvfb',
-            'libcapstone3',
             'libcapstone-dev',
             # patool and unpacking backends
             'lrzip',
@@ -153,12 +152,32 @@ DEPENDENCIES = {
             'python-lzo',
             'numpy',
             'scipy',
-            'git+https://github.com/jrspruitt/ubi_reader@v0.6.3-master'  # pinned as broken currently
+            'git+https://github.com/jrspruitt/ubi_reader@v0.6.3-master',  # pinned as broken currently
+            # dji
+            'pycrypto',
+            # hp / raw
+            'git+https://github.com/fkie-cad/common_helper_extraction.git',
+            # intel_hex
+            'intelhex',
+            # linuxkernel
+            'lz4',
+            'git+https://github.com/marin-m/vmlinux-to-elf',
+            # mikrotik
+            'npkPy',
+            # sevenz
+            'git+https://github.com/fkie-cad/common_helper_passwords.git',
+            # srec
+            'bincopy',
+            # uboot
+            'extract-dtb',
         ],
         'github': [
-            ('kartone/sasquatch', ['./build.sh']),
-            ('svidovich/jefferson-3', ['sudo python3 setup.py install']),
-            ('rampageX/firmware-mod-kit', ['(cd src && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'])
+            ('kartone/sasquatch', [f"sed 's/ -Werror / {CFLAGS} /g' -i patches/patch0.txt", './build.sh']),
+            ('svidovich/jefferson-3', ['python3 setup.py install' if is_virtualenv() else 'sudo -EH python3 setup.py install']),
+            (
+                'rampageX/firmware-mod-kit',
+                ['(cd src && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/']
+            )
         ]
     }
 }
@@ -169,20 +188,17 @@ def install_dependencies(dependencies):
     pip3 = dependencies.get('pip3', [])
     github = dependencies.get('github', [])
     apt_install_packages(*apt)
-    pip3_install_packages(*pip3)
+    pip_install_packages(*pip3)
     for repo in github:
         install_github_project(*repo)
 
 
 def main(distribution):
-    # removes due to compatibilty reasons
+    # removes due to compatibility reasons
     try:
         apt_remove_packages('python-lzma')
-        pip2_remove_packages('pyliblzma')
     except InstallationError:
         logging.debug('python-lzma not removed because present already')
-    with suppress(InstallationError):
-        pip2_remove_packages('jefferson')
 
     # install dependencies
     install_dependencies(DEPENDENCIES['common'])

@@ -40,7 +40,8 @@ PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor in
 # Compatible Ubuntu releases
 BIONIC_CODE_NAMES = ['bionic', 'tara', 'tessa', 'tina', 'disco']
 XENIAL_CODE_NAMES = ['xenial', 'yakkety', 'sarah', 'serena', 'sonya', 'sylvia']
-FOCAL_CODE_NAMES = ['focal', 'ulyana']
+FOCAL_CODE_NAMES = ['focal', 'ulyana', 'uma', 'una']
+JAMMY_CODE_NAMES = ['jammy', 'vanessa']
 
 # Compatible Debian/Kali releases
 BUSTER_CODE_NAMES = ['buster', 'stretch', 'kali-rolling']
@@ -55,7 +56,9 @@ def _setup_argparser():
 
 
 def _setup_logging(debug_flag=False):
-    log_format = logging.Formatter(fmt='[%(asctime)s][%(module)s][%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    log_format = logging.Formatter(
+        fmt='[%(asctime)s][%(module)s][%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S'
+    )
     logger = logging.getLogger('')
     logger.setLevel(logging.DEBUG)
     console_log = logging.StreamHandler()
@@ -81,13 +84,19 @@ def check_distribution():
     if codename in FOCAL_CODE_NAMES:
         logging.debug('Ubuntu 20.04 detected')
         return 'focal'
+    if codename in JAMMY_CODE_NAMES:
+        logging.debug('Ubuntu 22.04 detected')
+        return 'jammy'
     if codename in BUSTER_CODE_NAMES:
         logging.debug('Debian 10/Kali detected')
         return 'buster'
     if codename in BULLSEYE_CODE_NAMES:
         logging.debug('Debian 11 detected')
         return 'bullseye'
-    sys.exit(f'Your Distribution ({distro.id()} {distro.version()}) is not supported. FACT Extractor Installer requires Ubuntu 18.04, 20.04, or compatible!')
+    sys.exit(
+        f'Your Distribution ({distro.id()} {distro.version()}) is not supported. '
+        f'FACT Extractor Installer requires Ubuntu 18.04, 20.04, 22.04 or compatible!'
+    )
 
 
 def main():
