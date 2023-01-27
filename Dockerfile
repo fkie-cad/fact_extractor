@@ -9,7 +9,7 @@ WORKDIR /opt/app/fact_extractor
 ARG USER=root
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN install_clean python3.11 python3.11-dev python3.11-venv
+RUN install_clean python3.11 python3.11-dev python3.11-venv gcc
 
 RUN python3.11 -m venv venv
 

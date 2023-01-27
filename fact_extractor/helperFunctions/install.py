@@ -140,8 +140,8 @@ def install_github_project(project_path: str, commands: List[str]):
 
 
 def _checkout_github_project(github_path, folder_name):
-    clone_url = 'https://www.github.com/{}'.format(github_path)
-    stdout, return_code = execute_shell_command_get_return_code('git clone {}'.format(clone_url))
+    clone_url = f'https://www.github.com/{github_path}'
+    stdout, return_code = execute_shell_command_get_return_code(f'git clone {clone_url}')
     if return_code != 0:
         raise InstallationError(f'Cloning from github failed for project {github_path}: {stdout}\n')
     if not Path('.', folder_name).exists():
