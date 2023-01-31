@@ -252,6 +252,8 @@ DEPENDENCIES = {
             'bincopy',
             # uboot
             'extract-dtb',
+            # uefi
+            'uefi-firmware',
         ],
         'github': [
             ('kartone/sasquatch', [f"sed 's/ -Werror / {CFLAGS} /g' -i patches/patch0.txt", './build.sh']),
@@ -335,14 +337,15 @@ def _install_freetz():
             install_github_project(
                 'Freetz-NG/freetz-ng',
                 [
-                    'sudo useradd -M makeuser || :',
-                    'sudo mkdir /home/makeuser || :',
+                    # add user only if it does not exist to fix issues with re-running the installation after an error
+                    'id -u makeuser || sudo useradd -M makeuser',
+                    'sudo mkdir -p /home/makeuser',
                     'sudo chown -R makeuser /home/makeuser',
                     f'sudo chown -R makeuser {build_directory}',
                     'sudo su makeuser -c "make -j$(nproc) tools"',
                     f'sudo chmod -R 777 {build_directory}',
                     f'sudo chown -R {current_user} {build_directory}',
-                    'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma '  # FixMe? tools/sfk
+                    'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma '
                     f'tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi {BIN_DIR}',
                     'sudo userdel makeuser',
                 ],
