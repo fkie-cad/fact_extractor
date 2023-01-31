@@ -11,7 +11,6 @@ from helperFunctions.install import (
     gcc_is_new,
     install_github_project,
     InstallationError,
-    is_virtualenv,
     OperateInDirectory,
     pip_install_packages, apt_remove_packages,
 )
@@ -225,12 +224,14 @@ DEPENDENCIES = {
             'git+https://github.com/fkie-cad/fact_helper_file.git',
             'patool',
             'archmage',
+            # jefferson + deps
+            'git+https://github.com/sviehb/jefferson.git',
+            'cstruct==2.1',
+            'python-lzo',
             # binwalk
             'git+https://github.com/ReFirmLabs/binwalk@v2.3.2',
             'pyqtgraph',
             'capstone',
-            'cstruct==1.8',
-            'python-lzo',
             'numpy',
             'scipy',
             'git+https://github.com/jrspruitt/ubi_reader@v0.6.3-master',  # pinned as broken currently
@@ -254,10 +255,6 @@ DEPENDENCIES = {
         ],
         'github': [
             ('kartone/sasquatch', [f"sed 's/ -Werror / {CFLAGS} /g' -i patches/patch0.txt", './build.sh']),
-            (
-                'svidovich/jefferson-3',
-                ['python3 setup.py install' if is_virtualenv() else 'sudo -EH python3 setup.py install'],
-            ),
             (
                 'rampageX/firmware-mod-kit',
                 ['(cd src && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'],
