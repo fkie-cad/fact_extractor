@@ -132,7 +132,7 @@ def install_github_project(project_path: str, commands: List[str]):
         for command in commands:
             output, return_code = execute_shell_command_get_return_code(command)
             if return_code != 0:
-                error = f'Error while processing github project {project_path}!\n{output}'
+                error = f'Error while processing github project {project_path}!\n{command}\n{output}'
                 break
 
     if error:

@@ -336,7 +336,7 @@ def _install_freetz():
                 'Freetz-NG/freetz-ng',
                 [
                     'sudo useradd -M makeuser || :',
-                    'mkdir /home/makeuser || :',
+                    'sudo mkdir /home/makeuser || :',
                     'sudo chown -R makeuser /home/makeuser',
                     f'sudo chown -R makeuser {build_directory}',
                     'sudo su makeuser -c "make -j$(nproc) tools"',
