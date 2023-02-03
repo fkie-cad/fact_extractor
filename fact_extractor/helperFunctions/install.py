@@ -166,6 +166,6 @@ def check_gcc_major_version_at_least(version: int) -> bool:
     try:
         output = run(split('gcc -dumpversion'), text=True, capture_output=True, check=False).stdout
         major_version = int(output.strip().split('.')[0])
-        return  major_version >= version
+        return major_version >= version
     except ValueError:
         return False
