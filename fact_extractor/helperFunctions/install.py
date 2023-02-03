@@ -4,8 +4,6 @@ import os
 import shutil
 import sys
 from pathlib import Path
-from shlex import split
-from subprocess import run
 from typing import List
 
 from common_helper_process import execute_shell_command_get_return_code
@@ -160,12 +158,3 @@ def load_main_config():
 def is_virtualenv() -> bool:
     """Check if FACT runs in a virtual environment"""
     return sys.prefix != getattr(sys, 'base_prefix', getattr(sys, 'real_prefix', None))
-
-
-def check_gcc_major_version_at_least(version: int) -> bool:
-    try:
-        output = run(split('gcc -dumpversion'), text=True, capture_output=True, check=False).stdout
-        major_version = int(output.strip().split('.')[0])
-        return major_version >= version
-    except ValueError:
-        return False

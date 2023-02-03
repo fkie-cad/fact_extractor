@@ -8,16 +8,15 @@ from common_helper_process import execute_shell_command_get_return_code
 
 from helperFunctions.install import (
     apt_install_packages,
-    check_gcc_major_version_at_least,
     install_github_project,
     InstallationError,
     OperateInDirectory,
-    pip_install_packages, apt_remove_packages,
+    pip_install_packages,
+    apt_remove_packages,
 )
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
 
-CFLAGS = '-fcommon' if check_gcc_major_version_at_least(10) else ''
 DEPENDENCIES = {
     # Ubuntu
     'bionic': {
@@ -251,10 +250,10 @@ DEPENDENCIES = {
             # uboot
             'extract-dtb',
             # uefi
-            'uefi-firmware',
+            'git+https://github.com/theopolis/uefi-firmware-parser@v1.10',
         ],
         'github': [
-            ('kartone/sasquatch', [f"sed 's/ -Werror / {CFLAGS} /g' -i patches/patch0.txt", './build.sh']),
+            ('threadexio/sasquatch', ['./build.sh']),
             (
                 'rampageX/firmware-mod-kit',
                 ['(cd src && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'],
@@ -319,9 +318,7 @@ def _edit_sudoers():
     )
     Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n')  # pylint: disable=unspecified-encoding
     _, chown_code = execute_shell_command_get_return_code('sudo chown root:root /tmp/fact_overrides')
-    _, mv_code = execute_shell_command_get_return_code(
-        'sudo mv /tmp/fact_overrides /etc/sudoers.d/fact_overrides'
-    )
+    _, mv_code = execute_shell_command_get_return_code('sudo mv /tmp/fact_overrides /etc/sudoers.d/fact_overrides')
     if not chown_code == mv_code == 0:
         raise InstallationError('Editing sudoers file did not succeed\n{chown_output}\n{mv_output}')
 
