@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 
@@ -15,7 +16,5 @@ mv amba_fwpak.py ../../bin/
 mv amba_romfs.py ../../bin/
 cd ..
 rm -rf phantom-firmware-tools
-
-sudo -EH pip3 install --upgrade pycrypto
 
 exit 0
