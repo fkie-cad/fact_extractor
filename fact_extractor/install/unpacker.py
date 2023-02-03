@@ -51,12 +51,10 @@ DEPENDENCIES = {
             'java-wrappers',
             'libelf-dev',
             'libxml2-dev',
-            'libzstd-dev',
             'ncftp',
             'net-tools',
             'netcat',
             'patchutils',
-            'sqlite3',
             'zip',
         ]
     },
@@ -319,7 +317,7 @@ def _edit_sudoers():
             )
         )
     )
-    Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n')
+    Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n')  # pylint: disable=unspecified-encoding
     _, chown_code = execute_shell_command_get_return_code('sudo chown root:root /tmp/fact_overrides')
     _, mv_code = execute_shell_command_get_return_code(
         'sudo mv /tmp/fact_overrides /etc/sudoers.d/fact_overrides'

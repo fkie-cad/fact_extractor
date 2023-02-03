@@ -13,7 +13,6 @@ class TestDjiUnpacker(TestUnpackerBase):
         unpacked_files, meta_data = self.unpacker.extract_files_from_file(input_file, self.tmp_dir.name)
 
         assert "'entry_count': 2" in meta_data['output']
-        print(f"{unpacked_files=}")
         assert len(unpacked_files) >= 2, 'Should contain 2 modules'
         assert (
             f'{self.tmp_dir.name}/m0305_main_controller.module' in unpacked_files
