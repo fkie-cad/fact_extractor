@@ -8,7 +8,7 @@ from common_helper_process import execute_shell_command_get_return_code
 
 from helperFunctions.install import (
     apt_install_packages,
-    gcc_is_new,
+    check_gcc_major_version_at_least,
     install_github_project,
     InstallationError,
     OperateInDirectory,
@@ -17,7 +17,7 @@ from helperFunctions.install import (
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
 
-CFLAGS = '-fcommon' if gcc_is_new() else ''
+CFLAGS = '-fcommon' if check_gcc_major_version_at_least(10) else ''
 DEPENDENCIES = {
     # Ubuntu
     'bionic': {

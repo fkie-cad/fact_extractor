@@ -11,10 +11,12 @@ echo "------------------------------------"
 # install newest version of p7zip
 sudo apt-get remove -y p7zip-full
 
-mkdir /tmp/fact_build || :
+mkdir -p /tmp/fact_build
 cd /tmp/fact_build
 
 wget -O 7zip.tar.bz2 https://sourceforge.net/projects/p7zip/files/latest/download
+# remove possible artifacts from previous installation (: == NOP)
+rm -rf ./p7zip* || :
 tar xvjf 7zip.tar.bz2
 cd p7zip*
 # gcc >= 11 has -Wnarrowing as default flag which leads to an error during compilation

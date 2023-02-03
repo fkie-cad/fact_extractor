@@ -38,7 +38,7 @@ class OperateInDirectory:
             logging.debug(f'Falling back on root permission for deleting {folder_name}')
             execute_shell_command_get_return_code(f'sudo rm -rf {folder_name}')
         except Exception as exception:
-            raise InstallationError(exception)
+            raise InstallationError(exception) from exception
 
 
 def log_current_packages(packages, install=True):
@@ -46,9 +46,9 @@ def log_current_packages(packages, install=True):
     logging.info(f'{action} {" ".join(packages)}')
 
 
-def run_shell_command_raise_on_return_code(
+def run_shell_command_raise_on_return_code(  # pylint: disable=invalid-name
     command: str, error: str, add_output_on_error=False
-) -> str:  # pylint: disable=invalid-name
+) -> str:
     output, return_code = execute_shell_command_get_return_code(command)
     if return_code != 0:
         if add_output_on_error:
@@ -79,7 +79,7 @@ def apt_clean_system():
 
 def apt_install_packages(*args):
     if not args:
-        return
+        return None
 
     log_current_packages(args)
     return run_shell_command_raise_on_return_code(
@@ -89,7 +89,7 @@ def apt_install_packages(*args):
 
 def apt_remove_packages(*args):
     if not args:
-        return
+        return None
 
     log_current_packages(args, install=False)
     return run_shell_command_raise_on_return_code(
@@ -162,9 +162,10 @@ def is_virtualenv() -> bool:
     return sys.prefix != getattr(sys, 'base_prefix', getattr(sys, 'real_prefix', None))
 
 
-def gcc_is_new() -> bool:
+def check_gcc_major_version_at_least(version: int) -> bool:
     try:
-        output = run(split('gcc --version'), text=True, capture_output=True).stdout
-        return int(output.splitlines()[0].split(' ')[-1].split('.')[0]) >= 10
+        output = run(split('gcc -dumpversion'), text=True, capture_output=True, check=False).stdout
+        major_version = int(output.strip().split('.')[0])
+        return  major_version >= version
     except ValueError:
         return False
