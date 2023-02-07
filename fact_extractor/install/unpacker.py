@@ -28,13 +28,6 @@ DEPENDENCIES = {
             'libcapstone3',
             # patool and unpacking backends
             'openjdk-8-jdk',
-            # freetz
-            'build-essential',
-            'ncftp',
-            'net-tools',
-            'netcat',
-            'openssl',
-            'patchutils',
         ]
     },
     'focal': {
@@ -46,15 +39,6 @@ DEPENDENCIES = {
             'libcapstone3',
             # patool and unpacking backends
             'openjdk-16-jdk',
-            # freetz
-            'java-wrappers',
-            'libelf-dev',
-            'libxml2-dev',
-            'ncftp',
-            'net-tools',
-            'netcat',
-            'patchutils',
-            'zip',
         ]
     },
     'jammy': {
@@ -66,15 +50,6 @@ DEPENDENCIES = {
             'libcapstone4',
             # patool and unpacking backends
             'openjdk-19-jdk',
-            # freetz
-            'java-wrappers',
-            'libelf-dev',
-            'libxml2-dev',
-            'ncftp',
-            'net-tools',
-            'netcat-openbsd',
-            'patchutils',
-            'zip',
         ]
     },
     # Debian
@@ -88,10 +63,6 @@ DEPENDENCIES = {
             # patool and unpacking backends
             'openjdk-8-jdk',
             # freetz
-            'java-wrappers',
-            'libelf-dev',
-            'libxml2-dev',
-            'netcat',
         ]
     },
     'bullseye': {
@@ -103,11 +74,6 @@ DEPENDENCIES = {
             'libcapstone3',
             # patool and unpacking backends
             'openjdk-14-jdk',
-            # freetz
-            'java-wrappers',
-            'libelf-dev',
-            'libxml2-dev',
-            'netcat',
         ]
     },
     # Packages common to all platforms
@@ -161,53 +127,23 @@ DEPENDENCIES = {
             # Freetz
             'autoconf',
             'automake',
-            'autopoint',
-            'bc',
-            'binutils',
             'bison',
-            'bsdmainutils',
-            'ccache',
-            'cmake',
-            'curl',
-            'ecj',
             'flex',
             'g++',
             'gawk',
             'gcc',
-            'gcc-multilib',
             'gettext',
-            'graphicsmagick',
-            'imagemagick',
-            'inkscape',
-            'intltool',
-            'kmod',
-            'lib32ncurses5-dev',
-            'lib32stdc++6',
-            'lib32z1-dev',
+            'file',
             'libacl1-dev',
-            'libc6-dev-i386',
             'libcap-dev',
-            'libglib2.0-dev',
-            'libgnutls28-dev',
             'libncurses5-dev',
-            'libreadline-dev',
             'libsqlite3-dev',
-            'libssl-dev',
-            'libstring-crc32-perl',
             'libtool-bin',
-            'libusb-dev',
             'libzstd-dev',
             'make',
-            'patch',
-            'perl',
             'pkg-config',
-            'pv',
-            'rsync',
-            'sqlite3',
             'subversion',
-            'texinfo',
-            'tofrodos',
-            'uuid-dev',
+            'unzip',
             'wget',
             # android sparse image
             'simg2img',
@@ -326,6 +262,7 @@ def _edit_sudoers():
 def _install_freetz():
     logging.info('Installing FREETZ')
     current_user = getuser()
+    freetz_build_config = Path(__file__).parent / 'freetz.config'
     with TemporaryDirectory(prefix='fact_freetz') as build_directory:
         with OperateInDirectory(build_directory):
             os.umask(0o022)
@@ -336,6 +273,7 @@ def _install_freetz():
                     'id -u makeuser || sudo useradd -M makeuser',
                     'sudo mkdir -p /home/makeuser',
                     'sudo chown -R makeuser /home/makeuser',
+                    f'cp {freetz_build_config} ./.config',
                     f'sudo chown -R makeuser {build_directory}',
                     'sudo su makeuser -c "make -j$(nproc) tools"',
                     f'sudo chmod -R 777 {build_directory}',
