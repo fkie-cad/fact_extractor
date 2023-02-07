@@ -192,7 +192,10 @@ DEPENDENCIES = {
             ('threadexio/sasquatch', ['./build.sh']),
             (
                 'rampageX/firmware-mod-kit',
-                ['(cd src && make)', 'cp src/yaffs2utils/unyaffs2 src/untrx src/tpl-tool/src/tpl-tool ../../bin/'],
+                [
+                    '(cd src && make untrx && make -C tpl-tool/src && make -C yaffs2utils)',
+                    'cp src/untrx src/yaffs2utils/unyaffs2 src/tpl-tool/src/tpl-tool ../../bin/'
+                ],
             ),
         ],
     },
