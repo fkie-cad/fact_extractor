@@ -4,7 +4,6 @@ import gc
 import json
 import os
 import shutil
-import unittest
 from configparser import ConfigParser
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -14,8 +13,8 @@ from helperFunctions.file_system import get_test_data_dir
 from unpacker.unpack import Unpacker
 
 
-class TestUnpackerBase(unittest.TestCase):
-    def setUp(self):
+class TestUnpackerBase:
+    def setup_method(self):
         self.config = ConfigParser()
         self.ds_tmp_dir = TemporaryDirectory(prefix='fact_tests_')
         self.tmp_dir = TemporaryDirectory(prefix='fact_tests_')
@@ -33,7 +32,7 @@ class TestUnpackerBase(unittest.TestCase):
 
         self.test_file_path = Path(get_test_data_dir(), 'get_files_test/testfile1')
 
-    def tearDown(self):
+    def teardown_method(self):
         self.ds_tmp_dir.cleanup()
         self.tmp_dir.cleanup()
         gc.collect()
@@ -45,7 +44,7 @@ class TestUnpackerBase(unittest.TestCase):
 
     def check_unpacker_selection(self, mime_type, plugin_name):
         name = self.unpacker.get_unpacker(mime_type)[1]
-        self.assertEqual(name, plugin_name, 'wrong unpacker plugin selected')
+        assert name == plugin_name, 'wrong unpacker plugin selected'
 
     def check_unpacking_of_standard_unpack_set(
         self,
@@ -56,12 +55,12 @@ class TestUnpackerBase(unittest.TestCase):
     ):
         files, meta_data = self.unpacker.extract_files_from_file(str(in_file), self.tmp_dir.name)
         files = {f for f in files if not any(rule in f for rule in ignore or set())}
-        assert len(files) == 3, 'file number incorrect'
+        assert len(files) == 3, f'file number incorrect: {meta_data}'
         assert files == {
             os.path.join(self.tmp_dir.name, additional_prefix_folder, 'testfile1'),
             os.path.join(self.tmp_dir.name, additional_prefix_folder, 'testfile2'),
             os.path.join(self.tmp_dir.name, additional_prefix_folder, 'generic folder/test file 3_.txt'),
-        }, 'not all files found'
+        }, f'not all files found: {meta_data}'
         if output:
             assert 'output' in meta_data
         return meta_data
@@ -69,11 +68,9 @@ class TestUnpackerBase(unittest.TestCase):
 
 class TestUnpackerCore(TestUnpackerBase):
     def test_generic_carver_found(self):
-        self.assertTrue(
-            'generic/carver' in list(self.unpacker.unpacker_plugins.keys()), 'generic carver plugin not found'
-        )
+        assert 'generic/carver' in list(self.unpacker.unpacker_plugins.keys()), 'generic carver plugin not found'
         name = self.unpacker.unpacker_plugins['generic/carver'][1]
-        self.assertEqual(name, 'generic_carver', 'generic_carver plugin not found')
+        assert name == 'generic_carver', 'generic_carver plugin not found'
 
     def test_unpacker_selection_unknown(self):
         self.check_unpacker_selection('unknown/blah', 'generic_carver')
@@ -87,9 +84,9 @@ class TestUnpackerCore(TestUnpackerBase):
         file_paths = [f'{get_test_data_dir()}/zero_byte', f'{get_test_data_dir()}/get_files_test/testfile1']
         moved_files = self.unpacker.move_extracted_files(file_paths, get_test_data_dir())
 
-        self.assertEqual(len(moved_files), 1, 'number of objects not correct')
-        self.assertEqual(moved_files[0].name, 'testfile1', 'wrong object created')
-        self.assertIn('/get_files_test/testfile1', str(moved_files[0].absolute()))
+        assert len(moved_files) == 1, 'number of objects not correct'
+        assert moved_files[0].name == 'testfile1', 'wrong object created'
+        assert '/get_files_test/testfile1' in str(moved_files[0].absolute())
 
     @patch('unpacker.unpack.shutil.move', shutil.copy2)
     def test_extract_everything(self):
@@ -98,17 +95,17 @@ class TestUnpackerCore(TestUnpackerBase):
         moved_files = self.unpacker.move_extracted_files(file_paths, get_test_data_dir())
         moved_files.sort()
 
-        self.assertEqual(len(moved_files), 2, 'number of objects not correct')
-        self.assertEqual(moved_files[1].name, 'zero_byte', 'empty files should not be discarded')
+        assert len(moved_files) == 2, 'number of objects not correct'
+        assert moved_files[1].name == 'zero_byte', 'empty files should not be discarded'
 
     @patch('unpacker.unpack.shutil.move')
     def test_move_extracted_files(self, mock_shutil):
         file_paths = [f'{get_test_data_dir()}/fake_file', f'{get_test_data_dir()}/get_files_test/testfile1']
         moved_files = self.unpacker.move_extracted_files(file_paths, get_test_data_dir())
 
-        self.assertEqual(len(moved_files), 2, 'number of objects not correct')
-        self.assertEqual(moved_files[1].name, 'testfile1', 'wrong object created')
-        self.assertIn('/get_files_test/testfile1', str(moved_files[1].absolute()))
+        assert len(moved_files) == 2, 'number of objects not correct'
+        assert moved_files[1].name == 'testfile1', 'wrong object created'
+        assert '/get_files_test/testfile1' in str(moved_files[1].absolute())
 
     @patch('unpacker.unpack.shutil.move')
     def test_move_extracted_files_raise_assert(self, mock_shutil):
@@ -118,9 +115,9 @@ class TestUnpackerCore(TestUnpackerBase):
 
         moved_files = self.unpacker.move_extracted_files(file_paths, get_test_data_dir())
 
-        self.assertEqual(len(moved_files), 1, 'number of objects not correct')
-        self.assertEqual(moved_files[0].name, 'testfile1', 'wrong object created')
-        self.assertIn('/get_files_test/testfile1', str(moved_files[0].absolute()))
+        assert len(moved_files) == 1, 'number of objects not correct'
+        assert moved_files[0].name == 'testfile1', 'wrong object created'
+        assert '/get_files_test/testfile1' in str(moved_files[0].absolute())
 
     def test_clean_up(self):
         temp_dir = Mock()
@@ -137,17 +134,17 @@ class TestUnpackerCore(TestUnpackerBase):
     def test_unpack_failure_generic_fs_fallback(self):
         self.unpacker.FS_FALLBACK_CANDIDATES = ['7z']
         meta_data = self._unpack_fallback_check('generic/fs', 'generic_carver')
-        self.assertIn('0_FALLBACK_genericFS', meta_data, 'generic FS Fallback entry missing')
-        self.assertIn('0_ERROR_genericFS', meta_data, 'generic FS ERROR entry missing')
+        assert '0_FALLBACK_genericFS' in meta_data, 'generic FS Fallback entry missing'
+        assert '0_ERROR_genericFS' in meta_data, 'generic FS ERROR entry missing'
 
     def _unpack_fallback_check(self, fallback_mime, fallback_plugin_name):
         broken_zip = Path(get_test_data_dir(), 'container/broken.zip')
         self.unpacker.unpack(broken_zip)
         meta_data = self.get_unpacker_meta()
 
-        self.assertEqual(meta_data['0_ERROR_7z'][0:6], '\n7-Zip')
-        self.assertEqual(meta_data['0_FALLBACK_7z'], f'7z (failed) -> {fallback_mime} (fallback)')
-        self.assertEqual(meta_data['plugin_used'], fallback_plugin_name)
+        assert meta_data['0_ERROR_7z'][0:6] == '\n7-Zip'
+        assert meta_data['0_FALLBACK_7z'] == f'7z (failed) -> {fallback_mime} (fallback)'
+        assert meta_data['plugin_used'] == fallback_plugin_name
 
         return meta_data
 
@@ -157,14 +154,12 @@ class TestUnpackerCoreMain(TestUnpackerBase):
         extracted_files = self.unpacker.unpack(file_path)
         meta_data = self.get_unpacker_meta()
 
-        self.assertEqual(len(extracted_files), number_unpacked_files, 'not all files found')
-        self.assertEqual(meta_data['plugin_used'], first_unpacker, 'Wrong plugin in Meta')
-        self.assertEqual(
-            meta_data['number_of_unpacked_files'], number_unpacked_files, 'Number of unpacked files wrong in Meta'
-        )
-        self.assertEqual(
-            meta_data['number_of_excluded_files'], number_of_excluded_files, 'Number of excluded files wrong in Meta'
-        )
+        assert len(extracted_files) == number_unpacked_files, 'not all files found'
+        assert meta_data['plugin_used'] == first_unpacker, 'Wrong plugin in Meta'
+        assert meta_data['number_of_unpacked_files'] == number_unpacked_files, 'Number of unpacked files wrong in Meta'
+        assert (
+            meta_data['number_of_excluded_files'] == number_of_excluded_files
+        ), 'Number of excluded files wrong in Meta'
 
     def test_main_unpack_function(self):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
