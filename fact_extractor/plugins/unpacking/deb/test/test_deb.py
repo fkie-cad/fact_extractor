@@ -13,5 +13,5 @@ class TestDebUnpacker(TestUnpackerBase):
     def test_extraction(self):
         files, meta_data = self.unpacker.extract_files_from_file(os.path.join(TEST_DATA_DIR, 'test.deb'), self.tmp_dir.name)
 
-        self.assertEqual(len(files), 3, 'file number incorrect')
-        self.assertIn('./usr/bin/test_elf_sfx', meta_data['output'])
+        assert len(files) == 3, 'file number incorrect'
+        assert './usr/bin/test_elf_sfx' in meta_data['output']
