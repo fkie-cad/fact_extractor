@@ -1,12 +1,11 @@
 import gc
-import unittest
 
 from unpacker.helper.carving import CarvedArea
 
 
-class TestCarvedArea(unittest.TestCase):
+class TestCarvedArea:
 
-    def tearDown(self):
+    def teardown_method(self):
         gc.collect()
 
     def test_carved_complete_area(self):
@@ -45,16 +44,16 @@ class TestCarvedArea(unittest.TestCase):
         carved_area.carved((1180160, 8258048))
 
         expected = [(513, 15439), (48258, 131583), (1066831, 1180159)]
-        self.assertEqual(len(expected), len(carved_area.non_carved_areas))
+        assert len(carved_area.non_carved_areas) == len(expected)
 
         for area in expected:
-            self.assertIn(area, carved_area.non_carved_areas)
+            assert area in carved_area.non_carved_areas
 
-        self.assertEqual('(513:15439) (48258:131583) (1066831:1180159) ', str(carved_area))
+        assert str(carved_area) == '(513:15439) (48258:131583) (1066831:1180159) '
 
     def caring_test(self, area_size, carved_and_expected):
         for test_data in carved_and_expected:
             carved_area = CarvedArea(area_size)
             carved_area.carved(test_data['carved'])
 
-            self.assertEqual(test_data['expected'], carved_area.non_carved_areas, test_data)
+            assert test_data['expected'] == carved_area.non_carved_areas, test_data

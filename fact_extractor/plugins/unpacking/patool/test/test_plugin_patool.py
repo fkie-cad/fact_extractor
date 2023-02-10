@@ -15,14 +15,14 @@ class TestPaToolUnpacker(TestUnpackerBase):
     @pytest.mark.parametrize(
         'in_file, ignore',
         [
+            ('test.a', {'data'}),
             ('test.cab', None),
             ('test.jar', {'MANIFEST.MF'}),
+            ('test.lha', None),
             ('test.tar.bz2', None),
             ('test.tar.gz', None),
             ('test.tar.zip', None),
             ('test.zoo', None),
-            ('test.lha', None),
-            ('test.a', {'data'}),
         ],
     )
     def test_extraction(self, in_file, ignore):

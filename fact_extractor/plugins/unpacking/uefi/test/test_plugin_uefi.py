@@ -13,5 +13,5 @@ class TestUEFIUnpacker(TestUnpackerBase):
     def test_extraction(self):
         in_file = os.path.join(TEST_DATA_DIR, 'UEFI.CAP')
         files, meta_data = self.unpacker.extract_files_from_file(in_file, self.tmp_dir.name)
-        self.assertEqual(len(files), 1395, 'file number incorrect')
-        self.assertIn('output', meta_data)
+        assert len(files) == 1395, 'file number incorrect'
+        assert 'output' in meta_data

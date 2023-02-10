@@ -1,3 +1,5 @@
+# pylint: disable=attribute-defined-outside-init
+
 from __future__ import annotations
 
 import gc
@@ -39,8 +41,8 @@ class TestUnpackerBase:
 
     def get_unpacker_meta(self):
         return json.loads(
-            Path(self.unpacker._report_folder, 'meta.json').read_text()
-        )  # pylint: disable=protected-access
+            Path(self.unpacker._report_folder, 'meta.json').read_text()  # pylint: disable=protected-access
+        )
 
     def check_unpacker_selection(self, mime_type, plugin_name):
         name = self.unpacker.get_unpacker(mime_type)[1]
@@ -68,7 +70,7 @@ class TestUnpackerBase:
 
 class TestUnpackerCore(TestUnpackerBase):
     def test_generic_carver_found(self):
-        assert 'generic/carver' in list(self.unpacker.unpacker_plugins.keys()), 'generic carver plugin not found'
+        assert 'generic/carver' in list(self.unpacker.unpacker_plugins), 'generic carver plugin not found'
         name = self.unpacker.unpacker_plugins['generic/carver'][1]
         assert name == 'generic_carver', 'generic_carver plugin not found'
 
@@ -99,7 +101,7 @@ class TestUnpackerCore(TestUnpackerBase):
         assert moved_files[1].name == 'zero_byte', 'empty files should not be discarded'
 
     @patch('unpacker.unpack.shutil.move')
-    def test_move_extracted_files(self, mock_shutil):
+    def test_move_extracted_files(self, mock_shutil):  # pylint: disable=unused-argument
         file_paths = [f'{get_test_data_dir()}/fake_file', f'{get_test_data_dir()}/get_files_test/testfile1']
         moved_files = self.unpacker.move_extracted_files(file_paths, get_test_data_dir())
 

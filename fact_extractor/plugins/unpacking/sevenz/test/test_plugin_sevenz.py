@@ -42,9 +42,9 @@ class TestSevenZUnpacker(TestUnpackerBase):
         ],
     )
     def test_extraction_compressed(self, test_file, prefix, ignore):
-        with decompress_test_file(TEST_DATA_DIR / test_file) as test_file:
+        with decompress_test_file(TEST_DATA_DIR / test_file) as file:
             self.check_unpacking_of_standard_unpack_set(
-                test_file, output=True, additional_prefix_folder=prefix, ignore=ignore
+                file, output=True, additional_prefix_folder=prefix, ignore=ignore
             )
 
     def test_extraction_password(self):

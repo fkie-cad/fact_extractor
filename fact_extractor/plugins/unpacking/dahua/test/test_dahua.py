@@ -15,7 +15,7 @@ class TestDahuaUnpacker(TestUnpackerBase):
         input_file = Path(TEST_DATA_DIR, 'dh.bin')
         unpacked_files, meta_data = self.unpacker.extract_files_from_file(str(input_file), self.tmp_dir.name)
 
-        self.assertIn('zip header fixed', meta_data['output'])
-        self.assertEqual(len(unpacked_files), 1)
-        self.assertIn('{}/dahua_firmware.zip'.format(self.tmp_dir.name), unpacked_files)
-        self.assertEqual(input_file.stat().st_size, Path(unpacked_files[0]).stat().st_size, 'file size should not change')
+        assert 'zip header fixed' in meta_data['output']
+        assert len(unpacked_files) == 1
+        assert f'{self.tmp_dir.name}/dahua_firmware.zip' in unpacked_files
+        assert input_file.stat().st_size == Path(unpacked_files[0]).stat().st_size, 'file size should not change'
