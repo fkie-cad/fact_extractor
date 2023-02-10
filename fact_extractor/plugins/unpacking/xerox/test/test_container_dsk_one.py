@@ -23,7 +23,7 @@ class TestContainerDSKone:
     def test_error_handling_dsk(self):
         test_file = os.path.join(TEST_DATA_DIR, 'invalid_file')
         test_obj = DskOne(test_file)
-        assert len(test_obj.errors) >  0, 'errors should be present'
+        assert len(test_obj.errors) > 0, 'errors should be present'
 
         test_obj.header = b'inv'
         test_obj.HEADERSIZE = 0
