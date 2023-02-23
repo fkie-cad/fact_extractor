@@ -15,6 +15,6 @@ class TestSitUnpacker(TestUnpackerBase):
     def test_extraction(self):
         in_file = os.path.join(TEST_DATA_DIR, 'test.sitx')
         files, meta_data = self.unpacker.extract_files_from_file(in_file, self.tmp_dir.name)
-        self.assertEqual(len(files), 1, 'file number incorrect')
-        self.assertEqual(files, ['{}/Sampling SIM.app.rsrc'.format(self.tmp_dir.name)], 'not all files found')
-        self.assertIn('output', meta_data, 'output meta missing')
+        assert len(files) == 1, 'file number incorrect'
+        assert files == [f'{self.tmp_dir.name}/Sampling SIM.app.rsrc'], 'not all files found'
+        assert 'output' in meta_data, 'output meta missing'

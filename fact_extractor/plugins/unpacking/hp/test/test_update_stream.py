@@ -14,10 +14,10 @@ class TestHpStreamUnpacker(TestUnpackerBase):
     def test_extraction(self):
         input_file = Path(TEST_DATA_DIR, 'update_stream.bin')
         unpacked_files, meta_data = self.unpacker.extract_files_from_file(str(input_file), self.tmp_dir.name)
-        self.assertEqual(meta_data['number_of_zero_padded_sections'], 4)
-        self.assertEqual(meta_data['number_of_lzma_streams'], 1)
-        self.assertEqual(len(unpacked_files), 5)
-        self.assertIn('{}/0x0'.format(self.tmp_dir.name), unpacked_files)
-        self.assertIn('{}/0x8d_lzma_decompressed'.format(self.tmp_dir.name), unpacked_files)
-        decompressed_data = get_binary_from_file('{}/0x8d_lzma_decompressed'.format(self.tmp_dir.name))
-        self.assertEqual(decompressed_data, b'compressed_stream_data')
+        assert meta_data['number_of_zero_padded_sections'] == 4
+        assert meta_data['number_of_lzma_streams'] == 1
+        assert len(unpacked_files) == 5
+        assert f'{self.tmp_dir.name}/0x0' in unpacked_files
+        assert f'{self.tmp_dir.name}/0x8d_lzma_decompressed' in unpacked_files
+        decompressed_data = get_binary_from_file(f'{self.tmp_dir.name}/0x8d_lzma_decompressed')
+        assert decompressed_data == b'compressed_stream_data'

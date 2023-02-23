@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from helperFunctions.file_system import decompress_test_file
 from plugins.unpacking.sevenz.code.sevenz import MIME_PATTERNS
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
@@ -12,46 +14,39 @@ class TestSevenZUnpacker(TestUnpackerBase):
         for item in MIME_PATTERNS:
             self.check_unpacker_selection(item, '7z')
 
-    def test_extraction_7z(self):
+    @pytest.mark.parametrize(
+        'test_file, prefix',
+        [
+            ('test.7z', 'get_files_test'),
+            ('cramfs.img', ''),
+        ],
+    )
+    def test_extraction(self, test_file, prefix):
         self.check_unpacking_of_standard_unpack_set(
-            TEST_DATA_DIR / 'test.7z',
-            additional_prefix_folder='get_files_test',
+            TEST_DATA_DIR / test_file,
+            additional_prefix_folder=prefix,
             output=True,
         )
 
-    def test_extraction_cramfs(self):
-        self.check_unpacking_of_standard_unpack_set(
-            TEST_DATA_DIR / 'cramfs.img',
-            output=True,
-        )
-
-    def test_extraction_fat(self):
-        with decompress_test_file(TEST_DATA_DIR / 'fat.img.xz') as test_file:
+    @pytest.mark.parametrize(
+        'test_file, prefix, ignore',
+        [
+            ('fat.img.xz', 'get_files_test', None),
+            ('hfs.img.xz', 'untitled/get_files_test', None),
+            ('ntfs.img.xz', 'get_files_test', {'[SYSTEM]'}),
+            ('ext2.img.xz', 'get_files_test', {'Journal'}),
+            ('ext3.img.xz', 'get_files_test', {'Journal'}),
+            ('ext4.img.xz', 'get_files_test', {'Journal'}),
+        ],
+    )
+    def test_extraction_compressed(self, test_file, prefix, ignore):
+        with decompress_test_file(TEST_DATA_DIR / test_file) as file:
             self.check_unpacking_of_standard_unpack_set(
-                test_file, output=True, additional_prefix_folder='get_files_test'
+                file, output=True, additional_prefix_folder=prefix, ignore=ignore
             )
-
-    def test_extraction_hfs(self):
-        with decompress_test_file(TEST_DATA_DIR / 'hfs.img.xz') as test_file:
-            self.check_unpacking_of_standard_unpack_set(
-                test_file, output=True, additional_prefix_folder='untitled/get_files_test'
-            )
-
-    def test_extraction_ntfs(self):
-        with decompress_test_file(TEST_DATA_DIR / 'ntfs.img.xz') as test_file:
-            self.check_unpacking_of_standard_unpack_set(
-                test_file, output=True, additional_prefix_folder='get_files_test', ignore={'[SYSTEM]'}
-            )
-
-    def test_extraction_ext(self):
-        for index in [2, 3, 4]:
-            with decompress_test_file(TEST_DATA_DIR / f'ext{index}.img.xz') as test_file:
-                self.check_unpacking_of_standard_unpack_set(
-                    test_file, output=True, additional_prefix_folder='get_files_test', ignore={'Journal'}
-                )
 
     def test_extraction_password(self):
         meta = self.check_unpacking_of_standard_unpack_set(
-            TEST_DATA_DIR / 'test_password.7z', additional_prefix_folder="get_files_test", output=True
+            TEST_DATA_DIR / 'test_password.7z', additional_prefix_folder='get_files_test', output=True
         )
         assert meta['password'] == 'test', 'password info not set'
