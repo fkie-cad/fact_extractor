@@ -26,3 +26,9 @@ class TestPaToolUnpacker(TestUnpackerBase):
             output=False,
             ignore=ignore,
         )
+
+    def test_extract_deb(self):
+        in_file = os.path.join(TEST_DATA_DIR, 'test.deb')
+        files, meta_data = self.unpacker.extract_files_from_file(in_file, self.tmp_dir.name)
+        assert len(files) == 3, f'file number incorrect: {meta_data}'
+        assert 'extracted to' in meta_data['output']
