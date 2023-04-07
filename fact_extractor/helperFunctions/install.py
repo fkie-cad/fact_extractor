@@ -2,6 +2,7 @@ import configparser
 import logging
 import os
 import shutil
+import sys
 from pathlib import Path
 from typing import List
 
@@ -32,28 +33,32 @@ class OperateInDirectory:
         try:
             shutil.rmtree(folder_name)
         except PermissionError:
-            logging.debug('Falling back on root permission for deleting {}'.format(folder_name))
-            execute_shell_command_get_return_code('sudo rm -rf {}'.format(folder_name))
+            logging.debug(f'Falling back on root permission for deleting {folder_name}')
+            execute_shell_command_get_return_code(f'sudo rm -rf {folder_name}')
         except Exception as exception:
-            raise InstallationError(exception)
+            raise InstallationError(exception) from exception
 
 
 def log_current_packages(packages, install=True):
     action = 'Installing' if install else 'Removing'
-    logging.info('{} {}'.format(action, ' '.join(packages)))
+    logging.info(f'{action} {" ".join(packages)}')
 
 
-def run_shell_command_raise_on_return_code(command: str, error: str, add_output_on_error=False) -> str:  # pylint: disable=invalid-name
+def run_shell_command_raise_on_return_code(  # pylint: disable=invalid-name
+    command: str, error: str, add_output_on_error=False
+) -> str:
     output, return_code = execute_shell_command_get_return_code(command)
     if return_code != 0:
         if add_output_on_error:
-            error = '{}\n{}'.format(error, output)
+            error = f'{error}\n{output}'
         raise InstallationError(error)
     return output
 
 
 def apt_update_sources():
-    return run_shell_command_raise_on_return_code('sudo -E apt-get update', 'Unable to update repository sources. Check network.')
+    return run_shell_command_raise_on_return_code(
+        'sudo -E apt-get update', 'Unable to update repository sources. Check network.'
+    )
 
 
 def apt_upgrade_system():
@@ -61,7 +66,9 @@ def apt_upgrade_system():
 
 
 def apt_autoremove_packages():
-    return run_shell_command_raise_on_return_code('sudo -E apt-get autoremove -y', 'Automatic removal of packages failed:', True)
+    return run_shell_command_raise_on_return_code(
+        'sudo -E apt-get autoremove -y', 'Automatic removal of packages failed:', True
+    )
 
 
 def apt_clean_system():
@@ -70,72 +77,51 @@ def apt_clean_system():
 
 def apt_install_packages(*args):
     if not args:
-        return
+        return None
 
     log_current_packages(args)
-    return run_shell_command_raise_on_return_code('sudo -E apt-get install -y {}'.format(' '.join(args)), 'Error in installation of package(s) {}'.format(' '.join(args)), True)
+    return run_shell_command_raise_on_return_code(
+        f'sudo -E apt-get install -y {" ".join(args)}', f'Error in installation of package(s) {" ".join(args)}', True
+    )
 
 
 def apt_remove_packages(*args):
     if not args:
-        return
+        return None
 
     log_current_packages(args, install=False)
-    return run_shell_command_raise_on_return_code('sudo -E apt-get remove -y {}'.format(' '.join(args)), 'Error in removal of package(s) {}'.format(' '.join(args)), True)
+    return run_shell_command_raise_on_return_code(
+        f'sudo -E apt-get remove -y {" ".join(args)}', f'Error in removal of package(s) {" ".join(args)}', True
+    )
 
 
-def _pip_install_packages(version, args):
-    if not args:
+def pip_install_packages(*packages):
+    if not packages:
         return
 
-    log_current_packages(args)
-    for packet in args:
+    log_current_packages(packages)
+    pip_command = 'pip' if is_virtualenv() else 'sudo -EH pip'
+    for packet in packages:
         try:
-            run_shell_command_raise_on_return_code('sudo -EH pip{} install --upgrade {}'.format(version, packet), 'Error in installation of python package {}'.format(packet), True)
+            run_shell_command_raise_on_return_code(
+                f'{pip_command} install --upgrade {packet}', f'Error in installation of python package {packet}', True
+            )
         except InstallationError as installation_error:
             if 'is a distutils installed project' in str(installation_error):
-                logging.warning('Could not update python packet {}. Was not installed using pip originally'.format(packet))
+                logging.warning(f'Could not update python packet {packet}. Was not installed using pip originally')
             else:
                 raise installation_error
-
-
-def _pip_remove_packages(version, args):
-    if not args:
-        return
-
-    log_current_packages(args, install=False)
-    for packet in args:
-        try:
-            run_shell_command_raise_on_return_code('sudo -EH pip{} uninstall -y {}'.format(version, packet),
-                                                   'Error in removal of python package {}'.format(packet), True)
-        except InstallationError as installation_error:
-            if 'is a distutils installed project' in str(installation_error):
-                logging.warning('Could not remove python packet {}. Was not installed using pip originally'.format(packet))
-            else:
-                raise installation_error
-
-
-def pip3_install_packages(*args):
-    return _pip_install_packages(3, args)
-
-
-def pip2_install_packages(*args):
-    return _pip_install_packages(2, args)
-
-
-def pip2_remove_packages(*args):
-    return _pip_remove_packages(2, args)
 
 
 def check_if_command_in_path(command):
-    _, return_code = execute_shell_command_get_return_code('command -v {}'.format(command))
+    _, return_code = execute_shell_command_get_return_code(f'command -v {command}')
     if return_code != 0:
         return False
     return True
 
 
 def install_github_project(project_path: str, commands: List[str]):
-    log_current_packages([project_path, ])
+    log_current_packages([project_path])
     folder_name = Path(project_path).name
     _checkout_github_project(project_path, folder_name)
 
@@ -144,7 +130,7 @@ def install_github_project(project_path: str, commands: List[str]):
         for command in commands:
             output, return_code = execute_shell_command_get_return_code(command)
             if return_code != 0:
-                error = 'Error while processing github project {}!\n{}'.format(project_path, output)
+                error = f'Error while processing github project {project_path}!\n{command}\n{output}'
                 break
 
     if error:
@@ -152,18 +138,23 @@ def install_github_project(project_path: str, commands: List[str]):
 
 
 def _checkout_github_project(github_path, folder_name):
-    clone_url = 'https://www.github.com/{}'.format(github_path)
-    stdout, return_code = execute_shell_command_get_return_code('git clone {}'.format(clone_url))
+    clone_url = f'https://www.github.com/{github_path}'
+    stdout, return_code = execute_shell_command_get_return_code(f'git clone {clone_url}')
     if return_code != 0:
-        raise InstallationError('Cloning from github failed for project {}: {}\n'.format(github_path, stdout))
+        raise InstallationError(f'Cloning from github failed for project {github_path}: {stdout}\n')
     if not Path('.', folder_name).exists():
-        raise InstallationError('Repository creation failed on folder {}: {}\n'.format(folder_name, stdout))
+        raise InstallationError(f'Repository creation failed on folder {folder_name}: {stdout}\n')
 
 
 def load_main_config():
     config = configparser.ConfigParser()
     config_path = Path(Path(__file__).parent.parent, 'config', 'main.cfg')
     if not config_path.is_file():
-        raise InstallationError('Could not load config at path {}'.format(config_path))
+        raise InstallationError(f'Could not load config at path {config_path}')
     config.read(str(config_path))
     return config
+
+
+def is_virtualenv() -> bool:
+    """Check if FACT runs in a virtual environment"""
+    return sys.prefix != getattr(sys, 'base_prefix', getattr(sys, 'real_prefix', None))

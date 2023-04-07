@@ -15,16 +15,16 @@ class TestDraytekVigor167Unpacker(TestUnpackerBase):
         test_file = Path(TEST_DATA_DIR, 'valid_draytekvigor167_image.bin')
         unpacked_files, meta_data = self.unpacker.extract_files_from_file(test_file, self.tmp_dir.name)
 
-        self.assertEqual(meta_data['output'], 'successfully unpacked image')
-        self.assertEqual(len(unpacked_files), 2, 'number of extracted files not correct')
-        self.assertIn(str(Path(self.tmp_dir.name) / 'kernel_image'), unpacked_files, 'kernel image not extracted')
-        self.assertIn(str(Path(self.tmp_dir.name) / 'squashfs_root'), unpacked_files, 'squashfs not extracted')
+        assert meta_data['output'] == 'successfully unpacked image'
+        assert len(unpacked_files) == 2, 'number of extracted files not correct'
+        assert str(Path(self.tmp_dir.name) / 'kernel_image') in unpacked_files, 'kernel image not extracted'
+        assert str(Path(self.tmp_dir.name) / 'squashfs_root') in unpacked_files, 'squashfs not extracted'
         squashfs_binary = get_binary_from_file(Path(self.tmp_dir.name) / 'squashfs_root')
         squashfs_hash = get_sha256(squashfs_binary)
-        self.assertEqual(squashfs_hash, '73b648f484ab0a34ce00729ce8b7ef183885b4b5c540344a8451d18fe94cc2fa')
+        assert squashfs_hash == '73b648f484ab0a34ce00729ce8b7ef183885b4b5c540344a8451d18fe94cc2fa'
 
     def test_extraction_invalid_image(self):
         test_file = Path(TEST_DATA_DIR, 'invalid_draytekvigor167_image_struct_error.bin')
-        unpacked_files, meta_data = self.unpacker.extract_files_from_file(test_file, self.tmp_dir.name)
+        _, meta_data = self.unpacker.extract_files_from_file(test_file, self.tmp_dir.name)
 
-        self.assertIn('failed to recognize firmware container', meta_data['output'])
+        assert 'failed to recognize firmware container' in meta_data['output']
