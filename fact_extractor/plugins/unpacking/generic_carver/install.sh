@@ -15,10 +15,7 @@ curl -L -o sasquatch_1.0_amd64.deb https://github.com/onekey-sec/sasquatch/relea
 sudo dpkg -i sasquatch_1.0_amd64.deb
 rm -f sasquatch_1.0_amd64.deb
 
-git clone https://github.com/dorpvom/unblob.git -b allow-carving-only
-
-# install poetry
-sudo -EH pip3 install --upgrade poetry
+git clone https://github.com/onekey-sec/unblob.git
 cd unblob || exit 1
 
 # install unblob with poetry:
