@@ -7,17 +7,20 @@ from pathlib import Path
 
 from helperFunctions.file_system import get_fact_bin_dir
 
-
 SASQUATCH = Path('/usr/local/bin/sasquatch')
 UNSQUASHFS4_AVM_BE = Path(get_fact_bin_dir()) / 'unsquashfs4-avm-be'
 UNSQUASHFS4_AVM_LE = Path(get_fact_bin_dir()) / 'unsquashfs4-avm-le'
 UNSQUASHFS3_MULTI = Path(get_fact_bin_dir()) / 'unsquashfs3-multi'
 
-
 NAME = 'SquashFS'
 MIME_PATTERNS = ['filesystem/squashfs']
-VERSION = '0.9'
-SQUASH_UNPACKER = [SASQUATCH, UNSQUASHFS4_AVM_BE, UNSQUASHFS4_AVM_LE, UNSQUASHFS3_MULTI]
+VERSION = '0.10'
+SQUASH_UNPACKER = [
+    (SASQUATCH, '-c lzma-adaptive'),
+    (UNSQUASHFS4_AVM_BE, '-scan'),
+    (UNSQUASHFS4_AVM_LE, '-scan'),
+    (UNSQUASHFS3_MULTI, '-scan'),
+]
 
 
 def unpack_function(file_path, tmp_dir):
@@ -25,10 +28,9 @@ def unpack_function(file_path, tmp_dir):
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
     '''
-    unpack_result = dict()
-    for unpacker in SQUASH_UNPACKER:
-        scan_parameter = '-scan' if '-avm-' in unpacker.name else ''
-        output = execute_shell_command(f'fakeroot {unpacker} {scan_parameter} -d {tmp_dir}/fact_extracted {file_path}')
+    unpack_result = {}
+    for unpacker, parameter in SQUASH_UNPACKER:
+        output = execute_shell_command(f'fakeroot {unpacker} {parameter} -d {tmp_dir}/fact_extracted {file_path}')
         if _unpack_success(tmp_dir):
             unpack_result['unpacking_tool'] = unpacker.name
             unpack_result['output'] = output

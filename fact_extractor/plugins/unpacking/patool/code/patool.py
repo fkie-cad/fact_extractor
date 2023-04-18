@@ -7,6 +7,7 @@ NAME = 'PaTool'
 MIME_PATTERNS = [
     'application/gzip',
     'application/java-archive',
+    'application/vnd.debian.binary-package',
     'application/vnd.ms-cab-compressed',
     'application/x-ace',
     'application/x-adf',
@@ -18,6 +19,7 @@ MIME_PATTERNS = [
     'application/x-chm',
     'application/x-compress',
     'application/x-cpio',
+    'application/x-debian-package',
     'application/x-dms',
     'application/x-gzip',
     'application/x-lha',
@@ -27,6 +29,7 @@ MIME_PATTERNS = [
     'application/x-lzip',
     'application/x-lzo',
     'application/x-lzop',
+    'application/x-redhat-package-manager',
     'application/x-rzip',
     'application/x-shar',
     'application/x-tar',

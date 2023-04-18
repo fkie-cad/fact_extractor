@@ -51,6 +51,7 @@ class TestPaToolUnpacker(TestUnpackerBase):
             'test.lzo',
             'test.rz',
             'test.xz',
+            'test.deb',
         ],
     )
     def test_file_extraction(self, in_file):
@@ -71,3 +72,9 @@ class TestPaToolUnpacker(TestUnpackerBase):
         assert len(files) == 2
         unpacked_files = sorted(Path(f).name for f in files)
         assert unpacked_files == ['testfile1', 'testfile2']
+
+    def test_extract_deb(self):
+        test_file = TEST_DATA_DIR / 'test.deb'
+        files, meta_data = self.unpacker.extract_files_from_file(test_file, self.tmp_dir.name)
+        assert len(files) == 3, f'file number incorrect: {meta_data}'
+        assert 'extracted to' in meta_data['output']
