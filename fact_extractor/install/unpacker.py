@@ -185,7 +185,7 @@ DEPENDENCIES = {
             # uefi
             'git+https://github.com/theopolis/uefi-firmware-parser@v1.10',
             # unblob
-            'poetry',
+            'unblob',
         ],
         'github': [
             (

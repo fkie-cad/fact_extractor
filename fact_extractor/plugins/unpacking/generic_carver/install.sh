@@ -15,21 +15,4 @@ curl -L -o sasquatch_1.0_amd64.deb https://github.com/onekey-sec/sasquatch/relea
 sudo dpkg -i sasquatch_1.0_amd64.deb
 rm -f sasquatch_1.0_amd64.deb
 
-git clone https://github.com/onekey-sec/unblob.git
-cd unblob || exit 1
-
-# install unblob with poetry:
-poetry install --only main
-UNBLOB_PATH=$(poetry env info --path)
-
-if [[ -f "$UNBLOB_PATH""/bin/unblob" ]]; then
-  if [[ ! -f "/usr/local/bin/unblob" ]]; then
-    sudo ln -s "$UNBLOB_PATH""/bin/unblob" /usr/local/bin/unblob
-  fi
-else
-  echo "Could not install unblob" && exit 1
-fi
-
-rm -r tests
-
 exit 0
