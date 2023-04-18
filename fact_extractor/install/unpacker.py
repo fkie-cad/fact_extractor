@@ -9,8 +9,14 @@ from tempfile import TemporaryDirectory
 
 from common_helper_process import execute_shell_command_get_return_code
 
-from helperFunctions.install import (apt_install_packages, apt_remove_packages, install_github_project,
-                                     InstallationError, OperateInDirectory, pip_install_packages)
+from helperFunctions.install import (
+    InstallationError,
+    OperateInDirectory,
+    apt_install_packages,
+    apt_remove_packages,
+    install_github_project,
+    pip_install_packages,
+)
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
 
