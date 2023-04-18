@@ -1,4 +1,4 @@
-name: Publish Docker image based on master branch
+name: Publish Docker image based on unblob-2 branch
 
 on:
   push:
