@@ -1,0 +1,27 @@
+name: Publish Docker image based on unblob-2 branch
+
+on:
+  push:
+    branches: ['unblob-2']
+  workflow_dispatch:
+
+jobs:
+  build-and-publish-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: fkiecad/fact_extractor:unblob
