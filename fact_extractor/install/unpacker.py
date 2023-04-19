@@ -124,6 +124,9 @@ DEPENDENCIES = {
             'unace',
             'sharutils',
             'unar',
+            'zstd',
+            'liblz4-tool',
+            'p7zip-full',
             # Freetz
             'autoconf',
             'automake',
@@ -161,12 +164,6 @@ DEPENDENCIES = {
             'git+https://github.com/sviehb/jefferson.git',
             'cstruct==2.1',
             'python-lzo',
-            # binwalk
-            'git+https://github.com/ReFirmLabs/binwalk@v2.3.2',
-            'pyqtgraph',
-            'capstone',
-            'numpy',
-            'scipy',
             'git+https://github.com/jrspruitt/ubi_reader@v0.6.3-master',  # pinned as broken currently
             # dji / dlink_shrs
             'pycryptodome',
@@ -187,9 +184,10 @@ DEPENDENCIES = {
             'extract-dtb',
             # uefi
             'git+https://github.com/theopolis/uefi-firmware-parser@v1.10',
+            # unblob
+            'unblob',
         ],
         'github': [
-            ('threadexio/sasquatch', ['./build.sh']),
             (
                 'rampageX/firmware-mod-kit',
                 [
@@ -202,6 +200,13 @@ DEPENDENCIES = {
 }
 
 
+def check_mod_kit_installed() -> bool:
+    return all(
+        (Path(__file__).parent.parent / 'bin' / tool).exists()
+        for tool in ['tpl-tool', 'untrx', 'unyaffs2']
+    )
+
+
 def install_dependencies(dependencies):
     apt = dependencies.get('apt', [])
     pip3 = dependencies.get('pip3', [])
@@ -209,7 +214,10 @@ def install_dependencies(dependencies):
     apt_install_packages(*apt)
     pip_install_packages(*pip3)
     for repo in github:
-        install_github_project(*repo)
+        if repo[0].endswith('firmware-mod-kit') and check_mod_kit_installed():
+            logging.info('Skipping firmware-mod-kit since it is already installed')
+        else:
+            install_github_project(*repo)
 
 
 def main(distribution):
@@ -255,7 +263,7 @@ def _edit_sudoers():
             )
         )
     )
-    Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n')  # pylint: disable=unspecified-encoding
+    Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n', encoding='utf-8')
     _, chown_code = execute_shell_command_get_return_code('sudo chown root:root /tmp/fact_overrides')
     _, mv_code = execute_shell_command_get_return_code('sudo mv /tmp/fact_overrides /etc/sudoers.d/fact_overrides')
     if not chown_code == mv_code == 0:
@@ -263,6 +271,16 @@ def _edit_sudoers():
 
 
 def _install_freetz():
+    if all(
+        (Path(__file__).parent.parent / 'bin' / tool).exists()
+        for tool in [
+            'find-squashfs', 'unpack-kernel', 'freetz_bin_functions', 'unlzma', 'sfk', 'unsquashfs4-avm-be',
+            'unsquashfs4-avm-le', 'unsquashfs3-multi'
+        ]
+    ):
+        logging.info('Skipping FREETZ as it is already installed')
+        return
+
     logging.info('Installing FREETZ')
     current_user = getuser()
     freetz_build_config = Path(__file__).parent / 'freetz.config'
