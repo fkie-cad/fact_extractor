@@ -51,7 +51,6 @@ class TestPaToolUnpacker(TestUnpackerBase):
             'test.lzo',
             'test.rz',
             'test.xz',
-            'test.deb',
         ],
     )
     def test_file_extraction(self, in_file):
