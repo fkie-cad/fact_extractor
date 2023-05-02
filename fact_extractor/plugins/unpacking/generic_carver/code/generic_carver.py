@@ -42,7 +42,9 @@ class ArchivesFilter:
         self.screening_logs = []
 
     def remove_false_positive_archives(self) -> str:
-        for file_path in self.unpack_directory.iterdir():
+        for file_path in self.unpack_directory.glob('**/*'):
+            if not file_path.is_file():
+                continue
             file_type = get_file_type_from_path(file_path)['mime']
 
             if file_type == 'application/x-tar' or self._is_possible_tar(file_type, file_path):
