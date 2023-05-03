@@ -18,7 +18,9 @@ class TestSevenZUnpacker(TestUnpackerBase):
         'test_file, prefix',
         [
             ('test.7z', 'get_files_test'),
+            ('test.rar', 'get_files_test'),
             ('cramfs.img', ''),
+            ('test.iso', ''),
         ],
     )
     def test_extraction(self, test_file, prefix):

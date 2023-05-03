@@ -1,20 +1,27 @@
 '''
 This plugin uses 7z to extract several formats
 '''
-import os
 import logging
+import os
 
 from common_helper_passwords import get_merged_password_set
 from common_helper_process import execute_shell_command
+
 from helperFunctions.file_system import get_src_dir
 
 NAME = '7z'
 MIME_PATTERNS = [
     # compressed archives
-    'application/x-lzma',
+    'application/rar',
     'application/x-7z-compressed',
-    'application/zip',
+    'application/x-iso9660-image',
+    'application/x-lzma',
+    'application/x-rar',
+    'application/x-rpm',
+    'application/x-vhd',
+    'application/x-vhdx',
     'application/x-zip-compressed',
+    'application/zip',
     # file systems
     'filesystem/cramfs',
     'filesystem/ext2',
@@ -24,7 +31,7 @@ MIME_PATTERNS = [
     'filesystem/hfs',
     'filesystem/ntfs',
 ]
-VERSION = '0.8'
+VERSION = '0.8.1'
 
 UNPACKER_EXECUTABLE = '7z'
 PW_LIST = get_merged_password_set(os.path.join(get_src_dir(), 'unpacker/passwords'))

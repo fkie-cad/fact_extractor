@@ -69,7 +69,6 @@ class ArchivesFilter:
 
         return '\n'.join(self.screening_logs)
 
-
     @staticmethod
     def _is_possible_tar(file_type: str, file_path: Path) -> bool:
         # broken tar archives may be identified as octet-stream by newer versions of libmagic

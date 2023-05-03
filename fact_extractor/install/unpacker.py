@@ -1,18 +1,21 @@
+import hashlib
 import logging
 import os
 from getpass import getuser
 from pathlib import Path
+from shlex import split
+from subprocess import CalledProcessError, run
 from tempfile import TemporaryDirectory
 
 from common_helper_process import execute_shell_command_get_return_code
 
 from helperFunctions.install import (
-    apt_install_packages,
-    install_github_project,
     InstallationError,
     OperateInDirectory,
-    pip_install_packages,
+    apt_install_packages,
     apt_remove_packages,
+    install_github_project,
+    pip_install_packages,
 )
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
@@ -102,28 +105,29 @@ DEPENDENCIES = {
             'liblzo2-dev',
             'xvfb',
             'libcapstone-dev',
-            # patool and unpacking backends
-            'lrzip',
-            'cpio',
-            'unadf',
-            'rpm2cpio',
-            'lzop',
-            'lhasa',
-            'cabextract',
-            'zpaq',
-            'libchm-dev',
+            # patool
             'arj',
-            'xdms',
-            'rzip',
-            'lzip',
-            'unalz',
-            'unrar',
-            'gzip',
-            'nomarch',
+            'cabextract',
+            'cpio',
             'flac',
-            'unace',
+            'gzip',
+            'lhasa',
+            'libchm-dev',
+            'lrzip',
+            'lzip',
+            'lzop',
+            'ncompress',
+            'nomarch',
+            'rpm2cpio',
+            'rzip',
             'sharutils',
+            'unace',
+            'unadf',
+            'unalz',
             'unar',
+            'unrar',
+            'xdms',
+            'zpaq',
             # Freetz
             'autoconf',
             'automake',
@@ -194,7 +198,7 @@ DEPENDENCIES = {
                 'rampageX/firmware-mod-kit',
                 [
                     '(cd src && make untrx && make -C tpl-tool/src && make -C yaffs2utils)',
-                    'cp src/untrx src/yaffs2utils/unyaffs2 src/tpl-tool/src/tpl-tool ../../bin/'
+                    'cp src/untrx src/yaffs2utils/unyaffs2 src/tpl-tool/src/tpl-tool ../../bin/',
                 ],
             ),
         ],
@@ -228,6 +232,7 @@ def main(distribution):
 
     # install plug-in dependencies
     _install_plugins()
+    _install_patool_deps()
 
     # configure environment
     _edit_sudoers()
@@ -260,6 +265,25 @@ def _edit_sudoers():
     _, mv_code = execute_shell_command_get_return_code('sudo mv /tmp/fact_overrides /etc/sudoers.d/fact_overrides')
     if not chown_code == mv_code == 0:
         raise InstallationError('Editing sudoers file did not succeed\n{chown_output}\n{mv_output}')
+
+
+def _install_patool_deps():
+    '''install additional dependencies of patool'''
+    with TemporaryDirectory(prefix='patool') as build_directory:
+        with OperateInDirectory(build_directory):
+            # install zoo unpacker
+            file_name = 'zoo_2.10-28_amd64.deb'
+            try:
+                run(split(f'wget http://launchpadlibrarian.net/230277773/{file_name}'), capture_output=True, check=True)
+                expected_sha = '953f4f94095ef3813dfd30c8977475c834363aaabce15ab85ac5195e52fd816a'
+                assert _sha256_hash_file(Path(file_name)) == expected_sha
+                run(split(f'sudo dpkg -i {file_name}'), capture_output=True, check=True)
+            except (AssertionError, CalledProcessError) as error:
+                raise InstallationError('Error during zoo unpacker installation') from error
+
+
+def _sha256_hash_file(file_path: Path) -> str:
+    return hashlib.sha256(file_path.read_bytes()).hexdigest()
 
 
 def _install_freetz():

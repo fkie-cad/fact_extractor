@@ -7,7 +7,6 @@ NAME = 'PaTool'
 MIME_PATTERNS = [
     'application/gzip',
     'application/java-archive',
-    'application/rar',
     'application/vnd.debian.binary-package',
     'application/vnd.ms-cab-compressed',
     'application/x-ace',
@@ -23,15 +22,14 @@ MIME_PATTERNS = [
     'application/x-debian-package',
     'application/x-dms',
     'application/x-gzip',
-    'application/x-iso9660-image',
     'application/x-lha',
     'application/x-lrzip',
     'application/x-lzh',
+    'application/x-lzh-compressed',
     'application/x-lzip',
+    'application/x-lzo',
     'application/x-lzop',
-    'application/x-rar',
     'application/x-redhat-package-manager',
-    'application/x-rpm',
     'application/x-rzip',
     'application/x-shar',
     'application/x-tar',
@@ -40,7 +38,7 @@ MIME_PATTERNS = [
     'application/zpaq',
     'audio/flac',
 ]
-VERSION = '0.5.3'
+VERSION = '0.6.0'
 
 TOOL_PATH = execute_shell_command('which patool').strip()
 
