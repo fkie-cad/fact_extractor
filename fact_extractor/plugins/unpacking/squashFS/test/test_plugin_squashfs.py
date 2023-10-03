@@ -39,5 +39,5 @@ class TestSquashUnpacker(TestUnpackerBase):
 
     def test_extraction_sqfs(self):
         self.check_unpacking_of_standard_unpack_set(
-            TEST_DATA_DIR / 'sqfs.img', additional_prefix_folder='fact_extracted'
+            TEST_DATA_DIR / 'sqfs.img',
         )
