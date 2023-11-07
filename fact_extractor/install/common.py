@@ -35,6 +35,7 @@ DEPENDENCIES = {
             'pytest',
             'pytest-cov',
             'testresources',
+            'python-magic',
         ],
     },
 }
