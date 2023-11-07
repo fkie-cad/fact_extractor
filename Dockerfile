@@ -1,22 +1,26 @@
 FROM phusion/baseimage:jammy-1.0.3
 
-WORKDIR /opt/app
+RUN --mount=type=cache,target=/var/cache/apt \
+apt update && apt install -y \
+    python3.11 \
+    python3.11-dev \
+    python3.11-venv \
+    gcc
 
-COPY . /opt/app
+RUN python3.11 -m venv /venv
+ENV PATH=/venv/bin:$PATH \
+    VIRTUAL_ENV=/venv \
+    PYTHONPATH=/app/fact_extractor
 
-WORKDIR /opt/app/fact_extractor
+ADD ./fact_extractor/install/pre_install.sh /app/fact_extractor/install/pre_install.sh
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/root/.cache/pip \
+/app/fact_extractor/install/pre_install.sh
 
-ARG USER=root
-ARG DEBIAN_FRONTEND=noninteractive
+ADD . /app
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/root/.cache/pip \
+/app/fact_extractor/install.py
 
-RUN install_clean python3.11 python3.11-dev python3.11-venv gcc
 
-RUN python3.11 -m venv venv
-
-RUN . venv/bin/activate && install/pre_install.sh
-
-RUN . venv/bin/activate && venv/bin/python3.11 install.py
-
-ENV PATH=/opt/app/fact_extractor/venv/bin:$PATH
-
-ENTRYPOINT ["./docker_extraction.py"]
+ENTRYPOINT ["/app/fact_extractor/docker_extraction.py"]
