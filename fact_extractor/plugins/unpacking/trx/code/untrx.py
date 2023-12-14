@@ -3,6 +3,7 @@ from tempfile import NamedTemporaryFile
 
 from common_helper_process.fail_safe_subprocess import execute_shell_command
 from helperFunctions.file_system import get_fact_bin_dir
+from helperFunctions.shell_utils import shell_escape_string
 
 NAME = 'untrx'
 MIME_PATTERNS = ['firmware/trx']
@@ -43,7 +44,7 @@ def _remove_non_trx_header(source_path, target_fp, offset):
 
 
 def _unpack_trx(file_path, target_dir):
-    return execute_shell_command('fakeroot {} {} {}'.format(UNPACKER_EXECUTEABLE, file_path, target_dir))
+    return execute_shell_command('fakeroot {} {} {}'.format(UNPACKER_EXECUTEABLE, shell_escape_string(str(file_path)), shell_escape_string(str(target_dir))))
 
 
 # ----> Do not edit below this line <----

@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 from common_helper_process import execute_shell_command, execute_shell_command_get_return_code
+from helperFunctions.shell_utils import shell_escape_string
 
 INTERNAL_DIR = Path(__file__).parent.parent / 'internal'
 sys.path.append(str(INTERNAL_DIR))
@@ -33,7 +34,7 @@ def is_kernel(file_path):
     """
     found_cnt = 0
     for i in KERNEL_STRINGS_TO_MATCH:
-        output, ret_code = execute_shell_command_get_return_code(f'{STRINGS_PATH} {file_path} | grep -q "{i}"')
+        output, ret_code = execute_shell_command_get_return_code(f'{STRINGS_PATH} {shell_escape_string(str(file_path))} | grep -q "{i}"')
         if 0 == ret_code:
             found_cnt += 1
 
@@ -84,7 +85,7 @@ def unpack_function(file_path, tmp_dir):
         tool = command_absolute_path(file_data['command'])
         output_file_name = strip_extension(compressed_file)
 
-        cmd = f'fakeroot cat {compressed_file} | {tool} > {Path(tmp_dir, output_file_name)} 2> /dev/null'
+        cmd = f'fakeroot cat {shell_escape_string(str(compressed_file))} | {tool} > {Path(tmp_dir, output_file_name)} 2> /dev/null'
         output += cmd + '\n'
         output += execute_shell_command(cmd, timeout=600)
 

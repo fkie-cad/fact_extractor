@@ -2,19 +2,44 @@
 This plugin unpacks several formats utilizing patool
 '''
 from common_helper_process import execute_shell_command
+from helperFunctions.shell_utils import shell_escape_string
 
 NAME = 'PaTool'
 MIME_PATTERNS = [
-    'application/x-lrzip', 'application/x-cpio', 'application/x-archive', 'application/x-adf',
-    'application/x-redhat-package-manager', 'application/x-rpm', 'application/x-lzop', 'application/x-lzh',
-    'application/x-lha', 'application/x-cab', 'application/vnd.ms-cab-compressed', 'application/zpaq',
-    'application/x-chm', 'application/x-gzip', 'application/gzip', 'application/x-bzip2', 'application/x-dms',
-    'application/x-debian-package', 'application/x-rzip', 'application/x-tar', 'application/x-shar',
-    'application/x-lzip', 'application/x-alzip', 'application/x-rar', 'application/rar',
-    'application/java-archive', 'application/x-iso9660-image', 'application/x-compress', 'application/x-arc',
-    'audio/flac', 'application/x-ace', 'application/x-zoo', 'application/x-xz'
+    'application/gzip',
+    'application/java-archive',
+    'application/vnd.debian.binary-package',
+    'application/vnd.ms-cab-compressed',
+    'application/x-ace',
+    'application/x-adf',
+    'application/x-alzip',
+    'application/x-arc',
+    'application/x-archive',
+    'application/x-bzip2',
+    'application/x-cab',
+    'application/x-chm',
+    'application/x-compress',
+    'application/x-cpio',
+    'application/x-debian-package',
+    'application/x-dms',
+    'application/x-gzip',
+    'application/x-lha',
+    'application/x-lrzip',
+    'application/x-lzh',
+    'application/x-lzh-compressed',
+    'application/x-lzip',
+    'application/x-lzo',
+    'application/x-lzop',
+    'application/x-redhat-package-manager',
+    'application/x-rzip',
+    'application/x-shar',
+    'application/x-tar',
+    'application/x-xz',
+    'application/x-zoo',
+    'application/zpaq',
+    'audio/flac',
 ]
-VERSION = '0.5.2'
+VERSION = '0.6.0'
 
 TOOL_PATH = execute_shell_command('which patool').strip()
 
@@ -25,7 +50,9 @@ def unpack_function(file_path, tmp_dir):
     tmp_dir should be used to store the extracted files.
     """
     return {
-        'output': execute_shell_command('fakeroot python3 {} extract --outdir {} {}'.format(TOOL_PATH, tmp_dir, file_path), timeout=600)
+        'output': execute_shell_command(
+            f'fakeroot python3 {TOOL_PATH} extract --outdir {shell_escape_string(str(tmp_dir))} {shell_escape_string(str(file_path))}', timeout=600
+        )
     }
 
 

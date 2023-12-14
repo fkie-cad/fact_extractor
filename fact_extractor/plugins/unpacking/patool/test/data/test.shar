@@ -1,0 +1,227 @@
+#!/bin/sh
+# This is a shell archive (produced by GNU sharutils 4.15.2).
+# To extract the files from this archive, save it to some FILE, remove
+# everything before the '#!/bin/sh' line above, then type 'sh FILE'.
+#
+lock_dir=_sh99321
+# Made on 2023-02-10 12:53 CET by <foo@bar-123>.
+# Source directory was '/foo/bar'.
+#
+# Existing files will *not* be overwritten, unless '-c' is specified.
+#
+# This shar contains:
+# length mode       name
+# ------ ---------- ------------------------------------------
+#     20 -rw-r--r-- get_files_test/generic folder/test file 3_.txt
+#     62 -rw-r--r-- get_files_test/testfile1
+#     28 -rw-r--r-- get_files_test/testfile2
+#
+MD5SUM=${MD5SUM-md5sum}
+f=`${MD5SUM} --version | egrep '^md5sum .*(core|text)utils'`
+test -n "${f}" && md5check=true || md5check=false
+${md5check} || \
+  echo 'Note: not verifying md5sums.  Consider installing GNU coreutils.'
+if test "X$1" = "X-c"
+then keep_file=''
+else keep_file=true
+fi
+echo=echo
+save_IFS="${IFS}"
+IFS="${IFS}:"
+gettext_dir=
+locale_dir=
+set_echo=false
+
+for dir in $PATH
+do
+  if test -f $dir/gettext \
+     && ($dir/gettext --version >/dev/null 2>&1)
+  then
+    case `$dir/gettext --version 2>&1 | sed 1q` in
+      *GNU*) gettext_dir=$dir
+      set_echo=true
+      break ;;
+    esac
+  fi
+done
+
+if ${set_echo}
+then
+  set_echo=false
+  for dir in $PATH
+  do
+    if test -f $dir/shar \
+       && ($dir/shar --print-text-domain-dir >/dev/null 2>&1)
+    then
+      locale_dir=`$dir/shar --print-text-domain-dir`
+      set_echo=true
+      break
+    fi
+  done
+
+  if ${set_echo}
+  then
+    TEXTDOMAINDIR=$locale_dir
+    export TEXTDOMAINDIR
+    TEXTDOMAIN=sharutils
+    export TEXTDOMAIN
+    echo="$gettext_dir/gettext -s"
+  fi
+fi
+IFS="$save_IFS"
+if (echo "testing\c"; echo 1,2,3) | grep c >/dev/null
+then if (echo -n test; echo 1,2,3) | grep n >/dev/null
+     then shar_n= shar_c='
+'
+     else shar_n=-n shar_c= ; fi
+else shar_n= shar_c='\c' ; fi
+f=shar-touch.$$
+st1=200112312359.59
+st2=123123592001.59
+st2tr=123123592001.5 # old SysV 14-char limit
+st3=1231235901
+
+if   touch -am -t ${st1} ${f} >/dev/null 2>&1 && \
+     test ! -f ${st1} && test -f ${f}; then
+  shar_touch='touch -am -t $1$2$3$4$5$6.$7 "$8"'
+
+elif touch -am ${st2} ${f} >/dev/null 2>&1 && \
+     test ! -f ${st2} && test ! -f ${st2tr} && test -f ${f}; then
+  shar_touch='touch -am $3$4$5$6$1$2.$7 "$8"'
+
+elif touch -am ${st3} ${f} >/dev/null 2>&1 && \
+     test ! -f ${st3} && test -f ${f}; then
+  shar_touch='touch -am $3$4$5$6$2 "$8"'
+
+else
+  shar_touch=:
+  echo
+  ${echo} 'WARNING: not restoring timestamps.  Consider getting and
+installing GNU '\''touch'\'', distributed in GNU coreutils...'
+  echo
+fi
+rm -f ${st1} ${st2} ${st2tr} ${st3} ${f}
+#
+if test ! -d ${lock_dir} ; then :
+else ${echo} "lock directory ${lock_dir} exists"
+     exit 1
+fi
+if mkdir ${lock_dir}
+then ${echo} "x - created lock directory ${lock_dir}."
+else ${echo} "x - failed to create lock directory ${lock_dir}."
+     exit 1
+fi
+# ============= get_files_test/generic folder/test file 3_.txt ==============
+if test ! -d 'get_files_test'; then
+  mkdir 'get_files_test'
+if test $? -eq 0
+then ${echo} "x - created directory get_files_test."
+else ${echo} "x - failed to create directory get_files_test."
+     exit 1
+fi
+fi
+if test ! -d 'get_files_test/generic folder'; then
+  mkdir 'get_files_test/generic folder'
+if test $? -eq 0
+then ${echo} "x - created directory get_files_test/generic folder."
+else ${echo} "x - failed to create directory get_files_test/generic folder."
+     exit 1
+fi
+fi
+if test -n "${keep_file}" && test -f 'get_files_test/generic folder/test file 3_.txt'
+then
+${echo} "x - SKIPPING get_files_test/generic folder/test file 3_.txt (file already exists)"
+
+else
+${echo} "x - extracting get_files_test/generic folder/test file 3_.txt (Text)"
+  sed 's/^X//' << 'SHAR_EOF' | uudecode &&
+begin 600 get_files_test/generic folder/test file 3_.txt
+45&AE('1H:7)D('1E<W0@9FEL92$`
+`
+end
+SHAR_EOF
+  (set 20 15 09 15 12 20 40 'get_files_test/generic folder/test file 3_.txt'
+   eval "${shar_touch}") && \
+  chmod 0644 'get_files_test/generic folder/test file 3_.txt'
+if test $? -ne 0
+then ${echo} "restore of get_files_test/generic folder/test file 3_.txt failed"
+fi
+  if ${md5check}
+  then (
+       ${MD5SUM} -c >/dev/null 2>&1 || ${echo} 'get_files_test/generic folder/test file 3_.txt': 'MD5 check failed'
+       ) << \SHAR_EOF
+dfb79b49698fbae3d6eaca69b211b79d  get_files_test/generic folder/test file 3_.txt
+SHAR_EOF
+
+else
+test `LC_ALL=C wc -c < 'get_files_test/generic folder/test file 3_.txt'` -ne 20 && \
+  ${echo} "restoration warning:  size of 'get_files_test/generic folder/test file 3_.txt' is not 20"
+  fi
+fi
+# ============= get_files_test/testfile1 ==============
+if test -n "${keep_file}" && test -f 'get_files_test/testfile1'
+then
+${echo} "x - SKIPPING get_files_test/testfile1 (file already exists)"
+
+else
+${echo} "x - extracting get_files_test/testfile1 (text)"
+  sed 's/^X//' << 'SHAR_EOF' > 'get_files_test/testfile1' &&
+test file:
+content: MyTestRule 1.2.3
+Version: Program 0.0.0.0
+SHAR_EOF
+  (set 20 15 09 15 12 20 40 'get_files_test/testfile1'
+   eval "${shar_touch}") && \
+  chmod 0644 'get_files_test/testfile1'
+if test $? -ne 0
+then ${echo} "restore of get_files_test/testfile1 failed"
+fi
+  if ${md5check}
+  then (
+       ${MD5SUM} -c >/dev/null 2>&1 || ${echo} 'get_files_test/testfile1': 'MD5 check failed'
+       ) << \SHAR_EOF
+e802ca22f6cd2d9357cf3da1d191879e  get_files_test/testfile1
+SHAR_EOF
+
+else
+test `LC_ALL=C wc -c < 'get_files_test/testfile1'` -ne 62 && \
+  ${echo} "restoration warning:  size of 'get_files_test/testfile1' is not 62"
+  fi
+fi
+# ============= get_files_test/testfile2 ==============
+if test -n "${keep_file}" && test -f 'get_files_test/testfile2'
+then
+${echo} "x - SKIPPING get_files_test/testfile2 (file already exists)"
+
+else
+${echo} "x - extracting get_files_test/testfile2 (Text)"
+  sed 's/^X//' << 'SHAR_EOF' | uudecode &&
+begin 600 get_files_test/testfile2
+<5&AI<R!I<R!T:&4@<V5C;VYD('1E<W0@9FEL94Q_
+`
+end
+SHAR_EOF
+  (set 20 15 09 15 12 20 40 'get_files_test/testfile2'
+   eval "${shar_touch}") && \
+  chmod 0644 'get_files_test/testfile2'
+if test $? -ne 0
+then ${echo} "restore of get_files_test/testfile2 failed"
+fi
+  if ${md5check}
+  then (
+       ${MD5SUM} -c >/dev/null 2>&1 || ${echo} 'get_files_test/testfile2': 'MD5 check failed'
+       ) << \SHAR_EOF
+08dd892caa120da5985fb0c0ec739295  get_files_test/testfile2
+SHAR_EOF
+
+else
+test `LC_ALL=C wc -c < 'get_files_test/testfile2'` -ne 28 && \
+  ${echo} "restoration warning:  size of 'get_files_test/testfile2' is not 28"
+  fi
+fi
+if rm -fr ${lock_dir}
+then ${echo} "x - removed lock directory ${lock_dir}."
+else ${echo} "x - failed to remove lock directory ${lock_dir}."
+     exit 1
+fi
+exit 0

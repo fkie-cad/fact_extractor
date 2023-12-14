@@ -5,6 +5,7 @@ import logging
 from pathlib import Path
 
 from common_helper_process import execute_shell_command
+from helperFunctions.shell_utils import shell_escape_string
 
 NAME = 'JFFS2'
 MIME_PATTERNS = ['filesystem/jffs2', 'filesystem/jffs2-big']
@@ -18,7 +19,7 @@ def unpack_function(file_path, tmp_dir):
     '''
 
     extract_dir = Path(tmp_dir) / 'jffs-root'
-    output = execute_shell_command(f'fakeroot jefferson -v -d {extract_dir} {file_path}') + '\n'
+    output = execute_shell_command(f'fakeroot jefferson -v -d {extract_dir} {shell_escape_string(str(file_path))}') + '\n'
     meta_data = {'output': output}
     logging.debug(output)
     return meta_data

@@ -3,6 +3,7 @@ from shutil import copyfile
 
 from common_helper_process import execute_shell_command
 from helperFunctions.file_system import get_fact_bin_dir
+from helperFunctions.shell_utils import shell_escape_string
 
 NAME = 'tpl-tool'
 MIME_PATTERNS = ['firmware/tp-link']
@@ -21,8 +22,8 @@ def unpack_function(file_path, tmp_dir):
 
     result = {}
 
-    result['output'] = execute_shell_command('fakeroot {} -x {}'.format(UNPACKER_EXECUTEABLE, tmp_file_path))
-    result['header-info'] = execute_shell_command('{} -s {}'.format(UNPACKER_EXECUTEABLE, tmp_file_path))
+    result['output'] = execute_shell_command('fakeroot {} -x {}'.format(UNPACKER_EXECUTEABLE, shell_escape_string(str(tmp_file_path))))
+    result['header-info'] = execute_shell_command('{} -s {}'.format(UNPACKER_EXECUTEABLE, shell_escape_string(str(tmp_file_path))))
 
     os.remove(tmp_file_path)
 

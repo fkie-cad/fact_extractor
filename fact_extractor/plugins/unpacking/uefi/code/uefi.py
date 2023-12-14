@@ -1,16 +1,13 @@
 '''
 This plugin unpacks UEFI Firmware Container.
 '''
-import os
 
 from common_helper_process import execute_shell_command
-from helperFunctions.file_system import get_fact_bin_dir
+from helperFunctions.shell_utils import shell_escape_string
 
 NAME = 'UEFI'
 MIME_PATTERNS = ['firmware/uefi']
-VERSION = '0.5'
-
-TOOL_PATH = os.path.join(get_fact_bin_dir(), 'uefi-firmware-parser')
+VERSION = '0.6'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -19,7 +16,7 @@ def unpack_function(file_path, tmp_dir):
     tmp_dir should be used to store the extracted files.
     Optional: Return a dict with meta information
     '''
-    extraction_command = 'python3 {} --superbrute --extract --output {} {}'.format(TOOL_PATH, tmp_dir, file_path)
+    extraction_command = f'uefi-firmware-parser --superbrute --extract --output {shell_escape_string(str(tmp_dir))} {shell_escape_string(str(file_path))}'
     output = execute_shell_command(extraction_command)
     return {'output': output}
 

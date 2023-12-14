@@ -39,12 +39,12 @@ PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor in
 
 # Compatible Ubuntu releases
 BIONIC_CODE_NAMES = ['bionic', 'tara', 'tessa', 'tina', 'disco']
-XENIAL_CODE_NAMES = ['xenial', 'yakkety', 'sarah', 'serena', 'sonya', 'sylvia']
-FOCAL_CODE_NAMES = ['focal', 'ulyana']
+FOCAL_CODE_NAMES = ['focal', 'ulyana', 'uma', 'una']
+JAMMY_CODE_NAMES = ['jammy', 'vanessa']
 
 # Compatible Debian/Kali releases
-BUSTER_CODE_NAMES = ['buster', 'stretch', 'kali-rolling']
-BULLSEYE_CODE_NAMES = ['bullseye']
+BUSTER_CODE_NAMES = ['buster', 'stretch']
+BULLSEYE_CODE_NAMES = ['bullseye', 'kali-rolling']
 
 
 def _setup_argparser():
@@ -55,7 +55,9 @@ def _setup_argparser():
 
 
 def _setup_logging(debug_flag=False):
-    log_format = logging.Formatter(fmt='[%(asctime)s][%(module)s][%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    log_format = logging.Formatter(
+        fmt='[%(asctime)s][%(module)s][%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S'
+    )
     logger = logging.getLogger('')
     logger.setLevel(logging.DEBUG)
     console_log = logging.StreamHandler()
@@ -65,29 +67,31 @@ def _setup_logging(debug_flag=False):
 
 
 def check_python_version():
-    if sys.version_info.major != 3 or sys.version_info.minor < 6:
-        sys.exit(f'Error: Incompatible Python version! You need at least version 3.6! Your Version: {sys.version}')
+    if sys.version_info.major != 3 or sys.version_info.minor < 7:
+        sys.exit(f'Error: Incompatible Python version! You need at least version 3.7! Your Version: {sys.version}')
 
 
 def check_distribution():
     codename = distro.codename().lower()
-    if codename in XENIAL_CODE_NAMES:
-        logging.debug('Ubuntu 16.04 detected')
-        logging.warning('Ubuntu 16.04 is no longer supported')
-        return 'xenial'
     if codename in BIONIC_CODE_NAMES:
         logging.debug('Ubuntu 18.04 detected')
         return 'bionic'
     if codename in FOCAL_CODE_NAMES:
         logging.debug('Ubuntu 20.04 detected')
         return 'focal'
+    if codename in JAMMY_CODE_NAMES:
+        logging.debug('Ubuntu 22.04 detected')
+        return 'jammy'
     if codename in BUSTER_CODE_NAMES:
-        logging.debug('Debian 10/Kali detected')
+        logging.debug('Debian 10 detected')
         return 'buster'
     if codename in BULLSEYE_CODE_NAMES:
-        logging.debug('Debian 11 detected')
+        logging.debug('Debian 11/Kali detected')
         return 'bullseye'
-    sys.exit(f'Your Distribution ({distro.id()} {distro.version()}) is not supported. FACT Extractor Installer requires Ubuntu 18.04, 20.04, or compatible!')
+    sys.exit(
+        f'Your Distribution ({distro.id()} {distro.version()}) is not supported. '
+        f'FACT Extractor Installer requires Ubuntu 18.04/20.04/22.04, Debian 9/10, Kali or compatible!'
+    )
 
 
 def main():
@@ -99,9 +103,13 @@ def main():
     logging.info(f'{PROGRAM_NAME} {PROGRAM_VERSION}')
     installation_directory = str(Path(__file__).parent / 'install')
 
-    with OperateInDirectory(installation_directory):
-        common(distribution)
-        unpacker(distribution)
+    try:
+        with OperateInDirectory(installation_directory):
+            common(distribution)
+            unpacker(distribution)
+    except Exception as e:
+        logging.exception(f'Installation failed: {e}')
+        sys.exit(1)
 
     logging.info('installation complete')
 

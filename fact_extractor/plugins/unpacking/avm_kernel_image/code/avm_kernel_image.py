@@ -1,6 +1,7 @@
 from common_helper_process.fail_safe_subprocess import execute_shell_command
 from pathlib import Path
 from helperFunctions.file_system import get_fact_bin_dir
+from helperFunctions.shell_utils import shell_escape_string
 
 
 NAME = 'avm_kernel_image'
@@ -23,11 +24,11 @@ def unpack_function(file_path, tmp_dir):
 
 
 def _extract_squashfs(file_path, tmp_dir):
-    return execute_shell_command('cd {} && {} {}'.format(tmp_dir, FIND_SQUASHFS_TOOL_PATH, file_path))
+    return execute_shell_command('cd {} && {} {}'.format(shell_escape_string(str(tmp_dir)), FIND_SQUASHFS_TOOL_PATH, shell_escape_string(str(file_path))))
 
 
 def _extract_kernel_image(file_path, tmp_dir):
-    return execute_shell_command('{} {} {}/kernel_decompressed.img'.format(UNPACK_KERNEL_TOOL_PATH, file_path, tmp_dir))
+    return execute_shell_command('{} {} {}/kernel_decompressed.img'.format(UNPACK_KERNEL_TOOL_PATH, shell_escape_string(str(file_path)), shell_escape_string(str(tmp_dir))))
 
 
 # ----> Do not edit below this line <----

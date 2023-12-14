@@ -18,9 +18,9 @@ class TestRosUnpacker(TestUnpackerBase):
     def test_extraction(self):
         in_file = os.path.join(TEST_DATA_DIR, 'test.ros')
         files, meta_data = self.unpacker.extract_files_from_file(in_file, self.tmp_dir.name)
-        self.assertEqual(len(files), 6, 'file number incorrect ({})'.format(files.__str__()))
-        self.assertIn('{}/DATETIME_C'.format(self.tmp_dir.name), files, 'Not all files found')
-        self.assertIn('file_information', meta_data, 'Output meta not set')
+        assert len(files) == 6, f'file number incorrect ({files})'
+        assert f'{self.tmp_dir.name}/DATETIME_C' in files, 'Not all files found'
+        assert 'file_information' in meta_data, 'Output meta not set'
 
 
 def test_infer_endianness():

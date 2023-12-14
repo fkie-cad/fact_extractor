@@ -6,6 +6,7 @@ from os import chdir, getcwd, path, remove, rename
 from common_helper_files import get_files_in_dir
 from common_helper_process import execute_shell_command
 from helperFunctions.file_system import get_src_dir
+from helperFunctions.shell_utils import shell_escape_string
 
 NAME = 'Ambarella'
 MIME_PATTERNS = ['firmware/ambarella']
@@ -20,7 +21,7 @@ def unpack_function(file_path, tmp_dir):
     fallback_directory = getcwd()
     chdir(tmp_dir)
 
-    output = execute_shell_command('fakeroot {} -x -vv -m {}'.format(script_path, file_path)) + "\n"
+    output = execute_shell_command('fakeroot {} -x -vv -m {}'.format(shell_escape_string(str(script_path)), shell_escape_string(str(file_path)))) + "\n"
 
     _rename_files(file_path)
     _remove_ini_files()

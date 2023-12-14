@@ -12,7 +12,7 @@ class TestJFFS2Unpacker(TestUnpackerBase):
         self.check_unpacker_selection('filesystem/jffs2-big', 'JFFS2')
 
     def test_extraction_little(self):
-        self.check_unpacking_of_standard_unpack_set(TEST_DATA_DIR / 'jffs2_be.img', additional_prefix_folder='jffs-root/fs_1')
+        self.check_unpacking_of_standard_unpack_set(TEST_DATA_DIR / 'jffs2_be.img', additional_prefix_folder='jffs-root')
 
     def test_extraction_big(self):
-        self.check_unpacking_of_standard_unpack_set(TEST_DATA_DIR / 'jffs2_le.img', additional_prefix_folder='jffs-root/fs_1')
+        self.check_unpacking_of_standard_unpack_set(TEST_DATA_DIR / 'jffs2_le.img', additional_prefix_folder='jffs-root')

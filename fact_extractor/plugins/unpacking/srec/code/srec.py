@@ -1,39 +1,48 @@
 '''
 This plugin decodes / unpacks Motorola SRecord files (.srec)
 '''
+from __future__ import annotations
+import re
 from pathlib import Path
-from typing import Dict
 
 import bincopy
 
 NAME = 'Motorola S-Record'
 MIME_PATTERNS = ['firmware/srecord']
-VERSION = '0.1'
+VERSION = '0.2'
+SREC_REGEX = b'(S[0-6][0-9A-F]+[\n\r]{1,2})+(S[7-9][0-9A-F]+)?'
 
 
-def unpack_function(file_path: str, tmp_dir: str) -> Dict[str, str]:
+def unpack_function(file_path: str | Path, tmp_dir: str | Path) -> dict[str, str]:
     '''
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
     '''
-    target_file = Path(tmp_dir) / _get_unpacked_filename(file_path)
-    decoded = b''
     try:
-        srec = Path(file_path).read_bytes().splitlines()
-        for line in srec:
-            try:
-                _, _, _, data = bincopy.unpack_srec(line.decode())
-                decoded += data
-            except UnicodeDecodeError:
-                break
-        target_file.write_bytes(decoded)
-
-    except bincopy.Error as srec_error:
-        return {'output': 'Unknown error in srec decoding: {}'.format(str(srec_error))}
+        file_data = Path(file_path).read_bytes()
     except FileNotFoundError as fnf_error:
-        return {'output': 'Failed to open file: {}'.format(str(fnf_error))}
+        return {'output': f'Failed to open file: {str(fnf_error)}'}
+
+    match = re.match(SREC_REGEX, file_data)
+    if match is None:
+        return {'output': 'Error: no valid srec data found'}
+
+    try:
+        decoded = _decode_srec(file_data[0:match.end()])
+        target_file = Path(tmp_dir) / _get_unpacked_filename(file_path)
+        target_file.write_bytes(decoded)
+    except (bincopy.Error, ValueError) as srec_error:
+        return {'output': f'Unknown error in srec decoding: {str(srec_error)}'}
 
     return {'output': 'Successfully decoded srec file'}
+
+
+def _decode_srec(srec_data: bytes) -> bytes:
+    decoded = b''
+    for line in srec_data.splitlines():
+        _, _, _, data = bincopy.unpack_srec(line.decode())
+        decoded += data
+    return decoded
 
 
 def _get_unpacked_filename(file_path: str) -> str:

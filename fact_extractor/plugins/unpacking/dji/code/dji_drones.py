@@ -5,6 +5,7 @@ from os import path, rename
 from common_helper_files import delete_file, get_files_in_dir
 from common_helper_process import execute_shell_command
 from helperFunctions.file_system import get_fact_bin_dir
+from helperFunctions.shell_utils import shell_escape_string
 
 NAME = 'DJI_drones'
 MIME_PATTERNS = ['firmware/dji-drone']
@@ -17,7 +18,7 @@ def unpack_function(file_path, tmp_dir):
     if not path.exists(TOOL_PATH):
         return {'output': 'Error: phantom_firmware_tools not installed! Re-Run the installation script!'}
 
-    output = execute_shell_command('(cd {} && fakeroot python3 {} -x -vv -p {})'.format(tmp_dir, TOOL_PATH, file_path)) + '\n'
+    output = execute_shell_command(f'(cd {shell_escape_string(str(tmp_dir))} && fakeroot python3 {TOOL_PATH} -x -vv -p {shell_escape_string(str(file_path))})') + '\n'
 
     _rename_files(tmp_dir)
     _remove_ini_files(tmp_dir)
@@ -32,13 +33,13 @@ def _rename_files(tmp_dir):
         module_id = _extract_module_id(bin_file)
         if module_id:
             identifier = _get_identifier_from_ini(ini_file)
-            rename(bin_file, '{}/{}_{}.module'.format(tmp_dir, module_id, identifier))
+            rename(bin_file, f'{tmp_dir}/{module_id}_{identifier}.module')
 
 
 def _get_list_of_files(tmp_dir):
     all_files = get_files_in_dir(tmp_dir)
     bin_files = [any_file for any_file in all_files if any_file.endswith('bin')]
-    files = [('{}ini'.format(bin_file[:len(bin_file) - 3]), bin_file) for bin_file in bin_files]
+    files = [(f'{bin_file[:len(bin_file) - 3]}ini', bin_file) for bin_file in bin_files]
     return files
 
 

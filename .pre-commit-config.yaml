@@ -33,7 +33,7 @@ repos:
         types: [python]
 
 -   repo: https://gitlab.com/pycqa/flake8
-    rev: a7be77f7
+    rev: 3.9.2
     hooks:
     -   id: flake8
         args: [--select=W504, --ignore=E501,W503]

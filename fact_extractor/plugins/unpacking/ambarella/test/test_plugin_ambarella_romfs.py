@@ -13,5 +13,5 @@ class TestAmbarellaRomFSUnpacker(TestUnpackerBase):
     def test_extraction(self):
         input_file = os.path.join(TEST_DATA_DIR, 'ambarella_rom.fs')
         unpacked_files, meta_data = self.unpacker.extract_files_from_file(input_file, self.tmp_dir.name)
-        self.assertIn("'file_count': 4", meta_data['output'], 'should be 4 files in the romfs')
-        self.assertGreaterEqual(len(unpacked_files), 5, 'Should contain 4 files and a header')
+        assert "'file_count': 4" in meta_data['output'], 'should be 4 files in the romfs'
+        assert len(unpacked_files) >= 5, 'Should contain 4 files and a header'
