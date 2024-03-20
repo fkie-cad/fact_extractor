@@ -82,7 +82,7 @@ def call_docker(input_file, container, target, report_file, memory_limit, tmpdir
 
         shutil.copy(input_file, str(Path(tmpdir.name, 'input', Path(input_file).name)))
 
-        command = f'docker run --rm -m {memory_limit}m -v {tmpdir.name}:/tmp/extractor -v /dev:/dev --privileged {container} {arguments}'
+        command = f'docker run --rm --ulimit nofile=20000:50000 -m {memory_limit}m -v {tmpdir.name}:/tmp/extractor -v /dev:/dev --privileged {container} {arguments}'
         subprocess.run(command, shell=True)
 
         with suppress(shutil.Error):
