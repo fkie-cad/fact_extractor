@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-ci:
-    runs-on: [ self-hosted, linux, x64, jammy ]
+    runs-on: [ self-hosted, linux, x64, noble ]
     timeout-minutes: 45
     steps:
       - name: Add Masks

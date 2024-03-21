@@ -38,9 +38,9 @@ PROGRAM_VERSION = __VERSION__
 PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor installation script'
 
 # Compatible Ubuntu releases
-BIONIC_CODE_NAMES = ['bionic', 'tara', 'tessa', 'tina', 'disco']
 FOCAL_CODE_NAMES = ['focal', 'ulyana', 'uma', 'una']
-JAMMY_CODE_NAMES = ['jammy', 'vanessa']
+JAMMY_CODE_NAMES = ['jammy', 'vanessa', 'vera', 'victoria', 'virginia']
+NOBLE_CODE_NAMES = ['noble', 'wilma']
 
 # Compatible Debian/Kali releases
 BUSTER_CODE_NAMES = ['buster', 'stretch']
@@ -67,21 +67,21 @@ def _setup_logging(debug_flag=False):
 
 
 def check_python_version():
-    if sys.version_info.major != 3 or sys.version_info.minor < 7:  # noqa: PLR2004
-        sys.exit(f'Error: Incompatible Python version! You need at least version 3.7! Your Version: {sys.version}')
+    if sys.version_info.major != 3 or sys.version_info.minor < 8:  # noqa: PLR2004
+        sys.exit(f'Error: Incompatible Python version! You need at least version 3.8! Your Version: {sys.version}')
 
 
 def check_distribution():
     codename = distro.codename().lower()
-    if codename in BIONIC_CODE_NAMES:
-        logging.debug('Ubuntu 18.04 detected')
-        return 'bionic'
     if codename in FOCAL_CODE_NAMES:
         logging.debug('Ubuntu 20.04 detected')
         return 'focal'
     if codename in JAMMY_CODE_NAMES:
         logging.debug('Ubuntu 22.04 detected')
         return 'jammy'
+    if codename in NOBLE_CODE_NAMES:
+        logging.debug('Ubuntu 24.04 detected')
+        return 'noble'
     if codename in BUSTER_CODE_NAMES:
         logging.debug('Debian 10 detected')
         return 'buster'
@@ -90,7 +90,7 @@ def check_distribution():
         return 'bullseye'
     sys.exit(
         f'Your Distribution ({distro.id()} {distro.version()}) is not supported. '
-        f'FACT Extractor Installer requires Ubuntu 18.04/20.04/22.04, Debian 9/10, Kali or compatible!'
+        f'FACT Extractor Installer requires Ubuntu 18.04/20.04/22.04/24.04, Debian 9/10, Kali or compatible!'
     )
 
 
