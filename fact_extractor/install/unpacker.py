@@ -16,6 +16,7 @@ from helperFunctions.install import (
     apt_remove_packages,
     install_github_project,
     pip_install_packages,
+    load_requirements_file,
 )
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
@@ -154,44 +155,6 @@ DEPENDENCIES = {
             # 7z
             'yasm',
         ],
-        'pip3': [
-            'pluginbase',
-            'git+https://github.com/armbues/python-entropy',  # To be checked. Original dependency was deleted.
-            'git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git',
-            'git+https://github.com/fkie-cad/fact_helper_file.git',
-            'git+https://github.com/wummel/patool.git',
-            'archmage',
-            # jefferson + deps
-            'git+https://github.com/sviehb/jefferson.git',
-            'cstruct==2.1',
-            'python-lzo',
-            # binwalk
-            'git+https://github.com/ReFirmLabs/binwalk@v2.3.2',
-            'pyqtgraph',
-            'capstone',
-            'numpy',
-            'scipy',
-            'git+https://github.com/jrspruitt/ubi_reader@v0.6.3-master',  # pinned as broken currently
-            # dji / dlink_shrs
-            'pycryptodome',
-            # hp / raw
-            'git+https://github.com/fkie-cad/common_helper_extraction.git',
-            # intel_hex
-            'intelhex',
-            # linuxkernel
-            'lz4',
-            'git+https://github.com/marin-m/vmlinux-to-elf',
-            # mikrotik
-            'npkPy',
-            # sevenz
-            'git+https://github.com/fkie-cad/common_helper_passwords.git',
-            # srec
-            'bincopy',
-            # uboot
-            'extract-dtb',
-            # uefi
-            'git+https://github.com/theopolis/uefi-firmware-parser@v1.10',
-        ],
         'github': [
             ('threadexio/sasquatch', ['./build.sh']),
             (
@@ -204,14 +167,14 @@ DEPENDENCIES = {
         ],
     },
 }
+PIP_DEPENDENCY_FILE = Path(__file__).parent.parent.parent / 'requirements-unpackers.txt'
 
 
 def install_dependencies(dependencies):
     apt = dependencies.get('apt', [])
-    pip3 = dependencies.get('pip3', [])
     github = dependencies.get('github', [])
     apt_install_packages(*apt)
-    pip_install_packages(*pip3)
+    pip_install_packages(*load_requirements_file(PIP_DEPENDENCY_FILE))
     for repo in github:
         install_github_project(*repo)
 

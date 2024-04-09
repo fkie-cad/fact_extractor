@@ -1,0 +1,38 @@
+# FixMe: deprecated
+pluginbase~=1.0.1
+git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git
+git+https://github.com/fkie-cad/fact_helper_file.git
+patool~=2.2.0
+# jffs2: jefferson + deps
+git+https://github.com/sviehb/jefferson.git@v0.4.1
+cstruct==2.1
+python-lzo==1.14
+# generic_carver: binwalk
+# ToDo: pin to fork (?)
+git+https://github.com/ReFirmLabs/binwalk@v2.3.2
+pyqtgraph~=0.13.4
+capstone~=5.0.1
+numpy~=1.26.4
+scipy~=1.13.0
+# ubi
+ubi-reader~=0.8.9
+# dji / dlink_shrs
+pycryptodome~=3.20.0
+# hp / raw
+git+https://github.com/fkie-cad/common_helper_extraction.git
+# intel_hex
+intelhex~=2.3.0
+# linuxkernel
+lz4~=4.3.3
+# FixMe: this has also a dependency to a package called python-lzo (name conflict with python-lzo from jefferson)
+git+https://github.com/marin-m/vmlinux-to-elf
+# mikrotik
+npkPy~=2021.10.22.15.58
+# sevenz
+git+https://github.com/fkie-cad/common_helper_passwords.git
+# srec
+bincopy~=20.0.0
+# uboot
+extract-dtb~=1.2.3
+# uefi
+uefi-firmware~=1.11

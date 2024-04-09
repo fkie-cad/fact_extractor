@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import configparser
 import logging
 import os
@@ -104,13 +106,22 @@ def pip_install_packages(*packages):
     for packet in packages:
         try:
             run_shell_command_raise_on_return_code(
-                f'{pip_command} install --upgrade {packet}', f'Error in installation of python package {packet}', True
+                f'{pip_command} install --upgrade "{packet}"',
+                f'Error in installation of python package {packet}',
+                True
             )
         except InstallationError as installation_error:
             if 'is a distutils installed project' in str(installation_error):
                 logging.warning(f'Could not update python packet {packet}. Was not installed using pip originally')
             else:
                 raise installation_error
+
+
+def load_requirements_file(path: Path) -> list[str]:
+    return [
+        line for line in path.read_text().splitlines()
+        if line and not line.startswith('#')
+    ]
 
 
 def check_if_command_in_path(command):
