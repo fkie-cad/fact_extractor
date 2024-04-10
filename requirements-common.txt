@@ -1,0 +1,6 @@
+flask~=3.0.3
+flask-restful~=0.3.10
+gunicorn~=21.2.0
+pytest<8.1.1
+pytest-cov~=5.0.0
+testresources~=2.0.1
