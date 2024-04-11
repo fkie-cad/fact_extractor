@@ -22,7 +22,7 @@ import sys
 
 from helperFunctions.config import get_config_dir
 from helperFunctions.file_system import change_owner_of_output_files
-from helperFunctions.program_setup import load_config, setup_logging
+from helperFunctions.program_setup import check_ulimits, load_config, setup_logging
 from unpacker.unpack import unpack
 
 
@@ -43,6 +43,7 @@ def _parse_args():
 def main(args):
     config = load_config(f'{get_config_dir()}/main.cfg')
     setup_logging(debug=False)
+    check_ulimits()
 
     input_dir = Path(config.get('unpack', 'data_folder'), 'input')
     input_file = list(input_dir.iterdir())[0]
