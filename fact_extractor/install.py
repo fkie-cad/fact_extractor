@@ -88,10 +88,11 @@ def check_distribution():
     if codename in BULLSEYE_CODE_NAMES:
         logging.debug('Debian 11/Kali detected')
         return 'bullseye'
-    sys.exit(
+    msg: str = (
         f'Your Distribution ({distro.id()} {distro.version()}) is not supported. '
-        f'FACT Extractor Installer requires Ubuntu 18.04/20.04/22.04/24.04, Debian 9/10, Kali or compatible!'
+        'FACT Extractor Installer requires Ubuntu 20.04/22.04/24.04, Debian 11/12 or compatible!'
     )
+    logging.error(msg)
 
 
 def main():
