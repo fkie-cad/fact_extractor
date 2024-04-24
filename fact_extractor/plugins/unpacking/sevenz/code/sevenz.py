@@ -31,10 +31,13 @@ MIME_PATTERNS = [
     'filesystem/hfs',
     'filesystem/ntfs',
 ]
-VERSION = '0.8.1'
+VERSION = '0.8.2'
 
 UNPACKER_EXECUTABLE = '7z'
-PW_LIST = get_merged_password_set(os.path.join(get_src_dir(), 'unpacker/passwords'))
+
+# Empty password must be first in list to correctly detect if archive has no password
+PW_LIST = [""]
+PW_LIST.extend(get_merged_password_set(os.path.join(get_src_dir(), 'unpacker/passwords')))
 
 
 def unpack_function(file_path, tmp_dir):
@@ -49,11 +52,11 @@ def unpack_function(file_path, tmp_dir):
 
         meta['output'] = output
         if 'Wrong password' not in output:
-            if 'AES' in output:
+            if password:
                 meta['password'] = password
             break
 
-    # Inform the user if not correct password was found
+    # Inform the user if no correct password was found
     if 'Wrong password' in meta['output']:
         logging.warning(f'Password for {file_path} not found in fact_extractor/unpacker/passwords directory')
 
