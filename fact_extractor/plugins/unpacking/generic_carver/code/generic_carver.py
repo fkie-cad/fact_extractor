@@ -64,7 +64,7 @@ class ArchivesFilter:
                 'application/zip',
                 'application/zlib',
             ]:
-                self._remove_invalid_archives(file_path, '7z l {}', 'ERROR')
+                self._remove_invalid_archives(file_path, '7zzs l {}', 'ERROR')
 
             if file_path.is_file():
                 self._remove_trailing_data(file_type, file_path)
@@ -115,7 +115,7 @@ def _output_is_empty(output):
 
 def _find_trailing_data_index_zip(file_path: Path) -> int | None:
     """Archives carved by binwalk often have trailing data at the end. 7z can determine the actual file size."""
-    output = execute_shell_command(f'7z l {file_path}')
+    output = execute_shell_command(f'7zzs l {file_path}')
     if 'There are data after the end of archive' in output:
         match = REAL_SIZE_REGEX.search(output)
         if match:

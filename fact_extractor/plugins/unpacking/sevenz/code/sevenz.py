@@ -3,7 +3,7 @@ This plugin uses 7z to extract several formats
 """
 
 import logging
-import os
+from pathlib import Path
 
 from common_helper_passwords import get_merged_password_set
 from common_helper_process import execute_shell_command
@@ -32,13 +32,13 @@ MIME_PATTERNS = [
     'filesystem/hfs',
     'filesystem/ntfs',
 ]
-VERSION = '0.8.2'
+VERSION = '0.9.0'
 
-UNPACKER_EXECUTABLE = '7z'
+UNPACKER_EXECUTABLE = '7zzs'
 
-# Empty password must be first in list to correctly detect if archive has no password
-PW_LIST = ['']
-PW_LIST.extend(get_merged_password_set(os.path.join(get_src_dir(), 'unpacker/passwords')))
+# Empty password must be first in list to correctly detect if the archive has no password
+PW_LIST_DIR = Path(get_src_dir()) / 'unpacker/passwords'
+PW_LIST = get_merged_password_set(str(PW_LIST_DIR)).union({''})
 
 
 def unpack_function(file_path, tmp_dir):
