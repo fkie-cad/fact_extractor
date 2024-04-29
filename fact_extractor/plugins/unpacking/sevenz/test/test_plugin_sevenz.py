@@ -19,6 +19,7 @@ class TestSevenZUnpacker(TestUnpackerBase):
         [
             ('test.7z', 'get_files_test'),
             ('test.rar', 'get_files_test'),
+            ('test.arj', 'get_files_test'),
             ('cramfs.img', ''),
             ('test.iso', ''),
         ],
