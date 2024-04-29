@@ -92,6 +92,7 @@ APT_DEPENDENCIES = {
     # android sparse image
     'android-sdk-libsparse-utils',
     # 7z
+    '7zip',
     'yasm',
     # unblob
     'e2fsprogs',

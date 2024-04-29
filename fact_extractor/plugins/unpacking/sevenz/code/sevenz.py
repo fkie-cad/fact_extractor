@@ -41,11 +41,11 @@ MIME_PATTERNS = [
 ]
 VERSION = '0.9.0'
 
-UNPACKER_EXECUTABLE = '7z'
+UNPACKER_EXECUTABLE = '7zz'
 
-# Empty password must be first in list to correctly detect if archive has no password
-PW_LIST = ['']
-PW_LIST.extend(get_merged_password_set(Path(get_src_dir()) / 'unpacker/passwords'))
+# Empty password must be first in list to correctly detect if the archive has no password
+PW_LIST_DIR = Path(get_src_dir()) / 'unpacker/passwords'
+PW_LIST = sorted(get_merged_password_set(str(PW_LIST_DIR)).union({''}))
 TAIL_REGEX = re.compile(r'Tail Size = (\d+)')
 
 
