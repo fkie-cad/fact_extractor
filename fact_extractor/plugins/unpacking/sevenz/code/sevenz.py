@@ -31,9 +31,9 @@ MIME_PATTERNS = [
     'filesystem/hfs',
     'filesystem/ntfs',
 ]
-VERSION = '0.8.2'
+VERSION = '0.9.0'
 
-UNPACKER_EXECUTABLE = '7z'
+UNPACKER_EXECUTABLE = '7zzs'
 
 # Empty password must be first in list to correctly detect if archive has no password
 PW_LIST = [""]
