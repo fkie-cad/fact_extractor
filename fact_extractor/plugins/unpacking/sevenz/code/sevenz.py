@@ -15,6 +15,7 @@ MIME_PATTERNS = [
     # compressed archives
     'application/rar',
     'application/x-7z-compressed',
+    'application/x-arj',
     'application/x-iso9660-image',
     'application/x-lzma',
     'application/x-rar',
