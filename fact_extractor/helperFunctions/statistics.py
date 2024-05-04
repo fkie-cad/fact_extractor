@@ -1,5 +1,6 @@
 from configparser import ConfigParser
 from contextlib import suppress
+from mmap import mmap
 from pathlib import Path
 from typing import Dict, List
 
@@ -23,7 +24,7 @@ def add_unpack_statistics(extraction_dir: Path, meta_data: Dict):
     meta_data['number_of_unpacked_directories'] = unpacked_directories
 
 
-def get_unpack_status(file_path: str, binary: bytes, extracted_files: List[Path], meta_data: Dict, config: ConfigParser):
+def get_unpack_status(file_path: str, binary: bytes | mmap, extracted_files: List[Path], meta_data: Dict, config: ConfigParser):
     meta_data['summary'] = []
     meta_data['entropy'] = avg_entropy(binary)
 
