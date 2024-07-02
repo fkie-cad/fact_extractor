@@ -24,6 +24,7 @@ MIME_PATTERNS = [
     'application/x-gzip',
     'application/x-lha',
     'application/x-lrzip',
+    'application/x-lz4',
     'application/x-lzh',
     'application/x-lzh-compressed',
     'application/x-lzip',
