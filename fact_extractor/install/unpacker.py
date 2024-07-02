@@ -1,18 +1,22 @@
+import hashlib
 import logging
 import os
 from getpass import getuser
 from pathlib import Path
+from shlex import split
+from subprocess import CalledProcessError, run
 from tempfile import TemporaryDirectory
 
 from common_helper_process import execute_shell_command_get_return_code
 
 from helperFunctions.install import (
-    apt_install_packages,
-    install_github_project,
     InstallationError,
     OperateInDirectory,
-    pip_install_packages,
+    apt_install_packages,
     apt_remove_packages,
+    install_github_project,
+    pip_install_packages,
+    load_requirements_file,
 )
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
@@ -102,31 +106,32 @@ DEPENDENCIES = {
             'liblzo2-dev',
             'xvfb',
             'libcapstone-dev',
-            # patool and unpacking backends
-            'lrzip',
-            'cpio',
-            'unadf',
-            'rpm2cpio',
-            'lzop',
-            'lhasa',
-            'cabextract',
-            'zpaq',
-            'libchm-dev',
+            # patool
             'arj',
-            'xdms',
-            'rzip',
-            'lzip',
-            'unalz',
-            'unrar',
-            'gzip',
-            'nomarch',
+            'cabextract',
+            'cpio',
             'flac',
-            'unace',
-            'sharutils',
-            'unar',
-            'zstd',
+            'gzip',
+            'lhasa',
+            'libchm-dev',
             'liblz4-tool',
+            'lrzip',
+            'lzip',
+            'lzop',
+            'ncompress',
+            'nomarch',
             'p7zip-full',
+            'rpm2cpio',
+            'rzip',
+            'sharutils',
+            'unace',
+            'unadf',
+            'unalz',
+            'unar',
+            'unrar',
+            'xdms',
+            'zpaq',
+            'zstd',
             # Freetz
             'autoconf',
             'automake',
@@ -153,51 +158,18 @@ DEPENDENCIES = {
             # 7z
             'yasm',
         ],
-        'pip3': [
-            'pluginbase',
-            'git+https://github.com/armbues/python-entropy',  # To be checked. Original dependency was deleted.
-            'git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git',
-            'git+https://github.com/fkie-cad/fact_helper_file.git',
-            'git+https://github.com/wummel/patool.git',
-            'archmage',
-            # jefferson + deps
-            'git+https://github.com/sviehb/jefferson.git',
-            'cstruct==2.1',
-            'python-lzo',
-            'git+https://github.com/jrspruitt/ubi_reader@v0.6.3-master',  # pinned as broken currently
-            # dji / dlink_shrs
-            'pycryptodome',
-            # hp / raw
-            'git+https://github.com/fkie-cad/common_helper_extraction.git',
-            # intel_hex
-            'intelhex',
-            # linuxkernel
-            'lz4',
-            'git+https://github.com/marin-m/vmlinux-to-elf',
-            # mikrotik
-            'npkPy',
-            # sevenz
-            'git+https://github.com/fkie-cad/common_helper_passwords.git',
-            # srec
-            'bincopy',
-            # uboot
-            'extract-dtb',
-            # uefi
-            'git+https://github.com/theopolis/uefi-firmware-parser@v1.10',
-            # unblob
-            'unblob',
-        ],
         'github': [
             (
                 'rampageX/firmware-mod-kit',
                 [
                     '(cd src && make untrx && make -C tpl-tool/src && make -C yaffs2utils)',
-                    'cp src/untrx src/yaffs2utils/unyaffs2 src/tpl-tool/src/tpl-tool ../../bin/'
+                    'cp src/untrx src/yaffs2utils/unyaffs2 src/tpl-tool/src/tpl-tool ../../bin/',
                 ],
             ),
         ],
     },
 }
+PIP_DEPENDENCY_FILE = Path(__file__).parent.parent.parent / 'requirements-unpackers.txt'
 
 
 def check_mod_kit_installed() -> bool:
@@ -209,10 +181,9 @@ def check_mod_kit_installed() -> bool:
 
 def install_dependencies(dependencies):
     apt = dependencies.get('apt', [])
-    pip3 = dependencies.get('pip3', [])
     github = dependencies.get('github', [])
     apt_install_packages(*apt)
-    pip_install_packages(*pip3)
+    pip_install_packages(*load_requirements_file(PIP_DEPENDENCY_FILE))
     for repo in github:
         if repo[0].endswith('firmware-mod-kit') and check_mod_kit_installed():
             logging.info('Skipping firmware-mod-kit since it is already installed')
@@ -236,6 +207,7 @@ def main(distribution):
 
     # install plug-in dependencies
     _install_plugins()
+    _install_patool_deps()
 
     # configure environment
     _edit_sudoers()
@@ -268,6 +240,25 @@ def _edit_sudoers():
     _, mv_code = execute_shell_command_get_return_code('sudo mv /tmp/fact_overrides /etc/sudoers.d/fact_overrides')
     if not chown_code == mv_code == 0:
         raise InstallationError('Editing sudoers file did not succeed\n{chown_output}\n{mv_output}')
+
+
+def _install_patool_deps():
+    '''install additional dependencies of patool'''
+    with TemporaryDirectory(prefix='patool') as build_directory:
+        with OperateInDirectory(build_directory):
+            # install zoo unpacker
+            file_name = 'zoo_2.10-28_amd64.deb'
+            try:
+                run(split(f'wget http://launchpadlibrarian.net/230277773/{file_name}'), capture_output=True, check=True)
+                expected_sha = '953f4f94095ef3813dfd30c8977475c834363aaabce15ab85ac5195e52fd816a'
+                assert _sha256_hash_file(Path(file_name)) == expected_sha
+                run(split(f'sudo dpkg -i {file_name}'), capture_output=True, check=True)
+            except (AssertionError, CalledProcessError) as error:
+                raise InstallationError('Error during zoo unpacker installation') from error
+
+
+def _sha256_hash_file(file_path: Path) -> str:
+    return hashlib.sha256(file_path.read_bytes()).hexdigest()
 
 
 def _install_freetz():

@@ -30,7 +30,7 @@ fact_extractor/install/pre_install.sh
 fact_extractor/install.py
 ```
 
-:warning: **We no longer support Ubuntu 16.04 and Python <3.7** 
+:warning: **We no longer support Ubuntu 18.04 and Python <3.8** 
 (It may still work with a bit of tinkering, though)
 
 :warning: For the `generic_fs` unpacker plugin to work with all file system types, you may need to install extra kernel modules

@@ -1,6 +1,7 @@
 import argparse
 import configparser
 import logging
+import resource
 
 from common_helper_files import create_dir_for_file
 
@@ -37,6 +38,16 @@ def setup_logging(debug, log_file=None, log_level=None):
     console_log.setLevel(logging.DEBUG if debug else log_level)
     console_log.setFormatter(log_format)
     logger.addHandler(console_log)
+
+
+def check_ulimits():
+    # Get number of openable files
+    soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+    if soft < 1024:
+        resource.setrlimit(resource.RLIMIT_NOFILE, (min(1024, hard), hard))
+        logging.info(f'The number of openable files has been raised from {soft} to {min(1024, hard)}.')
+    elif soft == resource.RLIM_INFINITY or soft > 100000:
+        logging.warning('Warning: A very high (or no) nofile limit will slow down fakeroot and cause other problems.')
 
 
 def load_config(config_file):

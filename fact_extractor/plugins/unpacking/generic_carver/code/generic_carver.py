@@ -48,24 +48,15 @@ def unpack_function(file_path, tmp_dir):
     }
 
 
-def drop_underscore_directory(tmp_dir):
-    extracted_contents = list(Path(tmp_dir).iterdir())
-    if not extracted_contents:
-        return
-    if not len(extracted_contents) == 1 or not extracted_contents[0].name.endswith('_extract'):
-        return
-    for result in extracted_contents[0].iterdir():
-        shutil.move(str(result), str(result.parent.parent))
-    shutil.rmtree(str(extracted_contents[0]))
-
-
 class ArchivesFilter:
     def __init__(self, unpack_directory):
         self.unpack_directory = Path(unpack_directory)
         self.screening_logs = []
 
     def remove_false_positive_archives(self) -> str:
-        for file_path in self.unpack_directory.iterdir():
+        for file_path in self.unpack_directory.glob('**/*'):
+            if not file_path.is_file():
+                continue
             file_type = get_file_type_from_path(file_path)['mime']
 
             if file_type == 'application/x-tar' or self._is_possible_tar(file_type, file_path):
@@ -89,7 +80,6 @@ class ArchivesFilter:
                 self._remove_trailing_data(file_type, file_path)
 
         return '\n'.join(self.screening_logs)
-
 
     @staticmethod
     def _is_possible_tar(file_type: str, file_path: Path) -> bool:
@@ -156,6 +146,17 @@ def _find_trailing_data_index_bz2(file_path: Path) -> int | None:
             # 10 is magic string + CRC 32 checksum + padding (see https://en.wikipedia.org/wiki/Bzip2#File_format)
             return matches[0] + 10
     return None
+
+
+def drop_underscore_directory(tmp_dir):
+    extracted_contents = list(Path(tmp_dir).iterdir())
+    if not extracted_contents:
+        return
+    if not len(extracted_contents) == 1 or not extracted_contents[0].name.endswith('_extract'):
+        return
+    for result in extracted_contents[0].iterdir():
+        shutil.move(str(result), str(result.parent.parent))
+    shutil.rmtree(str(extracted_contents[0]))
 
 
 # ----> Do not edit below this line <----

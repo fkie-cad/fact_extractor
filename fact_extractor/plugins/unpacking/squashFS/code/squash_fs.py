@@ -30,7 +30,10 @@ def unpack_function(file_path, tmp_dir):
     '''
     unpack_result = {}
     for unpacker, parameter in SQUASH_UNPACKER:
-        output = execute_shell_command(f'fakeroot {unpacker} {parameter} -d {tmp_dir}/fact_extracted {file_path}')
+        # We need to force here since "-dest" does not allow existing directories
+        output = execute_shell_command(
+            f"fakeroot {unpacker} {parameter} -dest {tmp_dir} -force {file_path}",
+        )
         if _unpack_success(tmp_dir):
             unpack_result['unpacking_tool'] = unpacker.name
             unpack_result['output'] = output
