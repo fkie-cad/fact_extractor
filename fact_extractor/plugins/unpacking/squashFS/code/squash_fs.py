@@ -7,7 +7,7 @@ from pathlib import Path
 
 from helperFunctions.file_system import get_fact_bin_dir
 
-SASQUATCH = Path('/usr/local/bin/sasquatch')
+SASQUATCH = Path('/usr/bin/sasquatch')
 UNSQUASHFS4_AVM_BE = Path(get_fact_bin_dir()) / 'unsquashfs4-avm-be'
 UNSQUASHFS4_AVM_LE = Path(get_fact_bin_dir()) / 'unsquashfs4-avm-le'
 UNSQUASHFS3_MULTI = Path(get_fact_bin_dir()) / 'unsquashfs3-multi'

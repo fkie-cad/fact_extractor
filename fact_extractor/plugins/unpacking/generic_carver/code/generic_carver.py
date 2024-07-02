@@ -13,7 +13,7 @@ from fact_helper_file import get_file_type_from_path
 
 NAME = 'generic_carver'
 MIME_PATTERNS = ['generic/carver']
-VERSION = '0.8'
+VERSION = '0.9'
 
 TAR_MAGIC = b'ustar'
 BZ2_EOF_MAGIC = [  # the magic string is only aligned to half bytes -> two possible strings
@@ -28,12 +28,24 @@ def unpack_function(file_path, tmp_dir):
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
     '''
+    logging.debug(f'File type unknown: Execute unblob on {file_path}')
 
-    logging.debug(f'File Type unknown: execute binwalk on {file_path}')
-    output = execute_shell_command(f'binwalk --extract --carve --signature --directory  {tmp_dir} {file_path}')
+    temp_file = Path('/tmp/unblob_report.json')
+    temp_file.unlink(missing_ok=True)
+    output = execute_shell_command(
+        f'unblob -sk --report {temp_file.absolute()} --entropy-depth 0 --depth 1 --extract-dir {tmp_dir} {file_path}'
+    )
+    meta = temp_file.read_text(encoding='utf-8')
+    temp_file.unlink(missing_ok=True)
 
     drop_underscore_directory(tmp_dir)
-    return {'output': output, 'filter_log': ArchivesFilter(tmp_dir).remove_false_positive_archives()}
+    filter_log = ArchivesFilter(tmp_dir).remove_false_positive_archives()
+
+    return {
+        'output': output,
+        'unblob_meta': meta,
+        'filter_log': filter_log
+    }
 
 
 class ArchivesFilter:
@@ -140,7 +152,7 @@ def drop_underscore_directory(tmp_dir):
     extracted_contents = list(Path(tmp_dir).iterdir())
     if not extracted_contents:
         return
-    if not len(extracted_contents) == 1 or not extracted_contents[0].name.endswith('.extracted'):
+    if not len(extracted_contents) == 1 or not extracted_contents[0].name.endswith('_extract'):
         return
     for result in extracted_contents[0].iterdir():
         shutil.move(str(result), str(result.parent.parent))
