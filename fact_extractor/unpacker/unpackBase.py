@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import logging
 from os import getgid, getuid
+from pathlib import Path
 from subprocess import PIPE, Popen
 from time import time
 import fnmatch
@@ -49,9 +52,9 @@ class UnpackBase(object):
         else:
             return self.unpacker_plugins['generic/carver']
 
-    def extract_files_from_file(self, file_path: str, tmp_dir) -> Tuple[List, Dict]:
+    def extract_files_from_file(self, file_path: str | Path, tmp_dir) -> Tuple[List, Dict]:
         current_unpacker = self.get_unpacker(get_file_type_from_path(file_path)['mime'])
-        return self._extract_files_from_file_using_specific_unpacker(file_path, tmp_dir, current_unpacker)
+        return self._extract_files_from_file_using_specific_unpacker(str(file_path), tmp_dir, current_unpacker)
 
     def unpacking_fallback(self, file_path, tmp_dir, old_meta, fallback_plugin_mime) -> Tuple[List, Dict]:
         fallback_plugin = self.unpacker_plugins[fallback_plugin_mime]
