@@ -268,7 +268,7 @@ def _install_freetz():
                     'sudo su makeuser -c "make -j$(nproc) tools"',
                     f'sudo chmod -R 777 {build_directory}',
                     f'sudo chown -R {current_user} {build_directory}',
-                    'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma '
+                    'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma tools/sfk '
                     f'tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi {BIN_DIR}',
                     'sudo userdel makeuser',
                 ],
