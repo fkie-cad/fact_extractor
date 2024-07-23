@@ -156,7 +156,6 @@ DEPENDENCIES = {
             'yasm',
         ],
         'github': [
-            ('threadexio/sasquatch', ['./build.sh']),
             (
                 'rampageX/firmware-mod-kit',
                 [
@@ -168,6 +167,20 @@ DEPENDENCIES = {
     },
 }
 PIP_DEPENDENCY_FILE = Path(__file__).parent.parent.parent / 'requirements-unpackers.txt'
+EXTERNAL_DEB_DEPS = [
+    # zoo
+    (
+        'zoo_2.10-28_amd64.deb',
+        'http://launchpadlibrarian.net/230277773',
+        '953f4f94095ef3813dfd30c8977475c834363aaabce15ab85ac5195e52fd816a',
+    ),
+    # sasquatch
+    (
+        'sasquatch_1.0_amd64.deb',
+        'https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-4',
+        'bb211daf90069a43b7d5e76f136766a8542a5328015773e9b8be87541b307b60',
+    ),
+]
 
 
 def install_dependencies(dependencies):
@@ -195,7 +208,7 @@ def main(distribution):
 
     # install plug-in dependencies
     _install_plugins()
-    _install_patool_deps()
+    _install_external_deb_deps()
 
     # configure environment
     _edit_sudoers()
@@ -215,7 +228,7 @@ def _edit_sudoers():
                 '/bin/mount',
                 '/bin/umount',
                 '/bin/mknod',
-                '/usr/local/bin/sasquatch',
+                '/usr/bin/sasquatch',
                 '/bin/rm',
                 '/bin/cp',
                 '/bin/dd',
@@ -230,19 +243,20 @@ def _edit_sudoers():
         raise InstallationError('Editing sudoers file did not succeed\n{chown_output}\n{mv_output}')
 
 
-def _install_patool_deps():
-    '''install additional dependencies of patool'''
+def _install_external_deb_deps():
+    '''
+    install deb packages that aren't available through Debian/Ubuntu package sources
+    '''
     with TemporaryDirectory(prefix='patool') as build_directory:
         with OperateInDirectory(build_directory):
-            # install zoo unpacker
-            file_name = 'zoo_2.10-28_amd64.deb'
-            try:
-                run(split(f'wget http://launchpadlibrarian.net/230277773/{file_name}'), check=True, env=os.environ)
-                expected_sha = '953f4f94095ef3813dfd30c8977475c834363aaabce15ab85ac5195e52fd816a'
-                assert _sha256_hash_file(Path(file_name)) == expected_sha
-                run(split(f'sudo dpkg -i {file_name}'), capture_output=True, check=True)
-            except (AssertionError, CalledProcessError) as error:
-                raise InstallationError('Error during zoo unpacker installation') from error
+            for file_name, url, sha256 in EXTERNAL_DEB_DEPS:
+                try:
+                    run(split(f'wget {url}/{file_name}'), check=True, env=os.environ)
+                    if not _sha256_hash_file(Path(file_name)) == sha256:
+                        raise InstallationError(f'Wrong file hash: {file_name}')
+                    run(split(f'sudo dpkg -i {file_name}'), capture_output=True, check=True)
+                except CalledProcessError as error:
+                    raise InstallationError(f'Error during {file_name} unpacker installation') from error
 
 
 def _sha256_hash_file(file_path: Path) -> str:
