@@ -237,7 +237,7 @@ def _install_patool_deps():
             # install zoo unpacker
             file_name = 'zoo_2.10-28_amd64.deb'
             try:
-                run(split(f'wget http://launchpadlibrarian.net/230277773/{file_name}'), capture_output=True, check=True)
+                run(split(f'wget http://launchpadlibrarian.net/230277773/{file_name}'), check=True, env=os.environ)
                 expected_sha = '953f4f94095ef3813dfd30c8977475c834363aaabce15ab85ac5195e52fd816a'
                 assert _sha256_hash_file(Path(file_name)) == expected_sha
                 run(split(f'sudo dpkg -i {file_name}'), capture_output=True, check=True)
@@ -268,7 +268,7 @@ def _install_freetz():
                     'sudo su makeuser -c "make -j$(nproc) tools"',
                     f'sudo chmod -R 777 {build_directory}',
                     f'sudo chown -R {current_user} {build_directory}',
-                    'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma '
+                    'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma tools/sfk '
                     f'tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi {BIN_DIR}',
                     'sudo userdel makeuser',
                 ],
