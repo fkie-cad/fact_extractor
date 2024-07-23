@@ -255,7 +255,7 @@ def _install_external_deb_deps():
                     if not _sha256_hash_file(Path(file_name)) == sha256:
                         raise InstallationError(f'Wrong file hash: {file_name}')
                     run(split(f'sudo dpkg -i {file_name}'), capture_output=True, check=True)
-                except (AssertionError, CalledProcessError) as error:
+                except CalledProcessError as error:
                     raise InstallationError(f'Error during {file_name} unpacker installation') from error
 
 
