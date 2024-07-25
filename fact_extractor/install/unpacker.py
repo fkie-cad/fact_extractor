@@ -1,6 +1,7 @@
 import hashlib
 import logging
 import os
+import platform
 from getpass import getuser
 from pathlib import Path
 from shlex import split
@@ -167,21 +168,36 @@ DEPENDENCIES = {
     },
 }
 PIP_DEPENDENCY_FILE = Path(__file__).parent.parent.parent / 'requirements-unpackers.txt'
-EXTERNAL_DEB_DEPS = [
-    # zoo
-    (
-        'zoo_2.10-28_amd64.deb',
-        'http://launchpadlibrarian.net/230277773',
-        '953f4f94095ef3813dfd30c8977475c834363aaabce15ab85ac5195e52fd816a',
-    ),
-    # sasquatch
-    (
-        'sasquatch_1.0_amd64.deb',
-        'https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-4',
-        'bb211daf90069a43b7d5e76f136766a8542a5328015773e9b8be87541b307b60',
-    ),
-]
-
+if platform.machine() == 'x86_64':
+    EXTERNAL_DEB_DEPS = [
+        # zoo
+        (
+            'zoo_2.10-28_amd64.deb',
+            'http://launchpadlibrarian.net/230277773',
+            '953f4f94095ef3813dfd30c8977475c834363aaabce15ab85ac5195e52fd816a',
+        ),
+        # sasquatch
+        (
+            'sasquatch_1.0_amd64.deb',
+            'https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-4',
+            'bb211daf90069a43b7d5e76f136766a8542a5328015773e9b8be87541b307b60',
+        ),
+    ]
+elif platform.machine() == 'aarch64':
+    EXTERNAL_DEB_DEPS = [
+        # zoo
+        (
+            'zoo_2.10-28_arm64.deb',
+            'http://ports.ubuntu.com/pool/universe/z/zoo/',
+            'e6600d4e878eddd18d1353664fae9bee015a8f9206aa62d2c9bfa070fe4cb7b3',
+        ),
+        # sasquatch
+        (
+            'sasquatch_1.0_arm64.deb',
+            'https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-4',
+            'fb281906a25667414e8b6aff96b49ceb227519122a7844bbc8166f2b6a59554a',
+        ),
+    ]
 
 def install_dependencies(dependencies):
     apt = dependencies.get('apt', [])
