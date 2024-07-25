@@ -31,7 +31,7 @@ def test_not_unpackable_file():
 
 def test_tool_paths_set_correctly():
     for unpacker, _ in SQUASH_UNPACKER:
-        assert unpacker.exists()
+        assert unpacker.exists(), f'{unpacker} not found.'
 
 
 class TestSquashUnpacker(TestUnpackerBase):
