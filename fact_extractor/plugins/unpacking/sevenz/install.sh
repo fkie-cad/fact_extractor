@@ -22,7 +22,7 @@ cd p7zip*
 # gcc >= 11 has -Wnarrowing as default flag which leads to an error during compilation
 # g++ will try to use standard C++17 but the code is not compatible -> use C++14
 sed -i 's/CXXFLAGS=-c -I. \\/CXXFLAGS=-c -I. -Wno-narrowing -std=c++14 \\/g' makefile.glb  || echo "Warning: Could not apply makefile patch"
-cp makefile.linux_amd64_asm makefile.machine
+cp makefile.linux_any_cpu makefile.machine
 make -j"$(nproc)" all3
 sudo ./install.sh
 cd ..
