@@ -220,7 +220,8 @@ def main(distribution):
     install_dependencies(DEPENDENCIES[distribution])
 
     # installing freetz
-    _install_freetz()
+    if platform.machine() == 'x86_64':
+        _install_freetz()
 
     # install plug-in dependencies
     _install_plugins()
