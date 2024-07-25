@@ -188,7 +188,7 @@ elif platform.machine() == 'aarch64':
         # zoo
         (
             'zoo_2.10-28_arm64.deb',
-            'http://ports.ubuntu.com/pool/universe/z/zoo/',
+            'http://ports.ubuntu.com/pool/universe/z/zoo',
             'e6600d4e878eddd18d1353664fae9bee015a8f9206aa62d2c9bfa070fe4cb7b3',
         ),
         # sasquatch
