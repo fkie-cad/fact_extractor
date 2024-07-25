@@ -30,4 +30,5 @@ extract-dtb~=1.2.3
 # uefi
 uefi-firmware~=1.11
 # unblob
-unblob
+# FixMe: pin to next stable version; the latest release is missing a bug fix related to zip64
+git+https://github.com/onekey-sec/unblob.git@e0d9805

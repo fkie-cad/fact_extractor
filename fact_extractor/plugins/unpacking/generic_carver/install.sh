@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 
-# This setup is largely ripped of from emba @ https://github.com/e-m-b-a/emba/blob/master/installer/IP61_unblob.sh
-# Thanks to m-1-k-3 and the emba team!
-
 cd "$( dirname "${BASH_SOURCE[0]}" )" || exit 1
 
 echo "------------------------------------"
-echo "     install unblob via poetry      "
+echo "    install unblob dependencies     "
 echo "------------------------------------"
 
 sudo -EH apt-get install -y e2fsprogs img2simg lziprecover xz-utils libmagic1 libhyperscan5
