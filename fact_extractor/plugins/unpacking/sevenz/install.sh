@@ -7,13 +7,15 @@ echo "------------------------------------"
 echo "             install 7z             "
 echo "------------------------------------"
 
+VERSION="2407"
+FILE="7z${VERSION}-linux-x64.tar.xz"
 
 # install newest version of 7z
 mkdir -p /tmp/fact_build
 cd /tmp/fact_build
-wget https://www.7-zip.org/a/7z2403-linux-x64.tar.xz
-tar xvf 7z2403-linux-x64.tar.xz 7zzs
+wget "https://www.7-zip.org/a/${FILE}"
+tar xvf "${FILE}" 7zzs
 sudo mv 7zzs /usr/local/bin/
-rm 7z2403-linux-x64.tar.xz
+rm "${FILE}"
 
 exit 0
