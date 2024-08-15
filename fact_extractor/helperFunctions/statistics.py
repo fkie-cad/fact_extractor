@@ -1,3 +1,4 @@
+import magic
 from configparser import ConfigParser
 from contextlib import suppress
 from pathlib import Path
@@ -7,7 +8,6 @@ from common_helper_files import safe_rglob
 from common_helper_unpacking_classifier import (
     avg_entropy, get_binary_size_without_padding, is_compressed
 )
-from fact_helper_file import get_file_type_from_path
 from fact_extractor.helperFunctions.config import read_list_from_config
 
 
@@ -28,7 +28,7 @@ def get_unpack_status(file_path: str, binary: bytes, extracted_files: List[Path]
     meta_data['entropy'] = avg_entropy(binary)
 
     if not extracted_files and meta_data.get('number_of_excluded_files', 0) == 0:
-        if get_file_type_from_path(file_path)['mime'] in read_list_from_config(config, 'ExpertSettings', 'compressed_file_types')\
+        if magic.from_file(file_path, mime=True) in read_list_from_config(config, 'ExpertSettings', 'compressed_file_types')\
                 or not is_compressed(binary, compress_entropy_threshold=config.getfloat('ExpertSettings', 'unpack_threshold'), classifier=avg_entropy):
             meta_data['summary'] = ['unpacked']
         else:

@@ -2,12 +2,11 @@
 This plugin mounts filesystem images and extracts their content
 '''
 import re
+import magic
 from shlex import split
 from subprocess import run, PIPE, STDOUT
 from tempfile import TemporaryDirectory
 from time import sleep
-
-from fact_helper_file import get_file_type_from_path
 
 NAME = 'genericFS'
 MIME_PATTERNS = [
@@ -28,7 +27,7 @@ TYPES = {
 
 
 def unpack_function(file_path, tmp_dir):
-    mime_type = get_file_type_from_path(file_path)['mime']
+    mime_type = magic.from_file(file_path, mime=True)
     if mime_type == 'filesystem/dosmbr':
         output = _mount_from_boot_record(file_path, tmp_dir)
     else:
