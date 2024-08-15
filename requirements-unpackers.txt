@@ -8,12 +8,11 @@ git+https://github.com/sviehb/jefferson.git@v0.4.1
 cstruct==2.1
 python-lzo==1.14
 # generic_carver: binwalk
-# ToDo: pin to fork (?)
-git+https://github.com/ReFirmLabs/binwalk@v2.3.2
-pyqtgraph~=0.13.4
+git+https://github.com/OSPG/binwalk.git@v2.4.2
+pyqtgraph~=0.13.7
 capstone~=5.0.1
 numpy~=1.26.4
-scipy~=1.13.0
+scipy~=1.13.1
 # ubi
 ubi-reader~=0.8.9
 # dji / dlink_shrs

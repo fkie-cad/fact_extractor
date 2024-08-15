@@ -1,5 +1,5 @@
 #! /usr/bin/env python3
-'''
+"""
     fact_extractor installer
     Copyright (C) 2015-2020  Fraunhofer FKIE
 
@@ -15,7 +15,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import argparse
 import logging
@@ -38,13 +38,13 @@ PROGRAM_VERSION = __VERSION__
 PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor installation script'
 
 # Compatible Ubuntu releases
-BIONIC_CODE_NAMES = ['bionic', 'tara', 'tessa', 'tina', 'disco']
-FOCAL_CODE_NAMES = ['focal', 'ulyana', 'uma', 'una']
-JAMMY_CODE_NAMES = ['jammy', 'vanessa']
+FOCAL_CODE_NAMES = ['focal', 'ulyana', 'ulyssa', 'uma', 'una']
+JAMMY_CODE_NAMES = ['jammy', 'vanessa', 'vera', 'victoria', 'virginia']
+NOBLE_CODE_NAMES = ['noble', 'wilma']
 
 # Compatible Debian/Kali releases
-BUSTER_CODE_NAMES = ['buster', 'stretch']
-BULLSEYE_CODE_NAMES = ['bullseye', 'kali-rolling']
+BULLSEYE_CODE_NAMES = ['bullseye']
+BOOKWORM_CODE_NAMES = ['bookworm', 'kali-rolling']
 
 
 def _setup_argparser():
@@ -67,30 +67,30 @@ def _setup_logging(debug_flag=False):
 
 
 def check_python_version():
-    if sys.version_info.major != 3 or sys.version_info.minor < 7:
-        sys.exit(f'Error: Incompatible Python version! You need at least version 3.7! Your Version: {sys.version}')
+    if sys.version_info.major != 3 or sys.version_info.minor < 8:  # noqa: PLR2004
+        sys.exit(f'Error: Incompatible Python version! You need at least version 3.8! Your Version: {sys.version}')
 
 
 def check_distribution():
     codename = distro.codename().lower()
-    if codename in BIONIC_CODE_NAMES:
-        logging.debug('Ubuntu 18.04 detected')
-        return 'bionic'
     if codename in FOCAL_CODE_NAMES:
         logging.debug('Ubuntu 20.04 detected')
         return 'focal'
     if codename in JAMMY_CODE_NAMES:
         logging.debug('Ubuntu 22.04 detected')
         return 'jammy'
-    if codename in BUSTER_CODE_NAMES:
-        logging.debug('Debian 10 detected')
-        return 'buster'
+    if codename in NOBLE_CODE_NAMES:
+        logging.debug('Ubuntu 24.04 detected')
+        return 'noble'
     if codename in BULLSEYE_CODE_NAMES:
-        logging.debug('Debian 11/Kali detected')
+        logging.debug('Debian 11 detected')
+        return 'buster'
+    if codename in BOOKWORM_CODE_NAMES:
+        logging.debug('Debian 12/Kali detected')
         return 'bullseye'
     sys.exit(
         f'Your Distribution ({distro.id()} {distro.version()}) is not supported. '
-        f'FACT Extractor Installer requires Ubuntu 18.04/20.04/22.04, Debian 9/10, Kali or compatible!'
+        f'FACT Extractor Installer requires Ubuntu 20.04/22.04/24.04, Debian 11/12, Kali or compatible!'
     )
 
 
@@ -104,7 +104,7 @@ def main():
     installation_directory = str(Path(__file__).parent / 'install')
 
     with OperateInDirectory(installation_directory):
-        common(distribution)
+        common()
         unpacker(distribution)
 
     logging.info('installation complete')

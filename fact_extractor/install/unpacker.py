@@ -15,25 +15,14 @@ from helperFunctions.install import (
     apt_install_packages,
     apt_remove_packages,
     install_github_project,
-    pip_install_packages,
     load_requirements_file,
+    pip_install_packages,
 )
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
 
 DEPENDENCIES = {
     # Ubuntu
-    'bionic': {
-        'apt': [
-            # binwalk
-            'libqt4-opengl',
-            'python3-pyqt4',
-            'python3-pyqt4.qtopengl',
-            'libcapstone3',
-            # patool and unpacking backends
-            'openjdk-8-jdk',
-        ]
-    },
     'focal': {
         'apt': [
             # binwalk
@@ -43,6 +32,8 @@ DEPENDENCIES = {
             'libcapstone3',
             # patool and unpacking backends
             'openjdk-16-jdk',
+            # android sparse image
+            'simg2img',
         ]
     },
     'jammy': {
@@ -54,21 +45,24 @@ DEPENDENCIES = {
             'libcapstone4',
             # patool and unpacking backends
             'openjdk-19-jdk',
+            # android sparse image
+            'simg2img',
+        ]
+    },
+    'noble': {
+        'apt': [
+            # binwalk
+            'libqt5opengl5',
+            'python3-pyqt5',
+            'python3-pyqt5.qtopengl',
+            'libcapstone4',
+            # patool and unpacking backends
+            'openjdk-21-jdk',
+            # android sparse image
+            'android-sdk-libsparse-utils',
         ]
     },
     # Debian
-    'buster': {
-        'apt': [
-            # binwalk
-            'libqt4-opengl',
-            'python3-pyqt4',
-            'python3-pyqt4.qtopengl',
-            'libcapstone3',
-            # patool and unpacking backends
-            'openjdk-8-jdk',
-            # freetz
-        ]
-    },
     'bullseye': {
         'apt': [
             # binwalk
@@ -78,6 +72,21 @@ DEPENDENCIES = {
             'libcapstone3',
             # patool and unpacking backends
             'openjdk-14-jdk',
+            # android sparse image
+            'simg2img',
+        ]
+    },
+    'bookworm': {
+        'apt': [
+            # binwalk
+            'libqt5opengl5',
+            'python3-pyqt5',
+            'python3-pyqt5.qtopengl',
+            'libcapstone4',
+            # patool and unpacking backends
+            'openjdk-19-jdk',
+            # android sparse image
+            'simg2img',
         ]
     },
     # Packages common to all platforms
@@ -150,8 +159,6 @@ DEPENDENCIES = {
             'subversion',
             'unzip',
             'wget',
-            # android sparse image
-            'simg2img',
             # 7z
             'yasm',
         ],
@@ -220,20 +227,18 @@ def _edit_sudoers():
     logging.info('add rules to sudo...')
     username = getuser()
     sudoers_content = '\n'.join(
-        (
-            f'{username}\tALL=NOPASSWD: {command}'
-            for command in (
-                '/sbin/kpartx',
-                '/sbin/losetup',
-                '/bin/mount',
-                '/bin/umount',
-                '/bin/mknod',
-                '/usr/bin/sasquatch',
-                '/bin/rm',
-                '/bin/cp',
-                '/bin/dd',
-                '/bin/chown',
-            )
+        f'{username}\tALL=NOPASSWD: {command}'
+        for command in (
+            '/sbin/kpartx',
+            '/sbin/losetup',
+            '/bin/mount',
+            '/bin/umount',
+            '/bin/mknod',
+            '/usr/bin/sasquatch',
+            '/bin/rm',
+            '/bin/cp',
+            '/bin/dd',
+            '/bin/chown',
         )
     )
     Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n')  # pylint: disable=unspecified-encoding
@@ -244,9 +249,9 @@ def _edit_sudoers():
 
 
 def _install_external_deb_deps():
-    '''
+    """
     install deb packages that aren't available through Debian/Ubuntu package sources
-    '''
+    """
     with TemporaryDirectory(prefix='patool') as build_directory:
         with OperateInDirectory(build_directory):
             for file_name, url, sha256 in EXTERNAL_DEB_DEPS:

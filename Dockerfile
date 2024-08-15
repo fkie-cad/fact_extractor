@@ -1,22 +1,24 @@
-FROM phusion/baseimage:jammy-1.0.3
+FROM phusion/baseimage:noble-1.0.0
+
+ARG USER=root
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN install_clean python3.12 python3.12-dev python3.12-venv gcc
 
 WORKDIR /opt/app
+
+RUN python3 -m venv venv
+
+COPY fact_extractor/install/pre_install.sh ./pre_install.sh
+
+RUN . venv/bin/activate && ./pre_install.sh
 
 COPY . /opt/app
 
 WORKDIR /opt/app/fact_extractor
 
-ARG USER=root
-ARG DEBIAN_FRONTEND=noninteractive
+RUN . ../venv/bin/activate && ../venv/bin/python install.py
 
-RUN install_clean python3.11 python3.11-dev python3.11-venv gcc
-
-RUN python3.11 -m venv venv
-
-RUN . venv/bin/activate && install/pre_install.sh
-
-RUN . venv/bin/activate && venv/bin/python3.11 install.py
-
-ENV PATH=/opt/app/fact_extractor/venv/bin:$PATH
+ENV PATH=/opt/app/venv/bin:$PATH
 
 ENTRYPOINT ["./docker_extraction.py"]
