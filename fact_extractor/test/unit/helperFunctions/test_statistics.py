@@ -1,8 +1,8 @@
-from configparser import ConfigParser
 from pathlib import Path
 
 import pytest
 
+from helperFunctions.config import FactExtractorConfig
 from helperFunctions.file_system import get_test_data_dir
 from helperFunctions.statistics import get_unpack_status, _detect_unpack_loss
 
@@ -14,11 +14,10 @@ def common_tmpdir(tmpdir):
 
 @pytest.fixture(scope='function')
 def config_fixture(common_tmpdir):
-    config = ConfigParser()
-    config.add_section('unpack')
-    config.set('unpack', 'data_folder', str(common_tmpdir))
-    config.add_section('ExpertSettings')
-    config.set('ExpertSettings', 'unpack_threshold', '0.8')
+    config = FactExtractorConfig(
+        unpack={'data_folder': str(common_tmpdir)},
+        expert_settings={'unpack_threshold': 0.8}
+    )
     return config
 
 
@@ -32,7 +31,7 @@ def test_unpack_status_packed_file(config_fixture):
     assert result['summary'] == ['packed'], '7z file should be packed'
 
     result = dict()
-    config_fixture.set('ExpertSettings', 'compressed_file_types', 'application/x-7z-compressed, ')
+    config_fixture.expert_settings.compressed_file_types = ['application/x-7z-compressed']
     get_unpack_status(test_packed_file_path, test_packed_file_path.read_bytes(), list(), result, config_fixture)
     assert result['summary'] == ['unpacked'], 'Unpacking Whitelist does not work'
 

@@ -1,32 +1,32 @@
-# pylint: disable=attribute-defined-outside-init
-
 from __future__ import annotations
 
 import gc
 import json
 import os
 import shutil
-from configparser import ConfigParser
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import Mock, patch
 
+from helperFunctions.config import FactExtractorConfig
 from helperFunctions.file_system import get_test_data_dir
 from unpacker.unpack import Unpacker
 
 
 class TestUnpackerBase:
     def setup_method(self):
-        self.config = ConfigParser()
-        self.ds_tmp_dir = TemporaryDirectory(prefix='fact_tests_')
         self.tmp_dir = TemporaryDirectory(prefix='fact_tests_')
-
-        self.config.add_section('unpack')
-        self.config.set('unpack', 'data_folder', self.ds_tmp_dir.name)
-        self.config.set('unpack', 'blacklist', 'text/plain, image/png')
-        self.config.add_section('ExpertSettings')
-        self.config.set('ExpertSettings', 'header_overhead', '256')
-        self.config.set('ExpertSettings', 'unpack_threshold', '0.8')
+        self.ds_tmp_dir = TemporaryDirectory(prefix='fact_tests_')
+        self.config = FactExtractorConfig(
+            unpack={
+                'data_folder': self.ds_tmp_dir.name,
+                'blacklist': ['text/plain', 'image/png'],
+            },
+            expert_settings={
+                'header_overhead': 256,
+                'unpack_threshold': 0.8,
+            },
+        )
 
         self.unpacker = Unpacker(config=self.config)
         os.makedirs(str(self.unpacker._report_folder), exist_ok=True)  # pylint: disable=protected-access
@@ -169,15 +169,15 @@ class TestUnpackerCoreMain(TestUnpackerBase):
 
     def test_main_unpack_exclude_archive(self):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
-        self.unpacker.exclude = ['*test.zip']
+        self.unpacker.config.unpack.exclude = ['*test.zip']
         self.main_unpack_check(test_file_path, 0, 1, None)
 
     def test_main_unpack_exclude_subdirectory(self):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
-        self.unpacker.exclude = ['*/generic folder/*']
+        self.unpacker.config.unpack.exclude = ['*/generic folder/*']
         self.main_unpack_check(test_file_path, 2, 1, '7z')
 
     def test_main_unpack_exclude_files(self):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
-        self.unpacker.exclude = ['*/get_files_test/*test*']
+        self.unpacker.config.unpack.exclude = ['*/get_files_test/*test*']
         self.main_unpack_check(test_file_path, 0, 3, '7z')

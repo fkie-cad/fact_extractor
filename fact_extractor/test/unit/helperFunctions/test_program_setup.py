@@ -2,22 +2,16 @@ import logging
 from pathlib import Path
 
 from helperFunctions.config import get_config_dir
-from helperFunctions.program_setup import (
-    load_config, setup_logging, setup_argparser
-)
+from helperFunctions.program_setup import setup_logging, setup_argparser
 
 
-class ArgumentMock():
+class ArgumentMock:
     config_file = '{}/main.cfg'.format(get_config_dir())
     log_level = 'WARNING'
     log_file = '/tmp/fact_test_log'
     silent = False
     debug = False
 
-
-def test_load_config():
-    config = load_config('{}/main.cfg'.format(get_config_dir()))
-    assert config['ExpertSettings']['unpack_threshold'] == '0.8'
 
 
 def test_setup_logging():

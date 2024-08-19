@@ -1,5 +1,4 @@
 import argparse
-import configparser
 import logging
 import resource
 
@@ -10,19 +9,53 @@ from version import __VERSION__
 
 
 def setup_argparser(name, description, command_line_options, version=__VERSION__):
-    parser = argparse.ArgumentParser(description='{} - {}'.format(name, description))
-    parser.add_argument('-V', '--version', action='version', version='{} {}'.format(name, version))
-    parser.add_argument('-l', '--log_file', help='path to log file', default=None)
-    parser.add_argument('-L', '--log_level', help='define the log level', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default=None)
-    parser.add_argument('-d', '--debug', action='store_true', default=False, help='print debug messages')
-    parser.add_argument('-C', '--config_file', help='set path to config File', default='{}/main.cfg'.format(get_config_dir()))
-    parser.add_argument('FILE_PATH', type=str, help='Path to file that should be extracted')
+    parser = argparse.ArgumentParser(description=f'{name} - {description}')
+    parser.add_argument(
+        '-V',
+        '--version',
+        action='version',
+        version=f'{name} {version}',
+    )
+    parser.add_argument(
+        '-l',
+        '--log_file',
+        help='path to log file',
+        default=None,
+    )
+    parser.add_argument(
+        '-L',
+        '--log_level',
+        help='define the log level',
+        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
+        default=None,
+    )
+    parser.add_argument(
+        '-d',
+        '--debug',
+        action='store_true',
+        default=False,
+        help='print debug messages',
+    )
+    parser.add_argument(
+        '-C',
+        '--config_file',
+        help='set path to config File',
+        default=f'{get_config_dir()}/main.cfg',
+    )
+    parser.add_argument(
+        'FILE_PATH',
+        type=str,
+        help='Path to file that should be extracted',
+    )
     return parser.parse_args(command_line_options[1:])
 
 
 def setup_logging(debug, log_file=None, log_level=None):
     log_level = log_level if log_level else logging.WARNING
-    log_format = logging.Formatter(fmt='[%(asctime)s][%(module)s][%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+    log_format = logging.Formatter(
+        fmt='[%(asctime)s][%(module)s][%(levelname)s]: %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
+    )
     logger = logging.getLogger('')
     logger.setLevel(logging.DEBUG)
 
@@ -48,9 +81,3 @@ def check_ulimits():
         logging.info(f'The number of openable files has been raised from {soft} to {min(1024, hard)}.')
     elif soft == resource.RLIM_INFINITY or soft > 100000:
         logging.warning('Warning: A very high (or no) nofile limit will slow down fakeroot and cause other problems.')
-
-
-def load_config(config_file):
-    config = configparser.ConfigParser()
-    config.read(config_file)
-    return config
