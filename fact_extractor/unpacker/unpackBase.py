@@ -7,18 +7,17 @@ from typing import Callable, Dict, List, Tuple
 
 from common_helper_files import get_files_in_dir
 from fact_helper_file import get_file_type_from_path
-from helperFunctions.config import read_list_from_config
+from helperFunctions.config import FactExtractorConfig
 from helperFunctions.plugin import import_plugins
 
 
-class UnpackBase(object):
+class UnpackBase:
     '''
     The unpacker module unpacks all files included in a file
     '''
 
-    def __init__(self, config=None, extract_everything: bool = False):
+    def __init__(self, config: FactExtractorConfig = None, extract_everything: bool = False):
         self.config = config
-        self.exclude = read_list_from_config(config, 'unpack', 'exclude')
         self._setup_plugins()
         self.extract_everything = extract_everything
 
@@ -35,9 +34,8 @@ class UnpackBase(object):
             plugin.setup(self)
 
     def _set_whitelist(self):
-        self.blacklist = read_list_from_config(self.config, 'unpack', 'blacklist')
-        logging.debug(f'''Ignore (Blacklist): {', '.join(self.blacklist)}''')
-        for item in self.blacklist:
+        logging.debug(f'''Ignore (Blacklist): {', '.join(self.config.unpack.blacklist)}''')
+        for item in self.config.unpack.blacklist:
             self.register_plugin(item, self.unpacker_plugins['generic/nop'])
 
     def register_plugin(self, mime_type: str, unpacker_name_and_function: Tuple[Callable[[str, str], Dict], str, str]):
@@ -62,7 +60,7 @@ class UnpackBase(object):
 
     def _should_ignore(self, file):
         path = str(file)
-        for pattern in self.exclude:
+        for pattern in self.config.unpack.exclude:
             if fnmatch.fnmatchcase(path, pattern):
                 return True
         return False
@@ -90,7 +88,7 @@ class UnpackBase(object):
 
         out = get_files_in_dir(tmp_dir)
 
-        if self.exclude:
+        if self.config.unpack.exclude:
             # Remove paths that should be ignored
             excluded_count = len(out)
             out = [f for f in out if not self._should_ignore(f)]

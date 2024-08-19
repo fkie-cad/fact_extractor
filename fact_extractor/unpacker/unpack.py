@@ -7,6 +7,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import List, Dict, Tuple
 
+from helperFunctions.config import FactExtractorConfig
 from helperFunctions.dataConversion import ReportEncoder
 from helperFunctions.file_system import file_is_empty
 from helperFunctions.statistics import get_unpack_status, add_unpack_statistics
@@ -18,9 +19,9 @@ class Unpacker(UnpackBase):
     FS_FALLBACK_CANDIDATES = ['SquashFS']
     CARVER_FALLBACK_BLACKLIST = ['generic_carver', 'NOP', 'PaTool', 'SFX', 'LinuxKernel']
 
-    def __init__(self, config=None, extract_everything: bool = False, folder: str = None):
+    def __init__(self, config: FactExtractorConfig = None, extract_everything: bool = False, folder: str = None):
         super().__init__(config=config, extract_everything=extract_everything)
-        data_folder = Path(self.config.get('unpack', 'data_folder'))
+        data_folder = Path(self.config.unpack.data_folder)
         if folder:
             self._file_folder = data_folder / folder / 'files'
             self._report_folder = data_folder / folder / 'reports'
@@ -35,7 +36,7 @@ class Unpacker(UnpackBase):
                 'number_of_unpacked_files': 0,
                 'number_of_unpacked_directories': 0,
                 'number_of_excluded_files': 1,
-                'info': f'File was ignored because it matched the exclude list {self.exclude}',
+                'info': f'File was ignored because it matched the exclude list {self.config.unpack.exclude}',
             }
             extracted_files = []
         else:
@@ -50,8 +51,7 @@ class Unpacker(UnpackBase):
 
             extracted_files = self.move_extracted_files(extracted_files, Path(tmp_dir.name))
 
-            compute_stats = self.config.getboolean('ExpertSettings', 'statistics', fallback=True)
-            if compute_stats:
+            if self.config.expert_settings.statistics:
                 binary = Path(file_path).read_bytes()
                 add_unpack_statistics(self._file_folder, meta_data)
                 get_unpack_status(file_path, binary, extracted_files, meta_data, self.config)
@@ -106,7 +106,12 @@ class Unpacker(UnpackBase):
         return extracted_files
 
 
-def unpack(file_path: str, config, extract_everything: bool = False, folder: str | None = None):
+def unpack(
+        file_path: str,
+        config: FactExtractorConfig,
+        extract_everything: bool = False,
+        folder: str | None = None,
+):
     extracted_objects = Unpacker(config, extract_everything, folder).unpack(file_path)
     logging.info(f'{len(extracted_objects)} files extracted')
     path_extracted_files = '\n'.join((str(path) for path in extracted_objects))

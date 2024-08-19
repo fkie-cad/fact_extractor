@@ -20,9 +20,9 @@ import argparse
 from pathlib import Path
 import sys
 
-from helperFunctions.config import get_config_dir
+from helperFunctions.config import load_config
 from helperFunctions.file_system import change_owner_of_output_files
-from helperFunctions.program_setup import check_ulimits, load_config, setup_logging
+from helperFunctions.program_setup import check_ulimits, setup_logging
 from unpacker.unpack import unpack
 
 
@@ -41,17 +41,18 @@ def _parse_args():
 
 
 def main(args):
-    config = load_config(f'{get_config_dir()}/main.cfg')
+    config = load_config()
     setup_logging(debug=False)
     check_ulimits()
 
-    input_dir = Path(config.get('unpack', 'data_folder'), 'input')
+    data_folder = Path(config.unpack.data_folder)
+    input_dir = data_folder / 'input'
     input_file = list(input_dir.iterdir())[0]
 
     unpack(input_file, config, args.extract_everything)
 
     if args.chown:
-        output_dir = Path(config.get('unpack', 'data_folder'), 'files')
+        output_dir = data_folder / 'files'
         return change_owner_of_output_files(output_dir, args.chown)
 
     return 0
