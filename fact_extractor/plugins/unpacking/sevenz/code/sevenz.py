@@ -34,7 +34,7 @@ MIME_PATTERNS = [
 ]
 VERSION = '0.9.0'
 
-UNPACKER_EXECUTABLE = '7zzs'
+UNPACKER_EXECUTABLE = '7z'
 
 # Empty password must be first in list to correctly detect if archive has no password
 PW_LIST = [""]

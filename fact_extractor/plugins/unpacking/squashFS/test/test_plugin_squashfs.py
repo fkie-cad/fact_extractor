@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import pytest
 from tempfile import TemporaryDirectory
 
@@ -37,7 +38,23 @@ class TestSquashUnpacker(TestUnpackerBase):
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('filesystem/squashfs', 'SquashFS')
 
-    def test_extraction_sqfs(self):
-        self.check_unpacking_of_standard_unpack_set(
-            TEST_DATA_DIR / 'sqfs.img',
-        )
+    @pytest.mark.parametrize(('file', 'expected'), [
+        ('avm_be.sqfs4', 'sasquatch-v4be'),
+        ('avm_le.sqfs4', 'sasquatch'),
+        ('gzip.sqfs', 'sasquatch'),
+        ('lz4.sqfs', 'sasquatch'),
+        ('lzma.sqfs', 'sasquatch'),
+        ('lzma1_be.sqfs3', 'sasquatch'),
+        ('lzma1_le.sqfs3', 'sasquatch'),
+        ('lzma_be.sqfs2', 'unsquashfs4-avm-be'),
+        ('lzma_le.sqfs2', 'unsquashfs4-avm-be'),
+        ('lzo.sqfs', 'sasquatch'),
+        ('xz.sqfs', 'sasquatch'),
+        ('zlib_be.sqfs3', 'sasquatch'),
+        ('zlib_le.sqfs3', 'sasquatch'),
+        ('zstd.sqfs', 'sasquatch'),
+    ])
+    def test_extraction_sqfs(self, file, expected):
+        meta_data = self.check_unpacking_of_standard_unpack_set(TEST_DATA_DIR / file)
+        assert meta_data['plugin_used'] == 'SquashFS'
+        assert meta_data['unpacking_tool'] == expected

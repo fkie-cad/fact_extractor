@@ -7,16 +7,18 @@ from pathlib import Path
 
 from helperFunctions.file_system import get_fact_bin_dir
 
-SASQUATCH = Path('/usr/local/bin/sasquatch')
+SASQUATCH = Path('/usr/bin/sasquatch')
+SASQUATCH_BE = Path('/usr/bin/sasquatch-v4be')
 UNSQUASHFS4_AVM_BE = Path(get_fact_bin_dir()) / 'unsquashfs4-avm-be'
 UNSQUASHFS4_AVM_LE = Path(get_fact_bin_dir()) / 'unsquashfs4-avm-le'
 UNSQUASHFS3_MULTI = Path(get_fact_bin_dir()) / 'unsquashfs3-multi'
 
 NAME = 'SquashFS'
 MIME_PATTERNS = ['filesystem/squashfs']
-VERSION = '0.10'
+VERSION = '0.11.0'
 SQUASH_UNPACKER = [
-    (SASQUATCH, '-c lzma-adaptive'),
+    (SASQUATCH, ''),
+    (SASQUATCH_BE, ''),
     (UNSQUASHFS4_AVM_BE, '-scan'),
     (UNSQUASHFS4_AVM_LE, '-scan'),
     (UNSQUASHFS3_MULTI, '-scan'),

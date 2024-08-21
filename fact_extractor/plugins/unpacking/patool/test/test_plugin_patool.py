@@ -48,6 +48,7 @@ class TestPaToolUnpacker(TestUnpackerBase):
             'test.gz',
             'test.lrz',
             'test.lz',
+            'test.lz4',
             'test.lzo',
             'test.rz',
             'test.xz',
