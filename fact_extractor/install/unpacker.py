@@ -2,11 +2,11 @@ import hashlib
 import logging
 import os
 import platform
+import sys
 from getpass import getuser
 from pathlib import Path
 from shlex import split
 from subprocess import CalledProcessError, run
-import sys
 from tempfile import TemporaryDirectory
 
 from common_helper_process import execute_shell_command_get_return_code
@@ -229,7 +229,7 @@ def main(distribution):
     install_dependencies(DEPENDENCIES['common'])
     install_dependencies(DEPENDENCIES[distribution])
 
-    # installing freetz, but not on ARM machines
+    # Install architecture-specific dependencies
     arch = platform.machine()
     if arch.startswith('arm') or arch.startswith('aarch'):
         logging.warning(
@@ -244,7 +244,13 @@ def main(distribution):
                 pip_install_packages(*['https://github.com/FiniteStateInc/fact_extractor/releases/download/lief-0.12.3-cp310-linux-aarch64/lief-0.12.3-cp310-cp310-linux_aarch64.whl'])
 
     else:
-        _install_freetz()
+        # Installing Freetz-ng fails when building containers via Docker on x86_64 systems
+        # due to a lack of AVX2 support from the VirtioFS virtualization framework. To avoid
+        # this, we will skip the installation of Freetz-ng on x86_64 systems.
+        # This means that we won't support unpacking of certain types of AVM and 'FritzBox'
+        # firmware, but that is not a use case that has ever been seen in the wild so this
+        # is not believed to be a significant issue.
+        # _install_freetz()
         _install_patool_deps()
 
     # install plug-in dependencies
