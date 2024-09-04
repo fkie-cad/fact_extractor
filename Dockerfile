@@ -1,13 +1,14 @@
-FROM phusion/baseimage:jammy-1.0.3
+FROM phusion/baseimage:noble-1.0.0
 
 RUN --mount=type=cache,target=/var/cache/apt \
 apt update && apt install -y \
-    python3.11 \
-    python3.11-dev \
-    python3.11-venv \
+    python3.12 \
+    python3.12-dev \
+    python3.12-venv \
     gcc
 
-RUN python3.11 -m venv /venv
+RUN python3.12 -m venv /venv
+
 ENV PATH=/venv/bin:$PATH \
     VIRTUAL_ENV=/venv \
     PYTHONPATH=/app/fact_extractor
