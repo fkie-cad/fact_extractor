@@ -22,7 +22,7 @@ import logging
 import sys
 from pathlib import Path
 
-from version import __VERSION__
+from fact_extractor.version import __VERSION__
 
 import distro
 
@@ -98,7 +98,7 @@ def main():
     distribution = check_distribution()
 
     logging.info(f'{PROGRAM_NAME} {PROGRAM_VERSION}')
-    installation_directory = str(Path(__file__).parent / 'install')
+    installation_directory = str(Path(__file__).parent / 'fact_extractor' / 'install')
 
     with OperateInDirectory(installation_directory):
         common(distribution)

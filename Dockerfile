@@ -20,7 +20,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 ADD . /app
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,target=/root/.cache/pip \
-/app/fact_extractor/install.py
+/app/install.py
 
 
 ENTRYPOINT ["/app/fact_extractor/docker_extraction.py"]
