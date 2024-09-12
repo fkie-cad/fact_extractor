@@ -2,8 +2,8 @@ import os
 
 import pytest
 
-from helperFunctions.file_system import get_test_data_dir
-from helperFunctions.config import get_config_dir, load_config, read_list_from_config
+from fact_extractor.helperFunctions.file_system import get_test_data_dir
+from fact_extractor.helperFunctions.config import get_config_dir, load_config, read_list_from_config
 
 
 def test_get_config_dir():
@@ -11,7 +11,7 @@ def test_get_config_dir():
 
 
 def test_load_config(monkeypatch):
-    monkeypatch.setattr('helperFunctions.config.get_config_dir', lambda: '{}/helperFunctions'.format(get_test_data_dir()))
+    monkeypatch.setattr('fact_extractor.helperFunctions.config.get_config_dir', lambda: '{}/helperFunctions'.format(get_test_data_dir()))
     test_config = load_config('test.cfg')
     assert test_config['test']['test'] == 'test_config', 'config not correct'
 
@@ -24,7 +24,7 @@ def test_load_config(monkeypatch):
     (' item1 , item2 , item3 ', ['item1', 'item2', 'item3']),
 ])
 def test_read_list_from_config(monkeypatch, input_data, expected):
-    monkeypatch.setattr('helperFunctions.config.get_config_dir', lambda: '{}/helperFunctions'.format(get_test_data_dir()))
+    monkeypatch.setattr('fact_extractor.helperFunctions.config.get_config_dir', lambda: '{}/helperFunctions'.format(get_test_data_dir()))
     test_config = load_config('test.cfg')
     test_config.add_section('test_section')
     test_config.set('test_section', 'test_option', input_data)
@@ -33,7 +33,7 @@ def test_read_list_from_config(monkeypatch, input_data, expected):
 
 
 def test_read_list_from_config__key_not_in_config(monkeypatch):
-    monkeypatch.setattr('helperFunctions.config.get_config_dir', lambda: '{}/helperFunctions'.format(get_test_data_dir()))
+    monkeypatch.setattr('fact_extractor.helperFunctions.config.get_config_dir', lambda: '{}/helperFunctions'.format(get_test_data_dir()))
     test_config = load_config('test.cfg')
     result = read_list_from_config(test_config, 'foo', 'bar')
     assert result == []

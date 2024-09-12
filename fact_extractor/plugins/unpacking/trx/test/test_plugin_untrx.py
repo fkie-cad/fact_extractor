@@ -1,7 +1,7 @@
 import os
 import zipfile
 
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 

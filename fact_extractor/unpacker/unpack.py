@@ -7,10 +7,10 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import List, Dict, Tuple
 
-from helperFunctions.dataConversion import ReportEncoder
-from helperFunctions.file_system import file_is_empty
-from helperFunctions.statistics import get_unpack_status, add_unpack_statistics
-from unpacker.unpackBase import UnpackBase
+from fact_extractor.helperFunctions.dataConversion import ReportEncoder
+from fact_extractor.helperFunctions.file_system import file_is_empty
+from fact_extractor.helperFunctions.statistics import get_unpack_status, add_unpack_statistics
+from fact_extractor.unpacker.unpackBase import UnpackBase
 
 
 class Unpacker(UnpackBase):

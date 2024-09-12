@@ -3,8 +3,8 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from helperFunctions.hash import get_sha256
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.helperFunctions.hash import get_sha256
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 

@@ -2,7 +2,7 @@ import os
 from shutil import copyfile
 
 from common_helper_process import execute_shell_command
-from helperFunctions.file_system import get_fact_bin_dir
+from fact_extractor.helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'tpl-tool'
 MIME_PATTERNS = ['firmware/tp-link']

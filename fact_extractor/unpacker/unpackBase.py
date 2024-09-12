@@ -7,8 +7,8 @@ from typing import Callable, Dict, List, Tuple
 
 from common_helper_files import get_files_in_dir
 from fact_helper_file import get_file_type_from_path
-from helperFunctions.config import read_list_from_config
-from helperFunctions.plugin import import_plugins
+from fact_extractor.helperFunctions.config import read_list_from_config
+from fact_extractor.helperFunctions.plugin import import_plugins
 
 
 class UnpackBase(object):
@@ -29,7 +29,7 @@ class UnpackBase(object):
         self._set_whitelist()
 
     def load_plugins(self):
-        self.source = import_plugins('unpacker.plugins', 'plugins/unpacking')
+        self.source = import_plugins('fact_extractor.plugins.unpacking', 'plugins/unpacking')
         for plugin_name in self.source.list_plugins():
             plugin = self.source.load_plugin(plugin_name)
             plugin.setup(self)

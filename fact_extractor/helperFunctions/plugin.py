@@ -4,7 +4,7 @@ from pathlib import Path
 from common_helper_files import get_dirs_in_dir
 from pluginbase import PluginBase
 
-from helperFunctions.file_system import get_src_dir
+from fact_extractor.helperFunctions.file_system import get_src_dir
 
 
 def import_plugins(plugin_mount, plugin_base_dir):

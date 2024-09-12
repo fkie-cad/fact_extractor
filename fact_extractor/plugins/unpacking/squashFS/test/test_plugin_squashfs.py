@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from tempfile import TemporaryDirectory
 
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 from ..code.squash_fs import _unpack_success, unpack_function, SQUASH_UNPACKER
 

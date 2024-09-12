@@ -4,8 +4,8 @@ from pathlib import Path
 
 from common_helper_files import get_binary_from_file
 
-from helperFunctions.hash import get_sha256
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.helperFunctions.hash import get_sha256
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 from ..code.dlm import XeroxDLM
 
 TEST_DATA_DIR = Path(Path(__file__).parent, 'data')

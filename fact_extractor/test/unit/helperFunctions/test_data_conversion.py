@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from helperFunctions.dataConversion import make_bytes, make_unicode_string, remove_uneccessary_spaces, ReportEncoder
+from fact_extractor.helperFunctions.dataConversion import make_bytes, make_unicode_string, remove_uneccessary_spaces, ReportEncoder
 
 
 @pytest.mark.parametrize('input_data', [

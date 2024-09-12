@@ -1,10 +1,10 @@
 import os
 import gc
 
-from helperFunctions.hash import get_sha256
+from fact_extractor.helperFunctions.hash import get_sha256
 
 from ..internal.dsk_container import DskOne
-from plugins.unpacking.xerox.internal.dsk_container import ExtendedDskOne
+from fact_extractor.plugins.unpacking.xerox.internal.dsk_container import ExtendedDskOne
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 

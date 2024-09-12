@@ -27,9 +27,9 @@ from version import __VERSION__
 try:
     import distro
 
-    from helperFunctions.install import OperateInDirectory
-    from install.common import main as common
-    from install.unpacker import main as unpacker
+    from fact_extractor.helperFunctions.install import OperateInDirectory
+    from fact_extractor.install.common import main as common
+    from fact_extractor.install.unpacker import main as unpacker
 except ImportError:
     sys.exit('Could not import install dependencies. Please (re-)run install/pre_install.sh')
 

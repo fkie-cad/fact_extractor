@@ -5,7 +5,7 @@ from common_helper_files import get_files_in_dir
 from common_helper_process import execute_shell_command
 from pathlib import Path
 
-from helperFunctions.file_system import get_fact_bin_dir
+from fact_extractor.helperFunctions.file_system import get_fact_bin_dir
 
 SASQUATCH = Path('/usr/bin/sasquatch')
 SASQUATCH_BE = Path('/usr/bin/sasquatch-v4be')

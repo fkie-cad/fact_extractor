@@ -5,7 +5,7 @@ from pathlib import Path
 
 from common_helper_process import execute_shell_command
 
-from unpacker.helper.carving import Carver
+from fact_extractor.unpacker.helper.carving import Carver
 
 THIS_FILE = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(THIS_FILE, '..', 'internal'))

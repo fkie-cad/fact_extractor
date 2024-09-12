@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 from common_helper_files import get_files_in_dir
-from helperFunctions.file_system import (
+from fact_extractor.helperFunctions.file_system import (
     file_is_empty,
     get_fact_bin_dir,
     get_src_dir,

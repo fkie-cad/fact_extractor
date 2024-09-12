@@ -1,6 +1,6 @@
 import gc
 
-from unpacker.helper.carving import CarvedArea
+from fact_extractor.unpacker.helper.carving import CarvedArea
 
 
 class TestCarvedArea:

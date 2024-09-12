@@ -1,8 +1,8 @@
 from pathlib import Path
 from subprocess import check_output
 
-from plugins.unpacking.boschtool.code.boschtool import TOOL_PATH
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.plugins.unpacking.boschtool.code.boschtool import TOOL_PATH
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 
 TEST_FILE = Path(__file__).parent / 'data' / 'test.fw'

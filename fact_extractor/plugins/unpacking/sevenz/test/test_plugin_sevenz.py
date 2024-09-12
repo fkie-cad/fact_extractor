@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from helperFunctions.file_system import decompress_test_file
-from plugins.unpacking.sevenz.code.sevenz import MIME_PATTERNS
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.helperFunctions.file_system import decompress_test_file
+from fact_extractor.plugins.unpacking.sevenz.code.sevenz import MIME_PATTERNS
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 

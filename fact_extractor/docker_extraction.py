@@ -20,10 +20,10 @@ import argparse
 from pathlib import Path
 import sys
 
-from helperFunctions.config import get_config_dir
-from helperFunctions.file_system import change_owner_of_output_files
-from helperFunctions.program_setup import check_ulimits, load_config, setup_logging
-from unpacker.unpack import unpack
+from fact_extractor.helperFunctions.config import get_config_dir
+from fact_extractor.helperFunctions.file_system import change_owner_of_output_files
+from fact_extractor.helperFunctions.program_setup import check_ulimits, load_config, setup_logging
+from fact_extractor.unpacker.unpack import unpack
 
 
 def _parse_args():

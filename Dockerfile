@@ -10,7 +10,7 @@ apt update && apt install -y \
 RUN python3.11 -m venv /venv
 ENV PATH=/venv/bin:$PATH \
     VIRTUAL_ENV=/venv \
-    PYTHONPATH=/app/fact_extractor
+    PYTHONPATH=/app/
 
 ADD ./fact_extractor/install/pre_install.sh /app/fact_extractor/install/pre_install.sh
 RUN --mount=type=cache,target=/var/cache/apt \

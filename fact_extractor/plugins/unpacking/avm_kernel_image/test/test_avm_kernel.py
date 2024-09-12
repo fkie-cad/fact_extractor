@@ -1,4 +1,4 @@
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 from ..code.avm_kernel_image import FIND_SQUASHFS_TOOL_PATH, UNPACK_KERNEL_TOOL_PATH
 
 

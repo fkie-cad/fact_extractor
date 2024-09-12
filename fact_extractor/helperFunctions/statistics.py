@@ -8,7 +8,7 @@ from common_helper_unpacking_classifier import (
     avg_entropy, get_binary_size_without_padding, is_compressed
 )
 from fact_helper_file import get_file_type_from_path
-from helperFunctions.config import read_list_from_config
+from fact_extractor.helperFunctions.config import read_list_from_config
 
 
 def add_unpack_statistics(extraction_dir: Path, meta_data: Dict):

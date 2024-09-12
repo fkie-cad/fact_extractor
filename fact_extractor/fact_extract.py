@@ -20,8 +20,8 @@
 import sys
 from pathlib import Path
 
-from helperFunctions.program_setup import setup_argparser, setup_logging, load_config
-from unpacker.unpack import unpack
+from fact_extractor.helperFunctions.program_setup import setup_argparser, setup_logging, load_config
+from fact_extractor.unpacker.unpack import unpack
 
 
 def main():

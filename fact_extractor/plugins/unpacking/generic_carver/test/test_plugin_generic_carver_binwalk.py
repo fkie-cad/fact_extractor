@@ -5,9 +5,9 @@ from tempfile import TemporaryDirectory
 import pytest
 from contextlib import contextmanager
 
-from plugins.unpacking.generic_carver.code.generic_carver import ArchivesFilter
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
-from helperFunctions.file_system import get_test_data_dir
+from fact_extractor.plugins.unpacking.generic_carver.code.generic_carver import ArchivesFilter
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.helperFunctions.file_system import get_test_data_dir
 
 # pylint: disable=protected-access
 

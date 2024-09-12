@@ -5,7 +5,7 @@ import re
 from struct import unpack
 import sys
 
-from helperFunctions.dataConversion import make_unicode_string
+from fact_extractor.helperFunctions.dataConversion import make_unicode_string
 
 
 ENCODING_OVERHEAD = 0.33

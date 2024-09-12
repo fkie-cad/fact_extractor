@@ -1,6 +1,10 @@
 from pathlib import Path
 
-from plugins.unpacking.sevenz.code.sevenz import unpack_function as sevenz
+import fact_extractor.plugins.unpacking.sevenz
+import fact_extractor
+# This is not an actual import due to wired pluginbase shenanigans.
+# The 'sevenz' module is actually the 'code.sevenz' module.
+from fact_extractor.plugins.unpacking.sevenz import unpack_function as sevenz
 
 NAME = 'SFX'
 MIME_PATTERNS = ['application/x-executable', 'application/x-dosexec']

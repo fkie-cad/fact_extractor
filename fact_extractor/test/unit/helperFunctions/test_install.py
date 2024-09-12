@@ -1,6 +1,6 @@
 import pytest
 
-from helperFunctions.install import InstallationError, run_shell_command_raise_on_return_code
+from fact_extractor.helperFunctions.install import InstallationError, run_shell_command_raise_on_return_code
 
 
 def _patch_shell_command(patch, mock_output: str, mock_return_code: int):
