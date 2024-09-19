@@ -18,7 +18,10 @@ DEFAULT_CONTAINER = 'fkiecad/fact_extractor'
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description='Command line interface for FACT_extractor.\nExtract arbitrary container or compression formats with one utility.'
+        description=(
+            'Command line wrapper for FACT_extractor docker container.\n'
+            ' Extract arbitrary container or compression formats with one utility.'
+        )
     )
     parser.add_argument('-v', '--version', action='version', version=set_version())
     parser.add_argument('-c', '--container', help='docker container', default=DEFAULT_CONTAINER)

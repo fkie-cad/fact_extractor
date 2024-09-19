@@ -17,10 +17,10 @@ RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,target=/root/.cache/pip \
 /app/fact_extractor/install/pre_install.sh
 
-ADD . /app
+ADD . /app/
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,target=/root/.cache/pip \
 /app/install.py
 
 
-ENTRYPOINT ["/app/fact_extractor/docker_extraction.py"]
+ENTRYPOINT ["/app/docker/entrypoint.py"]

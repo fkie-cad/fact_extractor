@@ -20,7 +20,8 @@
 import sys
 from pathlib import Path
 
-from fact_extractor.helperFunctions.program_setup import setup_argparser, setup_logging, load_config
+from fact_extractor.helperFunctions.file_system import change_owner_of_output_files
+from fact_extractor.helperFunctions.program_setup import setup_argparser, setup_logging, load_config, check_ulimits
 from fact_extractor.unpacker.unpack import unpack
 
 
@@ -28,14 +29,20 @@ def main():
     arguments = setup_argparser('FACT extractor', 'Standalone extraction utility', sys.argv)
     config = load_config(arguments.config_file)
     setup_logging(arguments.debug, log_file=arguments.log_file, log_level=arguments.log_level)
+    check_ulimits()
+
+    data_dir = Path(config.get('unpack', 'data_folder'))
+    report_dir = data_dir / 'reports'
+    files_dir = data_dir / 'files'
 
     # Make sure report folder exists some meta.json can be written
-    report_folder = Path(config.get('unpack', 'data_folder'), 'reports')
-    report_folder.mkdir(parents=True, exist_ok=True)
+    report_dir.mkdir(parents=True, exist_ok=True)
+
     unpack(arguments.FILE_PATH, config)
+
+    if arguments.chown is not None:
+        change_owner_of_output_files(files_dir, arguments.chown)
 
     return 0
 
-
-if __name__ == '__main__':
-    exit(main())
+sys.exit(main())

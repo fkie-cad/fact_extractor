@@ -10,7 +10,7 @@ from fact_extractor.version import __VERSION__
 
 
 def setup_argparser(name, description, command_line_options, version=__VERSION__):
-    parser = argparse.ArgumentParser(description='{} - {}'.format(name, description))
+    parser = argparse.ArgumentParser(prog=name, description='{} - {}'.format(name, description))
     parser.add_argument('-V', '--version', action='version', version='{} {}'.format(name, version))
     parser.add_argument('-l', '--log_file', help='path to log file', default=None)
     parser.add_argument('-L', '--log_level', help='define the log level', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default=None)
