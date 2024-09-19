@@ -4,10 +4,9 @@ from pathlib import Path
 from typing import Dict, List
 
 from common_helper_files import safe_rglob
-from common_helper_unpacking_classifier import (
-    avg_entropy, get_binary_size_without_padding, is_compressed
-)
+from common_helper_unpacking_classifier import avg_entropy, get_binary_size_without_padding, is_compressed
 from fact_helper_file import get_file_type_from_path
+
 from helperFunctions.config import read_list_from_config
 
 
@@ -23,13 +22,20 @@ def add_unpack_statistics(extraction_dir: Path, meta_data: Dict):
     meta_data['number_of_unpacked_directories'] = unpacked_directories
 
 
-def get_unpack_status(file_path: str, binary: bytes, extracted_files: List[Path], meta_data: Dict, config: ConfigParser):
+def get_unpack_status(
+    file_path: str, binary: bytes, extracted_files: List[Path], meta_data: Dict, config: ConfigParser
+):
     meta_data['summary'] = []
     meta_data['entropy'] = avg_entropy(binary)
 
     if not extracted_files and meta_data.get('number_of_excluded_files', 0) == 0:
-        if get_file_type_from_path(file_path)['mime'] in read_list_from_config(config, 'ExpertSettings', 'compressed_file_types')\
-                or not is_compressed(binary, compress_entropy_threshold=config.getfloat('ExpertSettings', 'unpack_threshold'), classifier=avg_entropy):
+        if get_file_type_from_path(file_path)['mime'] in read_list_from_config(
+            config, 'ExpertSettings', 'compressed_file_types'
+        ) or not is_compressed(
+            binary,
+            compress_entropy_threshold=config.getfloat('ExpertSettings', 'unpack_threshold'),
+            classifier=avg_entropy,
+        ):
             meta_data['summary'] = ['unpacked']
         else:
             meta_data['summary'] = ['packed']

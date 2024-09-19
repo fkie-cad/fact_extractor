@@ -1,8 +1,9 @@
-'''
+"""
 Created on 21.08.2015
 
 @author: weidenba
-'''
+"""
+
 from helperFunctions.hash import get_sha256
 
 

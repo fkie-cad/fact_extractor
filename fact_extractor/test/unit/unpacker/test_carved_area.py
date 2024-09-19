@@ -4,24 +4,27 @@ from unpacker.helper.carving import CarvedArea
 
 
 class TestCarvedArea:
-
     def teardown_method(self):
         gc.collect()
 
     def test_carved_complete_area(self):
         area_size = 100
-        carved_and_expected = [{'carved': (0, area_size), 'expected': []},
-                               {'carved': (-1, area_size + 1), 'expected': []},
-                               {'carved': (-1, area_size), 'expected': []},
-                               {'carved': (0, area_size + 1), 'expected': []}]
+        carved_and_expected = [
+            {'carved': (0, area_size), 'expected': []},
+            {'carved': (-1, area_size + 1), 'expected': []},
+            {'carved': (-1, area_size), 'expected': []},
+            {'carved': (0, area_size + 1), 'expected': []},
+        ]
         self.caring_test(area_size, carved_and_expected)
 
     def test_carved_borders(self):
         area_size = 100
-        carved_and_expected = [{'carved': (0, area_size - 1), 'expected': [(100, 100)]},
-                               {'carved': (1, area_size), 'expected': [(0, 0)]},
-                               {'carved': (-1, area_size - 1), 'expected': [(100, 100)]},
-                               {'carved': (1, area_size + 1), 'expected': [(0, 0)]}]
+        carved_and_expected = [
+            {'carved': (0, area_size - 1), 'expected': [(100, 100)]},
+            {'carved': (1, area_size), 'expected': [(0, 0)]},
+            {'carved': (-1, area_size - 1), 'expected': [(100, 100)]},
+            {'carved': (1, area_size + 1), 'expected': [(0, 0)]},
+        ]
         self.caring_test(area_size, carved_and_expected)
 
     def test_carved_in_between(self):

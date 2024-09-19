@@ -2,12 +2,10 @@ from pathlib import Path
 
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
-
 TEST_DATA_DIR = Path(Path(__file__).parent, 'data')
 
 
 class TestDahuaUnpacker(TestUnpackerBase):
-
     def test_unpacker_selection(self):
         self.check_unpacker_selection('firmware/dahua', 'dahua')
 

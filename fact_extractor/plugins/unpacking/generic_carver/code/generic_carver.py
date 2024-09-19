@@ -1,6 +1,7 @@
-'''
+"""
 This plugin unpacks all files via carving
-'''
+"""
+
 from __future__ import annotations
 
 import logging
@@ -24,10 +25,10 @@ REAL_SIZE_REGEX = re.compile(r'Physical Size = (\d+)')
 
 
 def unpack_function(file_path, tmp_dir):
-    '''
+    """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
-    '''
+    """
 
     logging.debug(f'File Type unknown: execute binwalk on {file_path}')
     output = execute_shell_command(f'binwalk --extract --carve --signature --directory  {tmp_dir} {file_path}')
@@ -81,10 +82,7 @@ class ArchivesFilter:
     def _remove_invalid_archives(self, file_path: Path, command, search_key=None):
         output = execute_shell_command(command.format(file_path))
 
-        if search_key and search_key in output.replace('\n ', ''):
-            self._remove_file(file_path)
-
-        elif not search_key and _output_is_empty(output):
+        if search_key and search_key in output.replace('\n ', '') or not search_key and _output_is_empty(output):
             self._remove_file(file_path)
 
     def _remove_file(self, file_path):
@@ -115,7 +113,7 @@ def _output_is_empty(output):
 
 
 def _find_trailing_data_index_zip(file_path: Path) -> int | None:
-    '''Archives carved by binwalk often have trailing data at the end. 7z can determine the actual file size.'''
+    """Archives carved by binwalk often have trailing data at the end. 7z can determine the actual file size."""
     output = execute_shell_command(f'7z l {file_path}')
     if 'There are data after the end of archive' in output:
         match = REAL_SIZE_REGEX.search(output)
@@ -140,7 +138,7 @@ def drop_underscore_directory(tmp_dir):
     extracted_contents = list(Path(tmp_dir).iterdir())
     if not extracted_contents:
         return
-    if not len(extracted_contents) == 1 or not extracted_contents[0].name.endswith('.extracted'):
+    if len(extracted_contents) != 1 or not extracted_contents[0].name.endswith('.extracted'):
         return
     for result in extracted_contents[0].iterdir():
         shutil.move(str(result), str(result.parent.parent))

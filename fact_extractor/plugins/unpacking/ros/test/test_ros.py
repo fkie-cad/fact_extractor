@@ -5,13 +5,13 @@ import pytest
 
 from helperFunctions.file_system import get_test_data_dir
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
-from ..code.ros import infer_header_size_from_version, infer_endianness_from_file_count, unpack_function
+
+from ..code.ros import infer_endianness_from_file_count, infer_header_size_from_version, unpack_function
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
 class TestRosUnpacker(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('firmware/ros', 'ROSFile')
 

@@ -2,12 +2,10 @@ import os
 
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
-
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
 class TestUBootUnpacker(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('firmware/u-boot', 'Uboot')
 

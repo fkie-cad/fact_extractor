@@ -1,6 +1,7 @@
-'''
+"""
 Extractcs Upgrade Files from HP Printer Job Language (PJL) files
-'''
+"""
+
 import sys
 from pathlib import Path
 
@@ -9,8 +10,11 @@ from common_helper_files import get_binary_from_file
 INTERNAL_DIR = Path(__file__).parent.parent / 'internal'
 sys.path.append(str(INTERNAL_DIR))
 
-from pjl_helper import extract_all_upgrades, extract_fingerprint, get_pjl_commands  # noqa: E402 pylint: disable=import-error,wrong-import-position
-
+from pjl_helper import (  # noqa: E402 pylint: disable=import-error,wrong-import-position
+    extract_all_upgrades,
+    extract_fingerprint,
+    get_pjl_commands,
+)
 
 NAME = 'PJL'
 MIME_PATTERNS = ['firmware/hp-pjl']

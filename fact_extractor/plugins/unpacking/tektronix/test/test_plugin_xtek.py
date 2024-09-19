@@ -1,9 +1,8 @@
 import os
+from binascii import Error
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
-
-from binascii import Error
 
 from helperFunctions.file_system import get_test_data_dir
 from plugins.unpacking.tektronix.code.xtek import unpack_function
@@ -34,14 +33,12 @@ def meta_data_for_failed_analysis(file_path):
 
 
 class TestTektronixExtendedHex(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('firmware/xtek', 'Tektronix extended HEX')
 
     def test_extraction(self):
         for tfile in ['testfile.xtek', 'objcopy.xtek']:
-            files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, tfile),
-                                                                     self.tmp_dir.name)
+            files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, tfile), self.tmp_dir.name)
             successful_extraction(files, meta_data)
 
     @staticmethod

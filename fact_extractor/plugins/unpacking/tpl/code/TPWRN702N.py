@@ -2,6 +2,7 @@ import binascii
 from struct import unpack
 
 from common_helper_files import write_binary_to_file
+
 from unpacker.helper.carving import Carver
 
 NAME = 'TP-WR702N'
@@ -28,16 +29,16 @@ def unpack_function(file_path, tmp_dir):
     """
     tpwr702n = TPWR702N(file_path)
 
-    write_binary_to_file(tpwr702n.get_container_header(), '{}/container_header.hdr'.format(tmp_dir))
-    write_binary_to_file(tpwr702n.get_tpimg0_header(), '{}/img0.hdr'.format(tmp_dir))
-    write_binary_to_file(tpwr702n.get_bootloader(), '{}/bootloader.7z'.format(tmp_dir))
-    write_binary_to_file(tpwr702n.get_os_and_fs(), '{}/main.img'.format(tmp_dir))
-    write_binary_to_file(tpwr702n.get_os(), '{}/main.7z'.format(tmp_dir))
-    write_binary_to_file(tpwr702n.get_fs(), '{}/main.owfs'.format(tmp_dir))
+    write_binary_to_file(tpwr702n.get_container_header(), f'{tmp_dir}/container_header.hdr')
+    write_binary_to_file(tpwr702n.get_tpimg0_header(), f'{tmp_dir}/img0.hdr')
+    write_binary_to_file(tpwr702n.get_bootloader(), f'{tmp_dir}/bootloader.7z')
+    write_binary_to_file(tpwr702n.get_os_and_fs(), f'{tmp_dir}/main.img')
+    write_binary_to_file(tpwr702n.get_os(), f'{tmp_dir}/main.7z')
+    write_binary_to_file(tpwr702n.get_fs(), f'{tmp_dir}/main.owfs')
 
     remaining = tpwr702n.get_remaining_blocks()
     for offset in remaining:
-        write_binary_to_file(remaining[offset], '{}/{}_unknown.bin'.format(tmp_dir, offset))
+        write_binary_to_file(remaining[offset], f'{tmp_dir}/{offset}_unknown.bin')
 
     return tpwr702n.get_meta_dict()
 
@@ -62,7 +63,7 @@ class TPWR702N:
         self.carver = Carver(self.firmware_filepath)
 
     def __str__(self):
-        return 'MD5: {} \n Included Header:\n{}'.format(self.get_md5string(), str(self.img0))
+        return f'MD5: {self.get_md5string()} \n Included Header:\n{self.img0!s}'
 
     def get_remaining_blocks(self):
         non_carved_areas = self.carver.carved.non_carved_areas
@@ -164,7 +165,7 @@ class TPIMG0:  # pylint: disable=too-many-instance-attributes
         self.check_header()
 
     def __str__(self):
-        return 'IMG0\nSize: {}\nDevice ID: {}\nLanguage: {}\nSubheader: {}'.format(self.container_size, self.device_id, self.language, self.sub_header)
+        return f'IMG0\nSize: {self.container_size}\nDevice ID: {self.device_id}\nLanguage: {self.language}\nSubheader: {self.sub_header}'
 
     def get_meta_dict(self):
         meta_data = {}
@@ -201,7 +202,7 @@ class TPIMG0:  # pylint: disable=too-many-instance-attributes
 
     def check_header(self):
         if self.container_size <= 0:
-            raise InvalidImg0InformationException('Size is {}'.format(self.container_size))
+            raise InvalidImg0InformationException(f'Size is {self.container_size}')
 
         if self.device_id is None:
             raise InvalidImg0InformationException('Device Id is missing')
@@ -210,6 +211,7 @@ class TPIMG0:  # pylint: disable=too-many-instance-attributes
             raise InvalidImg0InformationException('Language is missing')
 
         return True
+
 
 # ----> Do not edit below this line <----
 

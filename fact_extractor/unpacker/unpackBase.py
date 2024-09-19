@@ -1,20 +1,21 @@
+import fnmatch
 import logging
 from os import getgid, getuid
 from subprocess import PIPE, Popen
 from time import time
-import fnmatch
 from typing import Callable, Dict, List, Tuple
 
 from common_helper_files import get_files_in_dir
 from fact_helper_file import get_file_type_from_path
+
 from helperFunctions.config import read_list_from_config
 from helperFunctions.plugin import import_plugins
 
 
-class UnpackBase(object):
-    '''
+class UnpackBase:
+    """
     The unpacker module unpacks all files included in a file
-    '''
+    """
 
     def __init__(self, config=None, extract_everything: bool = False):
         self.config = config
@@ -36,7 +37,7 @@ class UnpackBase(object):
 
     def _set_whitelist(self):
         self.blacklist = read_list_from_config(self.config, 'unpack', 'blacklist')
-        logging.debug(f'''Ignore (Blacklist): {', '.join(self.blacklist)}''')
+        logging.debug(f"""Ignore (Blacklist): {', '.join(self.blacklist)}""")
         for item in self.blacklist:
             self.register_plugin(item, self.unpacker_plugins['generic/nop'])
 
@@ -55,10 +56,14 @@ class UnpackBase(object):
 
     def unpacking_fallback(self, file_path, tmp_dir, old_meta, fallback_plugin_mime) -> Tuple[List, Dict]:
         fallback_plugin = self.unpacker_plugins[fallback_plugin_mime]
-        old_meta[f'''0_FALLBACK_{old_meta['plugin_used']}'''] = f'''{old_meta['plugin_used']} (failed) -> {fallback_plugin_mime} (fallback)'''
+        old_meta[f"""0_FALLBACK_{old_meta['plugin_used']}"""] = (
+            f"""{old_meta['plugin_used']} (failed) -> {fallback_plugin_mime} (fallback)"""
+        )
         if 'output' in old_meta.keys():
-            old_meta[f'''0_ERROR_{old_meta['plugin_used']}'''] = old_meta['output']
-        return self._extract_files_from_file_using_specific_unpacker(file_path, tmp_dir, fallback_plugin, meta_data=old_meta)
+            old_meta[f"""0_ERROR_{old_meta['plugin_used']}"""] = old_meta['output']
+        return self._extract_files_from_file_using_specific_unpacker(
+            file_path, tmp_dir, fallback_plugin, meta_data=old_meta
+        )
 
     def _should_ignore(self, file):
         path = str(file)
@@ -67,8 +72,12 @@ class UnpackBase(object):
                 return True
         return False
 
-    def _extract_files_from_file_using_specific_unpacker(self, file_path: str, tmp_dir: str, selected_unpacker, meta_data: dict = None) -> Tuple[List, Dict]:
-        unpack_function, name, version = selected_unpacker  # TODO Refactor register method to directly use four parameters instead of three
+    def _extract_files_from_file_using_specific_unpacker(
+        self, file_path: str, tmp_dir: str, selected_unpacker, meta_data: dict = None
+    ) -> Tuple[List, Dict]:
+        unpack_function, name, version = (
+            selected_unpacker  # TODO Refactor register method to directly use four parameters instead of three
+        )
 
         if meta_data is None:
             meta_data = {}
@@ -81,7 +90,7 @@ class UnpackBase(object):
             additional_meta = unpack_function(file_path, tmp_dir)
         except Exception as error:
             logging.debug(f'Unpacking of {file_path} failed: {error}', exc_info=True)
-            additional_meta = {'error': f'{type(error)}: {str(error)}'}
+            additional_meta = {'error': f'{type(error)}: {error!s}'}
         if isinstance(additional_meta, dict):
             meta_data.update(additional_meta)
 

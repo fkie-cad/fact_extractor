@@ -5,7 +5,10 @@ from pathlib import Path
 
 from helperFunctions.config import load_config
 from helperFunctions.install import (
-    apt_install_packages, apt_update_sources, pip_install_packages, load_requirements_file
+    apt_install_packages,
+    apt_update_sources,
+    load_requirements_file,
+    pip_install_packages,
 )
 
 APT_DEPENDENCIES = {
