@@ -14,6 +14,7 @@ MIME_PATTERNS = [
     # compressed archives
     'application/rar',
     'application/x-7z-compressed',
+    'application/x-arj',
     'application/x-iso9660-image',
     'application/x-lzma',
     'application/x-rar',
@@ -31,7 +32,7 @@ MIME_PATTERNS = [
     'filesystem/hfs',
     'filesystem/ntfs',
 ]
-VERSION = '0.8.2'
+VERSION = '0.9.0'
 
 UNPACKER_EXECUTABLE = '7z'
 
