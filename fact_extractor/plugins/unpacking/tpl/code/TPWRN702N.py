@@ -2,7 +2,7 @@ import binascii
 from struct import unpack
 
 from common_helper_files import write_binary_to_file
-from unpacker.helper.carving import Carver
+from fact_extractor.unpacker.helper.carving import Carver
 
 NAME = 'TP-WR702N'
 MIME_PATTERNS = ['firmware/tp-wr702n']

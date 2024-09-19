@@ -4,7 +4,7 @@ from os import path, rename
 
 from common_helper_files import delete_file, get_files_in_dir
 from common_helper_process import execute_shell_command
-from helperFunctions.file_system import get_fact_bin_dir
+from fact_extractor.helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'DJI_drones'
 MIME_PATTERNS = ['firmware/dji-drone']

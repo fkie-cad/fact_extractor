@@ -56,9 +56,6 @@ fixable = ["ALL"]
 "test*.py" = ["ARG002"]
 "conftest.py" = ["ARG002"]
 
-[tool.ruff.lint.isort]
-known-first-party = ["config", "helperFunctions", "install", "plugins", "test", "unpacker", "version"]
-
 [tool.ruff.lint.pylint]
 max-args=7
 max-public-methods = 40

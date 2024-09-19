@@ -1,7 +1,7 @@
 import os
 from configparser import ConfigParser, NoOptionError, NoSectionError
 
-from helperFunctions.file_system import get_src_dir
+from fact_extractor.helperFunctions.file_system import get_src_dir
 
 
 def load_config(config_file_name):

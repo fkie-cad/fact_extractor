@@ -22,16 +22,13 @@ import logging
 import sys
 from pathlib import Path
 
-from version import __VERSION__
+from fact_extractor.version import __VERSION__
 
-try:
-    import distro
+import distro
 
-    from helperFunctions.install import OperateInDirectory
-    from install.common import main as common
-    from install.unpacker import main as unpacker
-except ImportError:
-    sys.exit('Could not import install dependencies. Please (re-)run install/pre_install.sh')
+from fact_extractor.helperFunctions.install import OperateInDirectory
+from fact_extractor.install.common import main as common
+from fact_extractor.install.unpacker import main as unpacker
 
 PROGRAM_NAME = 'FACT_extractor Installer'
 PROGRAM_VERSION = __VERSION__
@@ -101,7 +98,7 @@ def main():
     distribution = check_distribution()
 
     logging.info(f'{PROGRAM_NAME} {PROGRAM_VERSION}')
-    installation_directory = str(Path(__file__).parent / 'install')
+    installation_directory = str(Path(__file__).parent / 'fact_extractor' / 'install')
 
     with OperateInDirectory(installation_directory):
         common(distribution)

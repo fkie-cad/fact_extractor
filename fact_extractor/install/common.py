@@ -3,8 +3,8 @@ import os
 from contextlib import suppress
 from pathlib import Path
 
-from helperFunctions.config import load_config
-from helperFunctions.install import (
+from fact_extractor.helperFunctions.config import load_config
+from fact_extractor.helperFunctions.install import (
     apt_install_packages, apt_update_sources, pip_install_packages, load_requirements_file
 )
 
