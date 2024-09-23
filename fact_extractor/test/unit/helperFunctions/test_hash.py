@@ -3,7 +3,7 @@ Created on 21.08.2015
 
 @author: weidenba
 '''
-from helperFunctions.hash import get_sha256
+from fact_extractor.helperFunctions.hash import get_sha256
 
 
 class TestHashGeneration:

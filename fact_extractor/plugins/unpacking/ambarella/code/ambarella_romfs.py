@@ -2,7 +2,7 @@
 from os import path
 
 from common_helper_process import execute_shell_command
-from helperFunctions.file_system import get_fact_bin_dir
+from fact_extractor.helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'Ambarella_RomFS'
 MIME_PATTERNS = ['filesystem/ambarella-romfs']

@@ -1,10 +1,11 @@
 import logging
+import subprocess as sp
 import os
 from contextlib import suppress
 from pathlib import Path
 
-from helperFunctions.config import load_config
-from helperFunctions.install import (
+from fact_extractor.helperFunctions.config import load_config
+from fact_extractor.helperFunctions.install import (
     apt_install_packages, apt_update_sources, pip_install_packages, load_requirements_file
 )
 
@@ -48,6 +49,23 @@ def main(distribution):
     # make bin dir
     with suppress(FileExistsError):
         os.mkdir('../bin')
+
+    sp.run(
+        [
+            "wget",
+            "--output-document",
+            "../bin/firmware.xz",
+            "https://github.com/fkie-cad/firmware-magic-database/releases/download/v0.2.1/firmware.xz",
+        ],
+        check=True,
+    )
+    sp.run(
+        [
+            "unxz",
+            "--force",
+            "../bin/firmware.xz",
+        ]
+    )
 
     config = load_config('main.cfg')
     data_folder = config.get('unpack', 'data_folder')

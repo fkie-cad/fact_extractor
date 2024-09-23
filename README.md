@@ -42,7 +42,7 @@ sudo apt install linux-modules-extra-$(uname -r)
 The tool can then be run with
 
 ```bash
-fact_extractor/fact_extract.py [OPTIONS] PATH_TO_FIRMWARE
+python -m fact_extractor [OPTIONS] PATH_TO_FIRMWARE
 ```
 The tool is build with docker in mind.
 To that end it extracts all files into a directory specified in the config.

@@ -1,5 +1,5 @@
 from pathlib import Path
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 from common_helper_files import get_binary_from_file
 

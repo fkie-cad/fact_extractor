@@ -11,8 +11,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import Mock, patch
 
-from helperFunctions.file_system import get_test_data_dir
-from unpacker.unpack import Unpacker
+from fact_extractor.helperFunctions.file_system import get_test_data_dir
+from fact_extractor.unpacker.unpack import Unpacker
 
 
 class TestUnpackerBase:
