@@ -1,7 +1,4 @@
-from common_helper_extraction import (
-    cut_at_padding, dump_files, extract_lzma_streams,
-    get_decompressed_lzma_streams
-)
+from common_helper_extraction import cut_at_padding, dump_files, extract_lzma_streams, get_decompressed_lzma_streams
 from common_helper_files import get_binary_from_file
 
 NAME = 'HP-Stream'

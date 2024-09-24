@@ -18,13 +18,13 @@ def i_always_crash_file_not_found(*args, **kwargs):
 
 
 class TestAdobeASCII85(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('firmware/adobe85', 'Adobe ASCII85')
 
     def test_extraction(self):
-        files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, 'testfile.adobe85'),
-                                                                 self.tmp_dir.name)
+        files, meta_data = self.unpacker.extract_files_from_file(
+            Path(TEST_DATA_DIR, 'testfile.adobe85'), self.tmp_dir.name
+        )
         assert len(files) == 1
         content = Path(files[0]).read_bytes()
         assert b'test for a FACT plugin' in content

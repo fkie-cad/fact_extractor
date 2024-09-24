@@ -3,17 +3,17 @@ from tempfile import TemporaryDirectory
 
 from helperFunctions.file_system import decompress_test_file
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
-from ..code.generic_fs import _extract_loop_devices, _mount_single_filesystem, TYPES
+
+from ..code.generic_fs import TYPES, _extract_loop_devices, _mount_single_filesystem
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
-KPARTX_OUTPUT = '''
+KPARTX_OUTPUT = """
 add map loop7p1 (253:0): 0 7953 linear 7:7 2048
 add map loop7p2 (253:1): 0 10207 linear 7:7 10240
-'''
+"""
 
 
 class TestGenericFsUnpacker(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('filesystem/btrfs', 'genericFS')
         self.check_unpacker_selection('filesystem/dosmbr', 'genericFS')
@@ -60,10 +60,11 @@ class TestGenericFsUnpacker(TestUnpackerBase):
         with decompress_test_file(TEST_DATA_DIR / 'mbr.img.xz') as test_file:
             files, meta_data = self.unpacker.extract_files_from_file(str(test_file), self.tmp_dir.name)
             expected = [
-                str(Path(self.tmp_dir.name, *file_path)) for file_path in [
+                str(Path(self.tmp_dir.name, *file_path))
+                for file_path in [
                     ('partition_0', 'test_data_file.bin'),
                     ('partition_1', 'yara_test_file'),
-                    ('partition_2', 'testfile1')
+                    ('partition_2', 'testfile1'),
                 ]
             ]
 

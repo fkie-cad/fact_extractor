@@ -4,13 +4,11 @@ from subprocess import check_output
 from plugins.unpacking.boschtool.code.boschtool import TOOL_PATH
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
-
 TEST_FILE = Path(__file__).parent / 'data' / 'test.fw'
 OUTPUT_FILES = ['test_file_1.txt', 'test_file_2.txt']
 
 
 class TestBoschToolUnpacker(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('firmware/bosch', 'BoschFirmwareTool')
 

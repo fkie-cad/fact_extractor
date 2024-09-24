@@ -3,8 +3,15 @@ from pathlib import Path
 
 import pytest
 
-from extract import container_exists, parse_arguments, setup_logging, handle_report, main, TemporaryDirectory, \
-    call_docker
+from extract import (
+    TemporaryDirectory,
+    call_docker,
+    container_exists,
+    handle_report,
+    main,
+    parse_arguments,
+    setup_logging,
+)
 
 
 def exec_stub(command, *_, **__):
@@ -82,14 +89,47 @@ def test_handle_report(monkeypatch, capsys, tmpdir):
     assert '    "a": 5\n' in report
 
 
-@pytest.mark.parametrize('arguments, return_code, message', [
-    [['extract.py', '-o', '/tmp', 'anyfile'], 1, 'Target directory exists'],
-    [['extract.py', '-o', '/tmp/valid_dir', '-c', 'container_will_fail', 'anyfile'], 1, 'fail doesn\'t exist'],
-    [['extract.py', '-o', '/tmp/valid_dir', '-c', 'container_will_succeed', 'anyfile'], 1, 'anyfile doesn\'t exist'],
-    [['extract.py', '-o', '/tmp/valid_dir', '-c', 'container_will_succeed', '-r', '/tmp/bad/path/to/report', '/bin/bash'], 1, 'Check if parent directory exists'],
-    [['extract.py', '-o', '/tmp/valid_dir', '-c', 'container_will_succeed', '-r', '/etc/environment', '/bin/bash'], 0, 'will be overwritten'],
-    [['extract.py', '-o', '/tmp/valid_dir', '-c', 'container_will_succeed', '-r', '/tmp/report', '/bin/bash'], 0, '']
-])
+@pytest.mark.parametrize(
+    'arguments, return_code, message',
+    [
+        [['extract.py', '-o', '/tmp', 'anyfile'], 1, 'Target directory exists'],
+        [['extract.py', '-o', '/tmp/valid_dir', '-c', 'container_will_fail', 'anyfile'], 1, "fail doesn't exist"],
+        [['extract.py', '-o', '/tmp/valid_dir', '-c', 'container_will_succeed', 'anyfile'], 1, "anyfile doesn't exist"],
+        [
+            [
+                'extract.py',
+                '-o',
+                '/tmp/valid_dir',
+                '-c',
+                'container_will_succeed',
+                '-r',
+                '/tmp/bad/path/to/report',
+                '/bin/bash',
+            ],
+            1,
+            'Check if parent directory exists',
+        ],
+        [
+            [
+                'extract.py',
+                '-o',
+                '/tmp/valid_dir',
+                '-c',
+                'container_will_succeed',
+                '-r',
+                '/etc/environment',
+                '/bin/bash',
+            ],
+            0,
+            'will be overwritten',
+        ],
+        [
+            ['extract.py', '-o', '/tmp/valid_dir', '-c', 'container_will_succeed', '-r', '/tmp/report', '/bin/bash'],
+            0,
+            '',
+        ],
+    ],
+)
 def test_main_return_values(arguments, return_code, message, monkeypatch, capsys):
     monkeypatch.setattr('extract.call_docker', lambda **_: None)
     monkeypatch.setattr('extract.sys.argv', arguments)

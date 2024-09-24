@@ -1,9 +1,11 @@
-'''
+"""
 This plugin unpacks SquashFS filesystem images
-'''
+"""
+
+from pathlib import Path
+
 from common_helper_files import get_files_in_dir
 from common_helper_process import execute_shell_command
-from pathlib import Path
 
 from helperFunctions.file_system import get_fact_bin_dir
 
@@ -26,15 +28,15 @@ SQUASH_UNPACKER = [
 
 
 def unpack_function(file_path, tmp_dir):
-    '''
+    """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
-    '''
+    """
     unpack_result = {}
     for unpacker, parameter in SQUASH_UNPACKER:
         # We need to force here since "-dest" does not allow existing directories
         output = execute_shell_command(
-            f"fakeroot {unpacker} {parameter} -dest {tmp_dir} -force {file_path}",
+            f'fakeroot {unpacker} {parameter} -dest {tmp_dir} -force {file_path}',
         )
         if _unpack_success(tmp_dir):
             unpack_result['unpacking_tool'] = unpacker.name

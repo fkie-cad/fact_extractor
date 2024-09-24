@@ -1,6 +1,7 @@
-'''
+"""
 This plugin unpacks several formats utilizing patool
-'''
+"""
+
 from common_helper_process import execute_shell_command
 
 NAME = 'PaTool'
