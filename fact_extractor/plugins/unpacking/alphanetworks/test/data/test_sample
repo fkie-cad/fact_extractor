@@ -1,0 +1,11 @@
+#!/bin/sh
+VENDOR="foo"
+HWBOARD="bar"
+HWVERSION="1.0.0"
+
+=== ddPack Boundary ===
+begin-base64 755 /dev/stdout
+Zm9vYmFyMTIzNA
+====
+=== Firmware Boundary ===
+firmware_foobar
