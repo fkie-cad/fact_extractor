@@ -36,3 +36,4 @@ bincopy~=20.0.0
 extract-dtb~=1.2.3
 # uefi
 uefi-firmware~=1.11
+pylibfdt ~= 1.7.1
