@@ -1,7 +1,9 @@
 import argparse
 import configparser
 import logging
+import os
 import resource
+from pathlib import Path
 
 from common_helper_files import create_dir_for_file
 
@@ -54,3 +56,8 @@ def load_config(config_file):
     config = configparser.ConfigParser()
     config.read(config_file)
     return config
+
+
+def init_magic():
+    firmware_magic_path = Path(__file__).parent.parent / 'bin' / 'firmware'
+    os.environ['MAGIC'] = f'{firmware_magic_path}:/usr/lib/file/magic.mgc'

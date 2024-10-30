@@ -8,13 +8,14 @@ from flask_restful import Api, Resource
 
 from helperFunctions.config import load_config
 from helperFunctions.file_system import change_owner_of_output_files
-from helperFunctions.program_setup import setup_logging
+from helperFunctions.program_setup import init_magic, setup_logging
 from unpacker.unpack import unpack
 
 app = Flask(__name__)
 api = Api(app)
 config = load_config('main.cfg')
 setup_logging(False, log_level=int(os.getenv('LOG_LEVEL', logging.WARNING)))  # pylint: disable=invalid-envvar-default
+init_magic()
 
 
 @api.resource('/start/<folder>', methods=['GET'])

@@ -20,7 +20,7 @@
 import sys
 from pathlib import Path
 
-from helperFunctions.program_setup import setup_argparser, setup_logging, load_config
+from helperFunctions.program_setup import init_magic, load_config, setup_argparser, setup_logging
 from unpacker.unpack import unpack
 
 
@@ -28,6 +28,7 @@ def main():
     arguments = setup_argparser('FACT extractor', 'Standalone extraction utility', sys.argv)
     config = load_config(arguments.config_file)
     setup_logging(arguments.debug, log_file=arguments.log_file, log_level=arguments.log_level)
+    init_magic()
 
     # Make sure report folder exists some meta.json can be written
     report_folder = Path(config.get('unpack', 'data_folder'), 'reports')
