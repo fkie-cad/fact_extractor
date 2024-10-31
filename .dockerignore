@@ -1,0 +1,19 @@
+# Contents of .gitignore
+.cache
+.coverage
+.idea
+.project
+.pyc
+.pydevproject
+.pytest_cache
+.settings
+__pycache__
+bin/
+install.log
+
+# Other files
+.dockerignore
+.git
+.github
+.gitignore
+.ruff_cache

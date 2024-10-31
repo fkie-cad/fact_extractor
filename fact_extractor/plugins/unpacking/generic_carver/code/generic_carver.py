@@ -3,13 +3,13 @@ This plugin unpacks all files via carving
 '''
 from __future__ import annotations
 
+import magic
 import logging
 import re
 import shutil
 from pathlib import Path
 
 from common_helper_process import execute_shell_command
-from fact_helper_file import get_file_type_from_path
 
 NAME = 'generic_carver'
 MIME_PATTERNS = ['generic/carver']
@@ -45,7 +45,7 @@ class ArchivesFilter:
         for file_path in self.unpack_directory.glob('**/*'):
             if not file_path.is_file():
                 continue
-            file_type = get_file_type_from_path(file_path)['mime']
+            file_type = magic.from_file(file_path, mime=True)
 
             if file_type == 'application/x-tar' or self._is_possible_tar(file_type, file_path):
                 self._remove_invalid_archives(file_path, 'tar -tvf {}', 'does not look like a tar archive')

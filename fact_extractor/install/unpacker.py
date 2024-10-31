@@ -10,7 +10,7 @@ from tempfile import TemporaryDirectory
 
 from common_helper_process import execute_shell_command_get_return_code
 
-from helperFunctions.install import (
+from fact_extractor.helperFunctions.install import (
     InstallationError,
     OperateInDirectory,
     apt_install_packages,

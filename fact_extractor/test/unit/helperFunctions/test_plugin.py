@@ -1,4 +1,4 @@
-from helperFunctions.plugin import _get_plugin_src_dirs, import_plugins
+from fact_extractor.helperFunctions.plugin import _get_plugin_src_dirs, import_plugins
 
 TEST_PLUGINS_BASE_PATH = 'test/data/plugin_system'
 

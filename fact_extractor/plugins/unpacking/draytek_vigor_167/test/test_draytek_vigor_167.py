@@ -1,7 +1,7 @@
 from pathlib import Path
-from helperFunctions.hash import get_sha256
+from fact_extractor.helperFunctions.hash import get_sha256
 from common_helper_files import get_binary_from_file
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 
