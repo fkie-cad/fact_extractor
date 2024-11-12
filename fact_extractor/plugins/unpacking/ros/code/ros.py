@@ -7,10 +7,7 @@ MIME_PATTERNS = ['firmware/ros']
 VERSION = '0.8'
 
 MAXIMUM_PART_NUMBER = 100
-HEADER_VERSIONS_AND_SIZES = {
-    b'1.01': 48,
-    b'2.00': 80
-}
+HEADER_VERSIONS_AND_SIZES = {b'1.01': 48, b'2.00': 80}
 
 
 def infer_endianness_from_file_count(header: bytes) -> str:
@@ -21,11 +18,11 @@ def infer_header_size_from_version(header: bytes) -> int:
     for version, size in HEADER_VERSIONS_AND_SIZES.items():
         if header[0x04:0x08] == version:
             return size
-    raise ValueError('Unknown ros header version {}'.format(header[0x04:0x08]))
+    raise ValueError(f'Unknown ros header version {header[0x04:0x08]}')
 
 
 def calculate_file_count(header: bytes, endianness: str) -> int:
-    return struct.unpack('{}I'.format(endianness), header[0x20:0x24])[0]
+    return struct.unpack(f'{endianness}I', header[0x20:0x24])[0]
 
 
 def generate_part_information(header: bytes, endianness: str, number_of_files: int) -> List[dict]:
@@ -37,8 +34,8 @@ def generate_part_information(header: bytes, endianness: str, number_of_files: i
         parts.append(
             {
                 'index': index,
-                'file_name': header[offset:offset + 16].decode().strip('\x00'),
-                'offset': struct.unpack('{}i'.format(endianness), header[offset + 16: offset + 20])[0]
+                'file_name': header[offset : offset + 16].decode().strip('\x00'),
+                'offset': struct.unpack(f'{endianness}i', header[offset + 16 : offset + 20])[0],
             }
         )
     return parts
@@ -83,7 +80,7 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
     return {
         'file_information': parts,
         'endianness': 'le' if endianness == '<' else 'be',
-        'ros_header_version': header[0x04:0x08].decode()
+        'ros_header_version': header[0x04:0x08].decode(),
     }
 
 

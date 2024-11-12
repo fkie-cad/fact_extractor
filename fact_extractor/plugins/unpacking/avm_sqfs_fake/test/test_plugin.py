@@ -1,14 +1,13 @@
 import os
+
 from common_helper_files import get_binary_from_file
 
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
-
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
 class TestAvmFakeSqFs(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('filesystem/avm-sqfs-fake', 'avm_sqfs_fake')
 

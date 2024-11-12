@@ -1,10 +1,10 @@
-'''
+"""
 This plugin decrypts D-Link SHRS binaries.
-'''
-from subprocess import PIPE, STDOUT, run
+"""
+
 from pathlib import Path
 from shlex import split
-
+from subprocess import PIPE, STDOUT, run
 
 NAME = 'D-Link SHRS'
 MIME_PATTERNS = ['firmware/dlink-shrs']

@@ -4,15 +4,15 @@ VERSION = '0.3'
 
 
 def unpack_function(file_path, tmp_dir):
-    '''
+    """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
-    '''
+    """
 
     xdlm = XeroxDLM(file_path)
     meta_data = _create_meta_dict(xdlm)
 
-    binary_path = '{}/dlm_data.bin'.format(tmp_dir)
+    binary_path = f'{tmp_dir}/dlm_data.bin'
     xdlm.write_data_to_file(binary_path)
 
     return meta_data
@@ -37,9 +37,7 @@ class XeroxDLM:
         self.dlm_extraction_criteria = None
 
     def __str__(self):
-        return 'DLM-Signature: {}\nDLM-Version: {}\nDLM-Name: {}\nDLM-Extraction-Criteria: {}'.format(
-            self.get_signature(), self.get_dlm_version(), self.get_dlm_name(), self.get_dlm_extraction_criteria()
-        )
+        return f'DLM-Signature: {self.get_signature()}\nDLM-Version: {self.get_dlm_version()}\nDLM-Name: {self.get_dlm_name()}\nDLM-Extraction-Criteria: {self.get_dlm_extraction_criteria()}'
 
     def get_header_end_offset(self):
         if self.header_end_offset is not None:
@@ -94,6 +92,7 @@ class XeroxDLM:
                     tgz.write(data_block)
                     if len(data_block) < block_size:
                         break
+
 
 # ----> Do not edit below this line <----
 

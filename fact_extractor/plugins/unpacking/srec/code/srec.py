@@ -1,7 +1,9 @@
-'''
+"""
 This plugin decodes / unpacks Motorola SRecord files (.srec)
-'''
+"""
+
 from __future__ import annotations
+
 import re
 from pathlib import Path
 
@@ -14,25 +16,25 @@ SREC_REGEX = b'(S[0-6][0-9A-F]+[\n\r]{1,2})+(S[7-9][0-9A-F]+)?'
 
 
 def unpack_function(file_path: str | Path, tmp_dir: str | Path) -> dict[str, str]:
-    '''
+    """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
-    '''
+    """
     try:
         file_data = Path(file_path).read_bytes()
     except FileNotFoundError as fnf_error:
-        return {'output': f'Failed to open file: {str(fnf_error)}'}
+        return {'output': f'Failed to open file: {fnf_error!s}'}
 
     match = re.match(SREC_REGEX, file_data)
     if match is None:
         return {'output': 'Error: no valid srec data found'}
 
     try:
-        decoded = _decode_srec(file_data[0:match.end()])
+        decoded = _decode_srec(file_data[0 : match.end()])
         target_file = Path(tmp_dir) / _get_unpacked_filename(file_path)
         target_file.write_bytes(decoded)
     except (bincopy.Error, ValueError) as srec_error:
-        return {'output': f'Unknown error in srec decoding: {str(srec_error)}'}
+        return {'output': f'Unknown error in srec decoding: {srec_error!s}'}
 
     return {'output': 'Successfully decoded srec file'}
 

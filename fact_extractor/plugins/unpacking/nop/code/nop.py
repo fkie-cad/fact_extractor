@@ -1,6 +1,6 @@
-'''
+"""
 This plugin does not unpack any files files.
-'''
+"""
 
 NAME = 'NOP'
 MIME_PATTERNS = ['generic/nop', 'inode/symlink']

@@ -1,6 +1,7 @@
-'''
+"""
 This plugin unpacks StuffIt files (.sit, .sitx)
-'''
+"""
+
 from common_helper_process import execute_shell_command
 
 NAME = 'StuffItFile'
@@ -11,11 +12,11 @@ STUFFIT_UNPACKER = 'unar'
 
 
 def unpack_function(file_path, tmp_dir):
-    '''
+    """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
-    '''
-    output = execute_shell_command('fakeroot {} -o {} {}'.format(STUFFIT_UNPACKER, tmp_dir, file_path))
+    """
+    output = execute_shell_command(f'fakeroot {STUFFIT_UNPACKER} -o {tmp_dir} {file_path}')
     return {'output': output}
 
 

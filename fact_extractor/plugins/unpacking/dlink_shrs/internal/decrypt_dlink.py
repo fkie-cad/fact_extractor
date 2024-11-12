@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-import sys
-import hashlib
-import binascii
-import pathlib
 import argparse
-
+import binascii
+import hashlib
+import pathlib
+import sys
 from contextlib import suppress
+
 from Crypto.Cipher import AES
 
 CIPHERTEXT_OFF = 0x6DC

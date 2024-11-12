@@ -15,7 +15,7 @@ TOOL_PATH = Path(__file__).parent.parent / 'bin' / 'boschfwtool'
 
 class FirmwareHeader:  # pylint: disable=too-many-instance-attributes
     header_length = 0x400
-    magic_string = b"\x10\x12\x20\x03"
+    magic_string = b'\x10\x12\x20\x03'
 
     def __init__(self, file_content: bytes, offset: int = 0, is_subheader: bool = False):
         self.file_content = file_content
@@ -36,7 +36,18 @@ class FirmwareHeader:  # pylint: disable=too-many-instance-attributes
     def __str__(self):
         header_prefix = 'Sub-' if self.is_subheader else ''
         output = [f'Firmware {header_prefix}Header at offset {self.offset}:']
-        for attribute in ['magic', 'target', 'variant', 'version', 'length', 'base', 'checksum', 'type', 'signature', 'key_blob']:
+        for attribute in [
+            'magic',
+            'target',
+            'variant',
+            'version',
+            'length',
+            'base',
+            'checksum',
+            'type',
+            'signature',
+            'key_blob',
+        ]:
             value = getattr(self, attribute)
             value = f'0x{value.hex()}' if isinstance(value, bytes) else str(value)
             output.append(f'{attribute}: {value}')
@@ -50,7 +61,7 @@ class FirmwareHeader:  # pylint: disable=too-many-instance-attributes
         )
 
     def _magic_matches(self, offset):
-        return self.file_content[offset:offset + 4] == self.magic_string
+        return self.file_content[offset : offset + 4] == self.magic_string
 
 
 class FirmwareHeaderIterator:
@@ -65,7 +76,9 @@ class FirmwareHeaderIterator:
         if self.first_iteration:
             self.first_iteration = False
             return self.header
-        next_header_offset = self.header.offset + self.header.header_length + (self.header.length if self.header.is_subheader else 0)
+        next_header_offset = (
+            self.header.offset + self.header.header_length + (self.header.length if self.header.is_subheader else 0)
+        )
         if self.header.next_header_exists(next_header_offset):
             with suppress(KeyError, IndexError, struct.error):
                 self.header = FirmwareHeader(self.header.file_content, offset=next_header_offset, is_subheader=True)

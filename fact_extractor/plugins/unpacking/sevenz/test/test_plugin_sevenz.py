@@ -21,7 +21,7 @@ class TestSevenZUnpacker(TestUnpackerBase):
             ('test.rar', 'get_files_test'),
             ('cramfs.img', ''),
             ('test.iso', ''),
-        ]
+        ],
     )
     def test_extraction(self, test_file, prefix):
         meta = self.check_unpacking_of_standard_unpack_set(
@@ -40,7 +40,7 @@ class TestSevenZUnpacker(TestUnpackerBase):
             ('ext2.img.xz', 'get_files_test', {'Journal'}),
             ('ext3.img.xz', 'get_files_test', {'Journal'}),
             ('ext4.img.xz', 'get_files_test', {'Journal'}),
-        ]
+        ],
     )
     def test_extraction_compressed(self, test_file, prefix, ignore):
         with decompress_test_file(TEST_DATA_DIR / test_file) as file:
@@ -49,13 +49,7 @@ class TestSevenZUnpacker(TestUnpackerBase):
             )
             assert 'password' not in meta, 'password incorrectly set'
 
-    @pytest.mark.parametrize(
-        'test_file',
-        [
-            'test_password.7z',
-            'test_password.zip'
-        ]
-    )
+    @pytest.mark.parametrize('test_file', ['test_password.7z', 'test_password.zip'])
     def test_extraction_password(self, test_file):
         meta = self.check_unpacking_of_standard_unpack_set(
             TEST_DATA_DIR / test_file, additional_prefix_folder='get_files_test', output=True

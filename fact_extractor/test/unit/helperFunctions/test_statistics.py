@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from helperFunctions.file_system import get_test_data_dir
-from helperFunctions.statistics import get_unpack_status, _detect_unpack_loss
+from helperFunctions.statistics import _detect_unpack_loss, get_unpack_status
 
 
 @pytest.fixture(scope='function')
@@ -50,7 +50,14 @@ def test_detect_unpack_loss_data_lost(config_fixture, common_tmpdir):
     included_file.write_bytes(256 * b'ABCDEFGH')
     result = {'summary': []}
 
-    _detect_unpack_loss(512 * b'ABCDEFGH', [included_file, ], result, 256)
+    _detect_unpack_loss(
+        512 * b'ABCDEFGH',
+        [
+            included_file,
+        ],
+        result,
+        256,
+    )
     assert 'data lost' in result['summary']
     assert result['size_packed'] == 512 * len(b'ABCDEFGH') - 256
     assert result['size_unpacked'] == 256 * len(b'ABCDEFGH')
@@ -61,5 +68,12 @@ def test_detect_unpack_loss_no_data_lost(config_fixture, common_tmpdir):
     included_file.write_bytes(512 * b'ABCDEFGH')
     result = {'summary': []}
 
-    _detect_unpack_loss(512 * b'ABCDEFGH', [included_file, ], result, 256)
+    _detect_unpack_loss(
+        512 * b'ABCDEFGH',
+        [
+            included_file,
+        ],
+        result,
+        256,
+    )
     assert 'no data lost' in result['summary']
