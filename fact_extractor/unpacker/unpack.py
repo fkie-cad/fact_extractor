@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import mmap
 import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -52,9 +53,10 @@ class Unpacker(UnpackBase):
 
             compute_stats = self.config.getboolean('ExpertSettings', 'statistics', fallback=True)
             if compute_stats:
-                binary = Path(file_path).read_bytes()
                 add_unpack_statistics(self._file_folder, meta_data)
-                get_unpack_status(file_path, binary, extracted_files, meta_data, self.config)
+                with open(file_path, 'rb') as f:
+                    with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as mm:
+                        get_unpack_status(file_path, mm, extracted_files, meta_data, self.config)
 
             self.cleanup(tmp_dir)
 
