@@ -1,8 +1,7 @@
 default_stages: [commit, push]
-exclude: ^src/bin/
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.1.0
+    rev: v4.0.1
     hooks:
     -   id: check-added-large-files
         args: [--maxkb=10000]
@@ -12,9 +11,6 @@ repos:
     -   id: check-merge-conflict
 
     -   id: check-yaml
-
-    -   id: end-of-file-fixer
-        types: [python]
 
     -   id: fix-encoding-pragma
         args: [--remove]
@@ -29,28 +25,14 @@ repos:
     -   id: pretty-format-json
         args: [--autofix]
 
-    -   id: trailing-whitespace
-        types: [python]
-
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
-    hooks:
-    -   id: flake8
-        args: [--select=W504, --ignore=E501,W503]
-
--   repo: https://github.com/pre-commit/mirrors-pylint
-    rev: v2.2.2
-    hooks:
-    -   id: pylint
-        language: system
-        args: [--rcfile=.pylintrc]
-
--   repo: https://github.com/jumanjihouse/pre-commit-hooks
-    rev: 2.1.5
+-   repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
     hooks:
     -   id: shellcheck
 
--   repo: https://github.com/pryorda/dockerfilelint-precommit-hooks
-    rev: v0.1.0
+-   repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.5.6'
     hooks:
-    -   id: dockerfilelint
+    -   id: ruff
+        args: [ --fix, --exit-non-zero-on-fix ]
+    -   id: ruff-format
