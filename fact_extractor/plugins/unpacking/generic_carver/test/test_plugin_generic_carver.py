@@ -18,7 +18,7 @@ class TestGenericCarver(TestUnpackerBase):
             in_file, self.tmp_dir.name, self.unpacker.unpacker_plugins['generic/carver']
         )
         files = set(files)
-        assert len(files) == 3, 'file number incorrect'
+        assert len(files) == 3, 'file number incorrect'  # noqa: PLR2004
         assert f'{self.tmp_dir.name}/100-887.zip' in files, 'hidden zip not identified correctly'
         assert 'output' in meta_data
 
@@ -29,7 +29,7 @@ class TestGenericCarver(TestUnpackerBase):
             str(in_file), self.tmp_dir.name, self.unpacker.unpacker_plugins['generic/carver']
         )
         files = set(files)
-        assert len(files) == 4, 'file number incorrect'
+        assert len(files) == 4, 'file number incorrect'  # noqa: PLR2004
         assert 'removed chunk 300-428' in meta_data['output']
         for file in ('0-128.unknown', '128-300.zip', '428-562.sevenzip', '562-626.unknown'):
             assert f'{self.tmp_dir.name}/{file}' in files

@@ -1,6 +1,7 @@
-'''
+"""
 This plugin unpacks all files via carving
-'''
+"""
+
 from __future__ import annotations
 
 import logging
@@ -15,12 +16,14 @@ from unblob.extractor import carve_unknown_chunk, carve_valid_chunk
 from unblob.file_utils import File
 from unblob.finder import search_chunks
 from unblob.handlers import BUILTIN_HANDLERS
-from unblob.models import TaskResult, PaddingChunk, UnknownChunk, Chunk
-from unblob.processing import Task, remove_inner_chunks, calculate_unknown_chunks
+from unblob.models import Chunk, PaddingChunk, TaskResult, UnknownChunk
+from unblob.processing import Task, calculate_unknown_chunks, remove_inner_chunks
 
 NAME = 'generic_carver'
 MIME_PATTERNS = ['generic/carver']
 VERSION = '1.0.0'
+
+MIN_FILE_ENTROPY = 0.01
 
 # deactivate internal logger of unblob because it can slow down searching chunks
 structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(logging.CRITICAL))
@@ -52,7 +55,7 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
         if filter_report:
             report += f'\nFiltered chunks:\n{filter_report}'
     except Exception as error:
-        report = f"Error {error} during unblob extraction:\n{traceback.format_exc()}"
+        report = f'Error {error} during unblob extraction:\n{traceback.format_exc()}'
     return {'output': report}
 
 
@@ -76,7 +79,7 @@ def _create_report(chunk_list: list[dict]) -> str:
 def _has_low_entropy(file: File, chunk: UnknownChunk) -> bool:
     file.seek(chunk.start_offset)
     content = file.read(chunk.size)
-    return avg_entropy(content) < 0.01
+    return avg_entropy(content) < MIN_FILE_ENTROPY
 
 
 # ----> Do not edit below this line <----
