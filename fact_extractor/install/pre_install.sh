@@ -4,7 +4,7 @@ echo "Install Pre-Install Requirements"
 (apt-get update && apt-get install sudo) || true
 
 sudo apt-get update
-sudo apt-get -y install git apt-transport-https ca-certificates curl software-properties-common wget libmagic-dev
+sudo apt-get -y install git apt-transport-https ca-certificates curl software-properties-common wget libmagic-dev xz-utils
 
 IS_VENV=$(python3 -c 'import sys; print(sys.exec_prefix!=sys.base_prefix)')
 if [[ $IS_VENV == "False" ]]

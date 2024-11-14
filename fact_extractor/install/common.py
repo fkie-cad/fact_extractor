@@ -1,11 +1,12 @@
 import logging
+import subprocess as sp
 import os
 from contextlib import suppress
 from pathlib import Path
 
 from helperFunctions.config import load_config
 from helperFunctions.install import (
-    apt_install_packages, apt_update_sources, pip_install_packages, load_requirements_file
+    apt_install_packages, apt_update_sources, pip_install_packages, load_requirements_file, OperateInDirectory
 )
 
 APT_DEPENDENCIES = {
@@ -37,6 +38,27 @@ def install_apt_dependencies(distribution: str):
     apt_install_packages(*APT_DEPENDENCIES[distribution])
 
 
+def _install_magic():
+    bin_dir = Path(__file__).parent.parent / 'bin'
+    with OperateInDirectory(bin_dir):
+        sp.run(
+            [
+                "wget",
+                "--output-document",
+                "firmware.xz",
+                "https://github.com/fkie-cad/firmware-magic-database/releases/download/v0.2.1/firmware.xz",
+            ],
+            check=True,
+        )
+        sp.run(
+            [
+                "unxz",
+                "--force",
+                "firmware.xz",
+            ]
+        )
+
+
 def main(distribution):
     logging.info('Updating package lists')
     apt_update_sources()
@@ -48,6 +70,8 @@ def main(distribution):
     # make bin dir
     with suppress(FileExistsError):
         os.mkdir('../bin')
+
+    _install_magic()
 
     config = load_config('main.cfg')
     data_folder = config.get('unpack', 'data_folder')

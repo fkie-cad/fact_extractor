@@ -1,12 +1,13 @@
+import fnmatch
 import logging
 from os import getgid, getuid
 from subprocess import PIPE, Popen
 from time import time
-import fnmatch
 from typing import Callable, Dict, List, Tuple
 
+from helperFunctions import magic
 from common_helper_files import get_files_in_dir
-from fact_helper_file import get_file_type_from_path
+
 from helperFunctions.config import read_list_from_config
 from helperFunctions.plugin import import_plugins
 
@@ -50,7 +51,7 @@ class UnpackBase(object):
             return self.unpacker_plugins['generic/carver']
 
     def extract_files_from_file(self, file_path: str, tmp_dir) -> Tuple[List, Dict]:
-        current_unpacker = self.get_unpacker(get_file_type_from_path(file_path)['mime'])
+        current_unpacker = self.get_unpacker(magic.from_file(file_path, mime=True))
         return self._extract_files_from_file_using_specific_unpacker(file_path, tmp_dir, current_unpacker)
 
     def unpacking_fallback(self, file_path, tmp_dir, old_meta, fallback_plugin_mime) -> Tuple[List, Dict]:
