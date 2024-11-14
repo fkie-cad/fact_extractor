@@ -1,12 +1,14 @@
 import logging
 import subprocess as sp
-import os
-from contextlib import suppress
 from pathlib import Path
 
 from helperFunctions.config import load_config
 from helperFunctions.install import (
-    apt_install_packages, apt_update_sources, pip_install_packages, load_requirements_file, OperateInDirectory
+    OperateInDirectory,
+    apt_install_packages,
+    apt_update_sources,
+    load_requirements_file,
+    pip_install_packages,
 )
 
 APT_DEPENDENCIES = {
@@ -31,6 +33,7 @@ APT_DEPENDENCIES = {
     ],
 }
 PIP_DEPENDENCY_FILE = Path(__file__).parent.parent.parent / 'requirements-common.txt'
+BIN_DIR = Path(__file__).parent.parent / 'bin'
 
 
 def install_apt_dependencies(distribution: str):
@@ -39,23 +42,23 @@ def install_apt_dependencies(distribution: str):
 
 
 def _install_magic():
-    bin_dir = Path(__file__).parent.parent / 'bin'
-    with OperateInDirectory(bin_dir):
+    with OperateInDirectory(BIN_DIR):
         sp.run(
             [
-                "wget",
-                "--output-document",
-                "firmware.xz",
-                "https://github.com/fkie-cad/firmware-magic-database/releases/download/v0.2.1/firmware.xz",
+                'wget',
+                '--output-document',
+                'firmware.xz',
+                'https://github.com/fkie-cad/firmware-magic-database/releases/download/v0.2.1/firmware.xz',
             ],
             check=True,
         )
         sp.run(
             [
-                "unxz",
-                "--force",
-                "firmware.xz",
-            ]
+                'unxz',
+                '--force',
+                'firmware.xz',
+            ],
+            check=False,
         )
 
 
@@ -67,15 +70,13 @@ def main(distribution):
     install_apt_dependencies(distribution)
     pip_install_packages(*load_requirements_file(PIP_DEPENDENCY_FILE))
 
-    # make bin dir
-    with suppress(FileExistsError):
-        os.mkdir('../bin')
+    BIN_DIR.mkdir(exist_ok=True)
 
     _install_magic()
 
     config = load_config('main.cfg')
     data_folder = config.get('unpack', 'data_folder')
-    os.makedirs(str(Path(data_folder, 'files')), exist_ok=True)
-    os.makedirs(str(Path(data_folder, 'reports')), exist_ok=True)
+    Path(data_folder, 'files').mkdir(parents=True, exist_ok=True)
+    Path(data_folder, 'reports').mkdir(exist_ok=True)
 
     return 0
