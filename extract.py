@@ -106,7 +106,7 @@ def handle_report(report_file, tmp):
     if report_file:
         Path(report_file).write_text(indented_report)
     else:
-        print(indented_report)
+        print(indented_report)  # noqa: T201
 
 
 def main():

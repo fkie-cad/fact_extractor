@@ -34,7 +34,7 @@ TEST_COMMAND = {
 
 
 @pytest.mark.parametrize(
-    'input_data, payload',
+    ('input_data', 'payload'),
     [(b'abcde...\x25\x2d12345X\x0ablah\x25\x2d12345X\x0ablub', b'blah'), (b'no_preamble', b'no_p')],
 )
 def test_get_end_position_of_first_pjl(input_data, payload):
@@ -49,7 +49,7 @@ def test_get_pjl_commands():
 
 
 @pytest.mark.parametrize(
-    'command, expected_type, expected_value',
+    ('command', 'expected_type', 'expected_value'),
     [(b'@PJL COMMENT test comment', b'COMMENT', b'test comment'), (b'@PJL JOB', b'JOB', None)],
 )
 def test_get_type_and_value(command, expected_type, expected_value):
@@ -75,7 +75,7 @@ def test_get_binary_of_upgrade():
 
 
 @pytest.mark.parametrize(
-    'input_data, fingerprint',
+    ('input_data', 'fingerprint'),
     [
         (b'no finger print', None),
         (

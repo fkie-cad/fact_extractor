@@ -15,7 +15,7 @@ class TestSevenZUnpacker(TestUnpackerBase):
             self.check_unpacker_selection(item, '7z')
 
     @pytest.mark.parametrize(
-        'test_file, prefix',
+        ('test_file', 'prefix'),
         [
             ('test.7z', 'get_files_test'),
             ('test.rar', 'get_files_test'),
@@ -32,7 +32,7 @@ class TestSevenZUnpacker(TestUnpackerBase):
         assert 'password' not in meta, 'password incorrectly set'
 
     @pytest.mark.parametrize(
-        'test_file, prefix, ignore',
+        ('test_file', 'prefix', 'ignore'),
         [
             ('fat.img.xz', 'get_files_test', None),
             ('hfs.img.xz', 'untitled/get_files_test', None),

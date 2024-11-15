@@ -5,7 +5,7 @@ import logging
 import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from helperFunctions.dataConversion import ReportEncoder
 from helperFunctions.file_system import file_is_empty
@@ -17,7 +17,7 @@ class Unpacker(UnpackBase):
     FS_FALLBACK_CANDIDATES = ['SquashFS']
     CARVER_FALLBACK_BLACKLIST = ['generic_carver', 'NOP', 'PaTool', 'SFX', 'LinuxKernel']
 
-    def __init__(self, config=None, extract_everything: bool = False, folder: str = None):
+    def __init__(self, config=None, extract_everything: bool = False, folder: Optional[str] = None):
         super().__init__(config=config, extract_everything=extract_everything)
         data_folder = Path(self.config.get('unpack', 'data_folder'))
         if folder:
@@ -89,7 +89,7 @@ class Unpacker(UnpackBase):
             logging.error(f'Could not CleanUp tmp_dir: {error}', exc_info=True)
 
     def move_extracted_files(self, file_paths: List[str], extraction_dir: Path) -> List[Path]:
-        extracted_files = list()
+        extracted_files = []
         for item in file_paths:
             if not file_is_empty(item) or self.extract_everything:
                 absolute_path = Path(item)

@@ -21,8 +21,7 @@ def unpack_function(file_path, tmp_dir):
 
     _rename_files(tmp_dir)
     _remove_ini_files(tmp_dir)
-    meta_data = {'output': output}
-    return meta_data
+    return {'output': output}
 
 
 def _rename_files(tmp_dir):
@@ -38,16 +37,14 @@ def _rename_files(tmp_dir):
 def _get_list_of_files(tmp_dir):
     all_files = get_files_in_dir(tmp_dir)
     bin_files = [any_file for any_file in all_files if any_file.endswith('bin')]
-    files = [(f'{bin_file[:len(bin_file) - 3]}ini', bin_file) for bin_file in bin_files]
-    return files
+    return [(f'{bin_file[:len(bin_file) - 3]}ini', bin_file) for bin_file in bin_files]
 
 
 def _extract_module_id(bin_file):
     id_match = re.match(r'.*(m[0-9]{4})\.bin', bin_file)
     if not id_match:
         return None
-    module_id = id_match.group(1)
-    return module_id
+    return id_match.group(1)
 
 
 def _get_identifier_from_ini(ini_file):

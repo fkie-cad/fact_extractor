@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 
 root_dir = Path(__file__).parent.parent.parent.parent.parent
-print(root_dir, [str(d) for d in root_dir.iterdir() if d.is_dir()])
 sys.path.append(str(root_dir))
 
 from test.unit.unpacker.test_unpacker import TestUnpackerBase

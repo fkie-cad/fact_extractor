@@ -23,11 +23,10 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
 
 
 def _get_meta_data(data_sections: list, lzma_streams: list) -> dict:
-    meta_data = {
+    return {
         'number_of_zero_padded_sections': len(data_sections),
         'number_of_lzma_streams': len(lzma_streams),
     }
-    return meta_data
 
 
 # ----> Do not edit below this line <----

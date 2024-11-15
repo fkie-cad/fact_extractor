@@ -44,8 +44,7 @@ def _rename_files(file_path):
 def _get_list_of_files():
     all_files = get_files_in_dir('.')
     bin_files = [any_file for any_file in all_files if any_file.endswith('a9s')]
-    files = [(f'{bin_file[:len(bin_file) - 3]}a9h', bin_file) for bin_file in bin_files]
-    return files
+    return [(f'{bin_file[:len(bin_file) - 3]}a9h', bin_file) for bin_file in bin_files]
 
 
 def _get_identifier_from_ini(ini_file):

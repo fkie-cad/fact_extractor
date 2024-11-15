@@ -28,8 +28,7 @@ def successful_extraction(files, meta_data):
 
 def meta_data_for_failed_analysis(file_path):
     with TemporaryDirectory() as tmp_dir:
-        meta_data = unpack_function(file_path, tmp_dir)
-    return meta_data
+        return unpack_function(file_path, tmp_dir)
 
 
 class TestTektronixExtendedHex(TestUnpackerBase):
@@ -45,8 +44,7 @@ class TestTektronixExtendedHex(TestUnpackerBase):
     def _get_meta_data(test_file):
         file_path = Path(TEST_DATA_DIR, test_file)
         with TemporaryDirectory() as tmp_dir:
-            meta_data = unpack_function(file_path, tmp_dir)
-        return meta_data
+            return unpack_function(file_path, tmp_dir)
 
     @staticmethod
     def test_extraction_bad_file():

@@ -16,8 +16,7 @@ def unpack_function(file_path, tmp_dir):
         return {'output': 'Error: phantom_firmware_tools not installed! Re-Run the installation script!'}
 
     output = execute_shell_command(f'(cd {tmp_dir} && fakeroot {TOOL_PATH} -x -vv -p {file_path})') + '\n'
-    meta_data = {'output': output}
-    return meta_data
+    return {'output': output}
 
 
 # ----> Do not edit below this line <----

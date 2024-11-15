@@ -121,9 +121,7 @@ def load_requirements_file(path: Path) -> list[str]:
 
 def check_if_command_in_path(command):
     _, return_code = execute_shell_command_get_return_code(f'command -v {command}')
-    if return_code != 0:
-        return False
-    return True
+    return return_code == 0
 
 
 def install_github_project(project_path: str, commands: List[str]):

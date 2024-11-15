@@ -14,7 +14,7 @@ class TestLinuxKernelUnpacker(TestUnpackerBase):
         self.check_unpacker_selection('linux/kernel', 'LinuxKernel')
 
     @pytest.mark.parametrize(
-        'input_file, expected',
+        ('input_file', 'expected'),
         [
             ('bzImage_bzip2', 'vmlinux_BZIP_17001'),
             ('bzImage_gzip', 'vmlinux_GZIP_17001'),

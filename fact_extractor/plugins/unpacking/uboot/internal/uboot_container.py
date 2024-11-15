@@ -1,3 +1,4 @@
+import contextlib
 from struct import unpack
 from time import gmtime
 
@@ -152,7 +153,5 @@ class uBootHeader:
         else:
             raise UbootInvalidCompression
 
-        try:
+        with contextlib.suppress(UnicodeDecodeError):
             self.image_name = header[11].replace(b'\x00', b'').decode(encoding='UTF-8')
-        except UnicodeDecodeError:
-            pass

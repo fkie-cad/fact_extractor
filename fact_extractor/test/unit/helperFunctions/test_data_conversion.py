@@ -15,7 +15,7 @@ def test_make_bytes(input_data):
 
 
 @pytest.mark.parametrize(
-    'input_data, expected',
+    ('input_data', 'expected'),
     [
         ('test string', 'test string'),
         (b'test string', 'test string'),
@@ -38,13 +38,13 @@ def test_make_list_from_dict():
     assert result_list == ['abc', 'bcd'], 'resulting list not correct'
 
 
-@pytest.mark.parametrize('input_data, expected', [(' test', 'test'), ('blah   blah ', 'blah blah')])
+@pytest.mark.parametrize(('input_data', 'expected'), [(' test', 'test'), ('blah   blah ', 'blah blah')])
 def test_remove_uneccessary_spaces(input_data, expected):
     assert remove_uneccessary_spaces(input_data) == expected
 
 
 @pytest.mark.parametrize(
-    'source, result',
+    ('source', 'result'),
     [
         (b'abc', '"abc"'),
         (b'\x00\xff', '"00ff"'),

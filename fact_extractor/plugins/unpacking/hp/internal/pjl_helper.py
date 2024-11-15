@@ -47,8 +47,7 @@ def _get_name_of_upgrade(raw_binary, upgrade_command):
 
 def _get_size_of_upgrade(upgrade_command):
     tmp = re.match(rb'SIZE=([0-9]+)', upgrade_command['value'])
-    tmp = int(tmp.group(1))
-    return tmp
+    return int(tmp.group(1))
 
 
 def _get_type_and_value(raw_command):
@@ -64,8 +63,7 @@ def _is_upgrade(pjl_command):
 
 def _remove_uneccessary_spaces(input_string):
     tmp = input_string.split()
-    tmp = ' '.join(tmp)
-    return tmp
+    return ' '.join(tmp)
 
 
 def _get_file_fingerprint(input_data):

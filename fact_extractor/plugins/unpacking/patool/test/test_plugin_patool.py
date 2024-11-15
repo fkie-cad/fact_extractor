@@ -15,7 +15,7 @@ class TestPaToolUnpacker(TestUnpackerBase):
         self.check_unpacker_selection('application/x-lzh-compressed', 'PaTool')
 
     @pytest.mark.parametrize(
-        'in_file, ignore',
+        ('in_file', 'ignore'),
         [
             ('test.cab', None),
             ('test.cpio', None),
