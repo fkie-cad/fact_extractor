@@ -17,7 +17,7 @@ def test_load_config(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    'input_data, expected',
+    ('input_data', 'expected'),
     [
         ('', []),
         ('item1', ['item1']),

@@ -17,8 +17,7 @@ def unpack_function(file_path, tmp_dir):
     output = (
         execute_shell_command(f'fakeroot ubireader_extract_images -i -w -v --output-dir {tmp_dir} {file_path}') + '\n'
     )
-    meta_data = {'output': output}
-    return meta_data
+    return {'output': output}
 
 
 # ----> Do not edit below this line <----

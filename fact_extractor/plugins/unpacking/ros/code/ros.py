@@ -26,7 +26,7 @@ def calculate_file_count(header: bytes, endianness: str) -> int:
 
 
 def generate_part_information(header: bytes, endianness: str, number_of_files: int) -> List[dict]:
-    parts = list()
+    parts = []
     header_size = infer_header_size_from_version(header)
 
     for index in range(number_of_files):

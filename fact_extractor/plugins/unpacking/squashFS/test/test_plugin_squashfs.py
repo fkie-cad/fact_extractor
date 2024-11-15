@@ -11,7 +11,7 @@ TEST_DATA_DIR = Path(__file__).parent / 'data'
 
 
 @pytest.mark.parametrize(
-    'unpack_path, expected',
+    ('unpack_path', 'expected'),
     [
         ('/foo/bar/unpacker', False),
         (TEST_DATA_DIR, True),

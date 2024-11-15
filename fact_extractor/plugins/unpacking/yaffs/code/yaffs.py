@@ -25,8 +25,7 @@ def unpack_function(file_path, tmp_dir):
 def _is_big_endian(file_path):
     with open(file_path, 'br') as fp:
         content = fp.read(10)
-        big_endian = content[7:] == b'\x01\xff\xff'
-    return big_endian
+        return content[7:] == b'\x01\xff\xff'
 
 
 # ----> Do not edit below this line <----

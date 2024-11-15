@@ -31,8 +31,7 @@ def unpack_function(file_path, tmp_dir):
 def _get_trx_offset(file_path):
     with open(file_path, 'br') as fp:
         content = fp.read()
-        offset = content.find(b'HDR0')
-    return offset
+        return content.find(b'HDR0')
 
 
 def _remove_non_trx_header(source_path, target_fp, offset):

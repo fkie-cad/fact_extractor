@@ -72,8 +72,7 @@ def is_valid_crc(rec):
 def get_data_field(rec):
     _addr_size = int(rec[6], 16)
     # _addr = int(rec[7:7 + _addr_size], 16)  # information not used by now
-    _data = rec[7 + _addr_size :]
-    return _data
+    return rec[7 + _addr_size :]
 
 
 def decode_record(rec):
