@@ -1,12 +1,11 @@
 from pathlib import Path
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
+from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 
 
 class TestDlinkShrs(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('firmware/dlink-shrs', 'D-Link SHRS')
 

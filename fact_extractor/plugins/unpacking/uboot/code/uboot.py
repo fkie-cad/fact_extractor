@@ -12,7 +12,6 @@ sys.path.append(os.path.join(THIS_FILE, '..', 'internal'))
 
 from uboot_container import uBootHeader  # noqa: E402 pylint: disable=import-error,wrong-import-position
 
-
 NAME = 'Uboot'
 MIME_PATTERNS = ['firmware/u-boot']
 VERSION = '0.2'
@@ -20,10 +19,10 @@ DTB_MAGIC = b'\xd0\x0d\xfe\xed'
 
 
 def unpack_function(file_path, tmp_dir):
-    '''
+    """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
-    '''
+    """
 
     unpacker = Uboot(file_path)
     meta = {}
@@ -44,7 +43,7 @@ def unpack_function(file_path, tmp_dir):
 
     # scan for device tree blobs
     if DTB_MAGIC in Path(file_path).read_bytes():
-        cmd = f'''extract-dtb {file_path} -o {Path(tmp_dir) / 'dtb'}'''
+        cmd = f"""extract-dtb {file_path} -o {Path(tmp_dir) / 'dtb'}"""
         output = cmd + '\n'
         output += execute_shell_command(cmd, timeout=10)
         meta['extract-dtb'] = output
@@ -71,7 +70,9 @@ class Uboot:
         return remaining
 
     def extract_uboot_image(self):
-        return self.carver.extract_data(uBootHeader.HEADER_LENGTH, uBootHeader.HEADER_LENGTH + self.ubootheader.image_data_size)
+        return self.carver.extract_data(
+            uBootHeader.HEADER_LENGTH, uBootHeader.HEADER_LENGTH + self.ubootheader.image_data_size
+        )
 
     def _set_uboot_header(self):
         with open(self.firmware_filepath, 'r+b') as raw_file:
@@ -83,6 +84,7 @@ class Uboot:
 
     def extract_uboot_header(self):
         return self.carver.extract_data(0, uBootHeader.HEADER_LENGTH)
+
 
 # ----> Do not edit below this line <----
 

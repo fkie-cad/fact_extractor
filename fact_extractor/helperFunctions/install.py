@@ -106,9 +106,7 @@ def pip_install_packages(*packages):
     for packet in packages:
         try:
             run_shell_command_raise_on_return_code(
-                f'{pip_command} install --upgrade "{packet}"',
-                f'Error in installation of python package {packet}',
-                True
+                f'{pip_command} install --upgrade "{packet}"', f'Error in installation of python package {packet}', True
             )
         except InstallationError as installation_error:
             if 'is a distutils installed project' in str(installation_error):
@@ -118,10 +116,7 @@ def pip_install_packages(*packages):
 
 
 def load_requirements_file(path: Path) -> list[str]:
-    return [
-        line for line in path.read_text().splitlines()
-        if line and not line.startswith('#')
-    ]
+    return [line for line in path.read_text().splitlines() if line and not line.startswith('#')]
 
 
 def check_if_command_in_path(command):

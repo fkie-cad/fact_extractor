@@ -1,13 +1,14 @@
 import shutil
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from tempfile import TemporaryDirectory
-import pytest
-from contextlib import contextmanager
 
+import pytest
+
+from helperFunctions.file_system import get_test_data_dir
 from plugins.unpacking.generic_carver.code.generic_carver import ArchivesFilter
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
-from helperFunctions.file_system import get_test_data_dir
 
 # pylint: disable=protected-access
 

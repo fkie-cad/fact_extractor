@@ -1,6 +1,6 @@
+import binascii
 import json
 import types
-import binascii
 
 
 class ReportEncoder(json.JSONEncoder):

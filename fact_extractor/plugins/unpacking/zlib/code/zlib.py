@@ -1,6 +1,7 @@
-'''
+"""
 This plugin unpacks Zlib streams.
-'''
+"""
+
 import os
 import zlib
 
@@ -19,12 +20,13 @@ def unpack_function(file_path, tmp_dir):
     """
     raw_data = get_binary_from_file(file_path)
     decompressed_data = zlib.decompress(raw_data)
-    output_file_path = os.path.join(tmp_dir, "zlib_decompressed")
+    output_file_path = os.path.join(tmp_dir, 'zlib_decompressed')
     write_binary_to_file(decompressed_data, output_file_path)
     return {}
 
 
 # ----> Do not edit below this line <----
+
 
 def setup(unpack_tool):
     for item in MIME_PATTERNS:

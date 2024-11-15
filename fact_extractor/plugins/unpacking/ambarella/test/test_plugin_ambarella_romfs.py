@@ -1,12 +1,11 @@
 import os
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
+from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
 class TestAmbarellaRomFSUnpacker(TestUnpackerBase):
-
     def test_unpacker_selection(self):
         self.check_unpacker_selection('filesystem/ambarella-romfs', 'Ambarella_RomFS')
 

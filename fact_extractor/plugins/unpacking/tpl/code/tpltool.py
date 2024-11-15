@@ -2,6 +2,7 @@ import os
 from shutil import copyfile
 
 from common_helper_process import execute_shell_command
+
 from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'tpl-tool'
@@ -11,18 +12,18 @@ UNPACKER_EXECUTEABLE = os.path.join(get_fact_bin_dir(), 'tpl-tool')
 
 
 def unpack_function(file_path, tmp_dir):
-    '''
+    """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
-    '''
+    """
     # tpl-tool unpacker unpacks files in the directory of the input file -> copy input file and delete afterwards
     tmp_file_path = os.path.join(tmp_dir, os.path.basename(file_path))
     copyfile(file_path, tmp_file_path)
 
     result = {}
 
-    result['output'] = execute_shell_command('fakeroot {} -x {}'.format(UNPACKER_EXECUTEABLE, tmp_file_path))
-    result['header-info'] = execute_shell_command('{} -s {}'.format(UNPACKER_EXECUTEABLE, tmp_file_path))
+    result['output'] = execute_shell_command(f'fakeroot {UNPACKER_EXECUTEABLE} -x {tmp_file_path}')
+    result['header-info'] = execute_shell_command(f'{UNPACKER_EXECUTEABLE} -s {tmp_file_path}')
 
     os.remove(tmp_file_path)
 

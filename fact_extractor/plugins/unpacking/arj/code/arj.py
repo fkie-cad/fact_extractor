@@ -15,11 +15,9 @@ def unpack_function(file_path, tmp_dir):
     Since the arj binary only works correct when files end with .arj, this is taken care of
     """
     with TemporaryDirectory() as staging_dir:
-        staged_path = str(Path(staging_dir) / '{}.arj'.format(Path(file_path).name))
+        staged_path = str(Path(staging_dir) / f'{Path(file_path).name}.arj')
         symlink(file_path, staged_path)
-        output = execute_shell_command(
-            'arj x -r -y {} {}'.format(staged_path, tmp_dir), timeout=600
-        )
+        output = execute_shell_command(f'arj x -r -y {staged_path} {tmp_dir}', timeout=600)
 
     return {'output': output}
 

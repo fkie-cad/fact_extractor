@@ -6,7 +6,6 @@ TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 
 class TestUnpackerPluginDsk(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         mimes = ['firmware/dsk1.0']
         for item in mimes:

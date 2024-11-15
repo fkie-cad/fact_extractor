@@ -6,6 +6,7 @@ from common_helper_files import get_binary_from_file
 
 from helperFunctions.hash import get_sha256
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
+
 from ..code.TPWRN702N import TPWR702N
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
