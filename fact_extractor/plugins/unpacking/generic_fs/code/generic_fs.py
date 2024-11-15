@@ -1,18 +1,27 @@
-'''
+"""
 This plugin mounts filesystem images and extracts their content
-'''
+"""
+
 import re
 from shlex import split
-from subprocess import run, PIPE, STDOUT
+from subprocess import PIPE, STDOUT, run
 from tempfile import TemporaryDirectory
 from time import sleep
 
-from fact_helper_file import get_file_type_from_path
+from helperFunctions import magic
 
 NAME = 'genericFS'
 MIME_PATTERNS = [
-    'filesystem/btrfs', 'filesystem/dosmbr', 'filesystem/f2fs', 'filesystem/jfs', 'filesystem/minix',
-    'filesystem/reiserfs', 'filesystem/romfs', 'filesystem/udf', 'filesystem/xfs', 'generic/fs',
+    'filesystem/btrfs',
+    'filesystem/dosmbr',
+    'filesystem/f2fs',
+    'filesystem/jfs',
+    'filesystem/minix',
+    'filesystem/reiserfs',
+    'filesystem/romfs',
+    'filesystem/udf',
+    'filesystem/xfs',
+    'generic/fs',
 ]
 VERSION = '0.6.1'
 TYPES = {
@@ -28,7 +37,7 @@ TYPES = {
 
 
 def unpack_function(file_path, tmp_dir):
-    mime_type = get_file_type_from_path(file_path)['mime']
+    mime_type = magic.from_file(file_path, mime=True)
     if mime_type == 'filesystem/dosmbr':
         output = _mount_from_boot_record(file_path, tmp_dir)
     else:
