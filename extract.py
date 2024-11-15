@@ -43,7 +43,12 @@ def setup_logging(verbose):
 
 
 def container_exists(container):
-    return subprocess.run(f'docker history {container}', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).returncode == 0
+    return (
+        subprocess.run(
+            f'docker history {container}', shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=False
+        ).returncode
+        == 0
+    )
 
 
 def default_container_status():
@@ -51,7 +56,10 @@ def default_container_status():
     try:
         process_result = subprocess.run(
             f'docker image ls {DEFAULT_CONTAINER} --format "{format_parameter}"',
-            shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            check=False,
         )
         tag, creation_time = process_result.stdout.decode().strip().split(',')
     except ValueError:
@@ -83,7 +91,7 @@ def call_docker(input_file, container, target, report_file, memory_limit, tmpdir
         shutil.copy(input_file, str(Path(tmpdir.name, 'input', Path(input_file).name)))
 
         command = f'docker run --rm --ulimit nofile=20000:50000 -m {memory_limit}m -v {tmpdir.name}:/tmp/extractor -v /dev:/dev --privileged {container} {arguments}'
-        subprocess.run(command, shell=True)
+        subprocess.run(command, shell=True, check=False)
 
         with suppress(shutil.Error):
             shutil.copytree(str(Path(tmpdir.name, 'files')), target)
@@ -105,18 +113,22 @@ def main():
     arguments = parse_arguments()
     setup_logging(arguments.verbose)
 
-    output_directory = arguments.output_directory if arguments.output_directory else str(Path('.') / 'extracted_files')
+    output_directory = arguments.output_directory if arguments.output_directory else str(Path() / 'extracted_files')
     if Path(output_directory).exists():
-        logging.error(f'Target directory exists ({output_directory}). Please choose a non-existing directory with -o option.')
+        logging.error(
+            f'Target directory exists ({output_directory}). Please choose a non-existing directory with -o option.'
+        )
         return 1
 
     if not container_exists(arguments.container):
-        logging.error(f'Container {arguments.container} doesn\'t exist. Please specify an existing container with the -c option.')
+        logging.error(
+            f"Container {arguments.container} doesn't exist. Please specify an existing container with the -c option."
+        )
         logging.info(f'You can download the default container with "docker pull {DEFAULT_CONTAINER}"')
         return 1
 
     if not Path(arguments.FILE[0]).is_file():
-        logging.error(f'Given input file {arguments.FILE[0]} doesn\'t exist. Please give an existing path.')
+        logging.error(f"Given input file {arguments.FILE[0]} doesn't exist. Please give an existing path.")
         return 1
 
     if arguments.report_file and not Path(arguments.report_file).parent.is_dir():
@@ -132,7 +144,7 @@ def main():
         target=output_directory,
         report_file=arguments.report_file,
         memory_limit=arguments.memory,
-        extract_everything=arguments.extract_everything
+        extract_everything=arguments.extract_everything,
     )
 
     return 0

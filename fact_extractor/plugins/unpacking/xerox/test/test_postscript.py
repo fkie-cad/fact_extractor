@@ -3,7 +3,8 @@ import os
 from common_helper_files import get_binary_from_file
 
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
-from ..code.postscript import _get_raw_payloads, _convert_payloads
+
+from ..code.postscript import _convert_payloads, _get_raw_payloads
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
@@ -11,7 +12,6 @@ TEST_FILE = os.path.join(TEST_DATA_DIR, 'xerox.ps')
 
 
 class TestUnpackerPluginPostscript(TestUnpackerBase):
-
     def test_unpacker_selection_adobe_ps(self):
         mimes = ['text/postscript']
         for item in mimes:
@@ -35,7 +35,10 @@ class TestUnpackerPluginPostscript(TestUnpackerBase):
     def test_get_raw_payloads(self):
         raw_content = get_binary_from_file(TEST_FILE)
         payloads = _get_raw_payloads(raw_content)
-        assert len(payloads) == 3, "number of payloads not correct"
-        assert payloads[0] == b'<~<+oue+DGm>FD,5.Anc:,F<FCgH#.D-A0C~>', "simple payload not correct"
-        assert payloads[1] == b'<~<+oue+DGm>@3BW&@rH6q+Dl72BHV,0DJ*O$+E1b7Ci<`m+EV:*F<GX<Dfol,+Cf>-FCAm$+\nEM+;ATD3q+Dbb0ATJu&DIal2D]it9/hSa~>', "multiline payload not correct"
-        assert payloads[2] == b'<~@;^"*BOu3kAoD^,@<;~>', "other header format"
+        assert len(payloads) == 3, 'number of payloads not correct'
+        assert payloads[0] == b'<~<+oue+DGm>FD,5.Anc:,F<FCgH#.D-A0C~>', 'simple payload not correct'
+        assert (
+            payloads[1]
+            == b'<~<+oue+DGm>@3BW&@rH6q+Dl72BHV,0DJ*O$+E1b7Ci<`m+EV:*F<GX<Dfol,+Cf>-FCAm$+\nEM+;ATD3q+Dbb0ATJu&DIal2D]it9/hSa~>'
+        ), 'multiline payload not correct'
+        assert payloads[2] == b'<~@;^"*BOu3kAoD^,@<;~>', 'other header format'

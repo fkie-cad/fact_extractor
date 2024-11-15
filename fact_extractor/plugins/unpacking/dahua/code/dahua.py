@@ -1,6 +1,7 @@
-'''
+"""
 This plugin unpacks dahua firmware images
-'''
+"""
+
 from pathlib import Path
 
 from common_helper_files import get_binary_from_file, write_binary_to_file

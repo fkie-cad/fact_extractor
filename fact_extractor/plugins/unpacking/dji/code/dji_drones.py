@@ -1,9 +1,9 @@
-
 import re
 from os import path, rename
 
 from common_helper_files import delete_file, get_files_in_dir
 from common_helper_process import execute_shell_command
+
 from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'DJI_drones'
@@ -52,7 +52,7 @@ def _extract_module_id(bin_file):
 
 def _get_identifier_from_ini(ini_file):
     identifier = 'default'
-    with open(ini_file, 'r') as fd:
+    with open(ini_file) as fd:
         lines = fd.readlines()
         for line in lines:
             match = re.match(r'\#.Stores.firmware.for.([0-9a-zA-Z ]*)', line)

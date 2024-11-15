@@ -1,13 +1,14 @@
 from pathlib import Path
-from helperFunctions.hash import get_sha256
+
 from common_helper_files import get_binary_from_file
+
+from helperFunctions.hash import get_sha256
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 
 
 class TestDraytekVigor167Unpacker(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('firmware/draytek-vigor-167', 'Draytek Vigor 167')
 

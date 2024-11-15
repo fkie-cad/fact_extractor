@@ -17,12 +17,13 @@ def i_always_crash(*args, **kwargs):
 
 
 class TestIntelHex(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('firmware/intel-hex', 'IntelHEX')
 
     def test_extraction(self):
-        files, meta_data = self.unpacker.extract_files_from_file(str(Path(TEST_DATA_DIR, 'testfile.hex')), self.tmp_dir.name)
+        files, meta_data = self.unpacker.extract_files_from_file(
+            str(Path(TEST_DATA_DIR, 'testfile.hex')), self.tmp_dir.name
+        )
         assert len(files) == 1
         content = Path(files[0]).read_text()
         assert 'test string' in content
