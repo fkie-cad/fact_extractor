@@ -22,7 +22,6 @@ def successful_extraction(files, meta_data):
 
 
 class TestMotorolaSRecord(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('firmware/srecord', 'Motorola S-Record')
 

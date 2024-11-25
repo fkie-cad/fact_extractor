@@ -1,12 +1,12 @@
 # pylint: disable=protected-access
 from pathlib import Path
+
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(Path(__file__).parent, 'data')
 
 
 class TestRawUnpacker(TestUnpackerBase):
-
     def test_unpacker_selection(self):
         self.check_unpacker_selection('data/raw', 'RAW')
 
@@ -21,7 +21,9 @@ class TestRawUnpacker(TestUnpackerBase):
 
     def test_extraction_encoded(self):
         input_file = Path(TEST_DATA_DIR, 'encoded.bin')
-        unpacked_files, meta_data = self.unpacker._extract_files_from_file_using_specific_unpacker(str(input_file), self.tmp_dir.name, self.unpacker.unpacker_plugins['data/raw'])
+        unpacked_files, meta_data = self.unpacker._extract_files_from_file_using_specific_unpacker(
+            str(input_file), self.tmp_dir.name, self.unpacker.unpacker_plugins['data/raw']
+        )
         assert meta_data['Intel Hex'] == 1
         assert meta_data['Motorola S-Record'] == 1
         assert f'{self.tmp_dir.name}/0x6.ihex' in unpacked_files

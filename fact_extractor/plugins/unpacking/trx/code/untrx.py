@@ -2,6 +2,7 @@ from os import path
 from tempfile import NamedTemporaryFile
 
 from common_helper_process.fail_safe_subprocess import execute_shell_command
+
 from helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'untrx'
@@ -12,10 +13,10 @@ UNPACKER_EXECUTEABLE = path.join(get_fact_bin_dir(), 'untrx')
 
 
 def unpack_function(file_path, tmp_dir):
-    '''
+    """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
-    '''
+    """
     offset = _get_trx_offset(file_path)
     if offset > 0:
         with NamedTemporaryFile('bw') as tf:
@@ -30,8 +31,7 @@ def unpack_function(file_path, tmp_dir):
 def _get_trx_offset(file_path):
     with open(file_path, 'br') as fp:
         content = fp.read()
-        offset = content.find(b'HDR0')
-    return offset
+        return content.find(b'HDR0')
 
 
 def _remove_non_trx_header(source_path, target_fp, offset):
@@ -43,7 +43,7 @@ def _remove_non_trx_header(source_path, target_fp, offset):
 
 
 def _unpack_trx(file_path, target_dir):
-    return execute_shell_command('fakeroot {} {} {}'.format(UNPACKER_EXECUTEABLE, file_path, target_dir))
+    return execute_shell_command(f'fakeroot {UNPACKER_EXECUTEABLE} {file_path} {target_dir}')
 
 
 # ----> Do not edit below this line <----

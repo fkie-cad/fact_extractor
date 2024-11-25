@@ -1,6 +1,7 @@
-'''
+"""
 This plugin decodes / unpacks Intel HEX files (.hex)
-'''
+"""
+
 from pathlib import Path
 
 from intelhex import HexRecordError, IntelHex, IntelHexError
@@ -11,10 +12,10 @@ VERSION = '0.1'
 
 
 def unpack_function(file_path, tmp_dir):
-    '''
+    """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
-    '''
+    """
     target_file = Path(tmp_dir, Path(file_path).name)
 
     try:
@@ -23,7 +24,7 @@ def unpack_function(file_path, tmp_dir):
     except HexRecordError:
         return {'output': 'Invalid hex file'}
     except IntelHexError as intel_hex_error:
-        return {'output': 'Unknown error in decoding: {}'.format(str(intel_hex_error))}
+        return {'output': f'Unknown error in decoding: {intel_hex_error!s}'}
 
     return {'output': 'Successfully decoded hex file'}
 

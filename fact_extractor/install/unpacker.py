@@ -16,8 +16,8 @@ from helperFunctions.install import (
     apt_install_packages,
     apt_remove_packages,
     install_github_project,
-    pip_install_packages,
     load_requirements_file,
+    pip_install_packages,
 )
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
@@ -199,6 +199,7 @@ elif platform.machine() == 'aarch64':
         ),
     ]
 
+
 def install_dependencies(dependencies):
     apt = dependencies.get('apt', [])
     github = dependencies.get('github', [])
@@ -237,20 +238,18 @@ def _edit_sudoers():
     logging.info('add rules to sudo...')
     username = getuser()
     sudoers_content = '\n'.join(
-        (
-            f'{username}\tALL=NOPASSWD: {command}'
-            for command in (
-                '/sbin/kpartx',
-                '/sbin/losetup',
-                '/bin/mount',
-                '/bin/umount',
-                '/bin/mknod',
-                '/usr/bin/sasquatch',
-                '/bin/rm',
-                '/bin/cp',
-                '/bin/dd',
-                '/bin/chown',
-            )
+        f'{username}\tALL=NOPASSWD: {command}'
+        for command in (
+            '/sbin/kpartx',
+            '/sbin/losetup',
+            '/bin/mount',
+            '/bin/umount',
+            '/bin/mknod',
+            '/usr/bin/sasquatch',
+            '/bin/rm',
+            '/bin/cp',
+            '/bin/dd',
+            '/bin/chown',
         )
     )
     Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n')  # pylint: disable=unspecified-encoding
@@ -261,19 +260,18 @@ def _edit_sudoers():
 
 
 def _install_external_deb_deps():
-    '''
+    """
     install deb packages that aren't available through Debian/Ubuntu package sources
-    '''
-    with TemporaryDirectory(prefix='patool') as build_directory:
-        with OperateInDirectory(build_directory):
-            for file_name, url, sha256 in EXTERNAL_DEB_DEPS:
-                try:
-                    run(split(f'wget {url}/{file_name}'), check=True, env=os.environ)
-                    if not _sha256_hash_file(Path(file_name)) == sha256:
-                        raise InstallationError(f'Wrong file hash: {file_name}')
-                    run(split(f'sudo dpkg -i {file_name}'), capture_output=True, check=True)
-                except CalledProcessError as error:
-                    raise InstallationError(f'Error during {file_name} unpacker installation') from error
+    """
+    with TemporaryDirectory(prefix='patool') as build_directory, OperateInDirectory(build_directory):
+        for file_name, url, sha256 in EXTERNAL_DEB_DEPS:
+            try:
+                run(split(f'wget {url}/{file_name}'), check=True, env=os.environ)
+                if not _sha256_hash_file(Path(file_name)) == sha256:
+                    raise InstallationError(f'Wrong file hash: {file_name}')
+                run(split(f'sudo dpkg -i {file_name}'), capture_output=True, check=True)
+            except CalledProcessError as error:
+                raise InstallationError(f'Error during {file_name} unpacker installation') from error
 
 
 def _sha256_hash_file(file_path: Path) -> str:
@@ -284,26 +282,25 @@ def _install_freetz():
     logging.info('Installing FREETZ')
     current_user = getuser()
     freetz_build_config = Path(__file__).parent / 'freetz.config'
-    with TemporaryDirectory(prefix='fact_freetz') as build_directory:
-        with OperateInDirectory(build_directory):
-            os.umask(0o022)
-            install_github_project(
-                'Freetz-NG/freetz-ng',
-                [
-                    # add user only if it does not exist to fix issues with re-running the installation after an error
-                    'id -u makeuser || sudo useradd -M makeuser',
-                    'sudo mkdir -p /home/makeuser',
-                    'sudo chown -R makeuser /home/makeuser',
-                    f'cp {freetz_build_config} ./.config',
-                    f'sudo chown -R makeuser {build_directory}',
-                    'sudo su makeuser -c "make -j$(nproc) tools"',
-                    f'sudo chmod -R 777 {build_directory}',
-                    f'sudo chown -R {current_user} {build_directory}',
-                    'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma tools/sfk '
-                    f'tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi {BIN_DIR}',
-                    'sudo userdel makeuser',
-                ],
-            )
+    with TemporaryDirectory(prefix='fact_freetz') as build_directory, OperateInDirectory(build_directory):
+        os.umask(0o022)
+        install_github_project(
+            'Freetz-NG/freetz-ng',
+            [
+                # add user only if it does not exist to fix issues with re-running the installation after an error
+                'id -u makeuser || sudo useradd -M makeuser',
+                'sudo mkdir -p /home/makeuser',
+                'sudo chown -R makeuser /home/makeuser',
+                f'cp {freetz_build_config} ./.config',
+                f'sudo chown -R makeuser {build_directory}',
+                'sudo su makeuser -c "make -j$(nproc) tools"',
+                f'sudo chmod -R 777 {build_directory}',
+                f'sudo chown -R {current_user} {build_directory}',
+                'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma tools/sfk '
+                f'tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi {BIN_DIR}',
+                'sudo userdel makeuser',
+            ],
+        )
 
 
 def _install_plugins():

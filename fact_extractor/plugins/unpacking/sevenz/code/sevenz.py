@@ -1,6 +1,7 @@
-'''
+"""
 This plugin uses 7z to extract several formats
-'''
+"""
+
 import logging
 import os
 
@@ -36,15 +37,15 @@ VERSION = '0.8.2'
 UNPACKER_EXECUTABLE = '7z'
 
 # Empty password must be first in list to correctly detect if archive has no password
-PW_LIST = [""]
+PW_LIST = ['']
 PW_LIST.extend(get_merged_password_set(os.path.join(get_src_dir(), 'unpacker/passwords')))
 
 
 def unpack_function(file_path, tmp_dir):
-    '''
+    """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
-    '''
+    """
     meta = {}
     for password in PW_LIST:
         execution_string = f'fakeroot {UNPACKER_EXECUTABLE} x -y -p{password} -o{tmp_dir} {file_path}'

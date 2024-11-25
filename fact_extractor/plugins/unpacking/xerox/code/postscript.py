@@ -1,13 +1,12 @@
+import binascii
 import logging
 import os
 import re
-import binascii
 from base64 import a85decode
 
 from common_helper_files import get_binary_from_file, write_binary_to_file
-from helperFunctions.dataConversion import (
-    make_bytes, make_unicode_string, remove_uneccessary_spaces
-)
+
+from helperFunctions.dataConversion import make_bytes, make_unicode_string, remove_uneccessary_spaces
 
 NAME = 'Postscript'
 MIME_PATTERNS = ['text/postscript']
@@ -49,7 +48,7 @@ def _convert_payloads(raw_payloads):
         try:
             payloads.append(a85decode(item, adobe=True))
         except binascii.Error as error_message:
-            logging.error('Could not decode payload: {}'.format(error_message))
+            logging.error(f'Could not decode payload: {error_message}')
     return payloads
 
 
@@ -71,7 +70,7 @@ def _get_next_payload(raw, start_pos, payload_header_regex=FILE_HEADER, payload_
     if payload_header:
         payload_footer = payload_footer_regex.search(raw, payload_header.end())
         if payload_footer:
-            return raw[payload_header.end():payload_footer.end()], payload_footer.end()
+            return raw[payload_header.end() : payload_footer.end()], payload_footer.end()
         logging.error('End of Payload could not be found!')
         return None, len(raw)
     return None, len(raw)
@@ -80,8 +79,9 @@ def _get_next_payload(raw, start_pos, payload_header_regex=FILE_HEADER, payload_
 def _store_files(payloads, tmp_dir):
     counter = 0
     for item in payloads:
-        write_binary_to_file(item, os.path.join(tmp_dir, 'payload_{}.bin'.format(counter)))
+        write_binary_to_file(item, os.path.join(tmp_dir, f'payload_{counter}.bin'))
         counter += 1
+
 
 # ----> Do not edit below this line <----
 

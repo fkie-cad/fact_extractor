@@ -5,20 +5,19 @@ import logging
 import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import List, Dict, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from helperFunctions.dataConversion import ReportEncoder
 from helperFunctions.file_system import file_is_empty
-from helperFunctions.statistics import get_unpack_status, add_unpack_statistics
+from helperFunctions.statistics import add_unpack_statistics, get_unpack_status
 from unpacker.unpackBase import UnpackBase
 
 
 class Unpacker(UnpackBase):
-
     FS_FALLBACK_CANDIDATES = ['SquashFS']
     CARVER_FALLBACK_BLACKLIST = ['generic_carver', 'NOP', 'PaTool', 'SFX', 'LinuxKernel']
 
-    def __init__(self, config=None, extract_everything: bool = False, folder: str = None):
+    def __init__(self, config=None, extract_everything: bool = False, folder: Optional[str] = None):
         super().__init__(config=config, extract_everything=extract_everything)
         data_folder = Path(self.config.get('unpack', 'data_folder'))
         if folder:
@@ -72,12 +71,12 @@ class Unpacker(UnpackBase):
 
         if not extracted_files and meta_data['plugin_used'] in self.FS_FALLBACK_CANDIDATES:
             logging.warning(
-                f'''{meta_data['plugin_used']} could not extract any file from {file_path} -> generic fs fallback'''
+                f"""{meta_data['plugin_used']} could not extract any file from {file_path} -> generic fs fallback"""
             )
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/fs')
         if not extracted_files and meta_data['plugin_used'] not in self.CARVER_FALLBACK_BLACKLIST:
             logging.warning(
-                f'''{meta_data['plugin_used']} could not extract any file from {file_path} -> generic carver fallback'''
+                f"""{meta_data['plugin_used']} could not extract any file from {file_path} -> generic carver fallback"""
             )
             extracted_files, meta_data = self.unpacking_fallback(file_path, tmp_dir, meta_data, 'generic/carver')
         return extracted_files, meta_data
@@ -90,7 +89,7 @@ class Unpacker(UnpackBase):
             logging.error(f'Could not CleanUp tmp_dir: {error}', exc_info=True)
 
     def move_extracted_files(self, file_paths: List[str], extraction_dir: Path) -> List[Path]:
-        extracted_files = list()
+        extracted_files = []
         for item in file_paths:
             if not file_is_empty(item) or self.extract_everything:
                 absolute_path = Path(item)
@@ -109,5 +108,5 @@ class Unpacker(UnpackBase):
 def unpack(file_path: str, config, extract_everything: bool = False, folder: str | None = None):
     extracted_objects = Unpacker(config, extract_everything, folder).unpack(file_path)
     logging.info(f'{len(extracted_objects)} files extracted')
-    path_extracted_files = '\n'.join((str(path) for path in extracted_objects))
-    logging.debug(f'''Extracted files:\n{path_extracted_files}''')
+    path_extracted_files = '\n'.join(str(path) for path in extracted_objects)
+    logging.debug(f"""Extracted files:\n{path_extracted_files}""")

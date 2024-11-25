@@ -8,7 +8,6 @@ sys.path.append(os.path.join(THIS_FILE, '..', 'internal'))
 
 from dsk_container import DskOne  # noqa: E402 pylint: disable=import-error,wrong-import-position
 
-
 NAME = 'DSK'
 MIME_PATTERNS = ['firmware/dsk1.0']
 VERSION = '0.2'

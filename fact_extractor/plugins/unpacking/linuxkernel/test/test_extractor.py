@@ -1,7 +1,7 @@
 import os
 import sys
 from pathlib import Path
-from unittest.mock import patch, mock_open
+from unittest.mock import mock_open, patch
 
 INTERNAL_DIR = Path(__file__).parent.parent / 'internal'
 sys.path.append(str(INTERNAL_DIR))
@@ -11,7 +11,6 @@ SAMPLE_DATA = b'####-------\x1f\x8b\x08-------\x1f\x8b\x08$$$$BZh$$$$'
 
 
 class TestExtractorCases:
-
     def test_find_offsets(self):
         with patch('builtins.open', mock_open(read_data=SAMPLE_DATA)) as mock_file:
             extract = Extractor('file_name', 'output_dir')

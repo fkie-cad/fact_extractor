@@ -1,10 +1,10 @@
-
 import logging
 import re
 from os import chdir, getcwd, path, remove, rename
 
 from common_helper_files import get_files_in_dir
 from common_helper_process import execute_shell_command
+
 from helperFunctions.file_system import get_src_dir
 
 NAME = 'Ambarella'
@@ -13,14 +13,14 @@ VERSION = '0.2'
 
 
 def unpack_function(file_path, tmp_dir):
-    script_path = path.join(get_src_dir(), "bin", "amba_fwpak.py")
+    script_path = path.join(get_src_dir(), 'bin', 'amba_fwpak.py')
     if not path.exists(script_path):
-        return {'output': "Error: phantom_firmware_tools not installed! Re-Run the installation script!"}
+        return {'output': 'Error: phantom_firmware_tools not installed! Re-Run the installation script!'}
 
     fallback_directory = getcwd()
     chdir(tmp_dir)
 
-    output = execute_shell_command('fakeroot {} -x -vv -m {}'.format(script_path, file_path)) + "\n"
+    output = execute_shell_command(f'fakeroot {script_path} -x -vv -m {file_path}') + '\n'
 
     _rename_files(file_path)
     _remove_ini_files()
@@ -38,22 +38,21 @@ def _rename_files(file_path):
 
     for ini_file, bin_file in files:
         identifier = _get_identifier_from_ini(ini_file)
-        rename(bin_file, "{}_{}.partition".format(basename, identifier))
+        rename(bin_file, f'{basename}_{identifier}.partition')
 
 
 def _get_list_of_files():
     all_files = get_files_in_dir('.')
     bin_files = [any_file for any_file in all_files if any_file.endswith('a9s')]
-    files = [('{}a9h'.format(bin_file[:len(bin_file) - 3]), bin_file) for bin_file in bin_files]
-    return files
+    return [(f'{bin_file[:len(bin_file) - 3]}a9h', bin_file) for bin_file in bin_files]
 
 
 def _get_identifier_from_ini(ini_file):
-    identifier = "default"
-    with open(ini_file, 'r') as fd:
+    identifier = 'default'
+    with open(ini_file) as fd:
         lines = fd.readlines()
         for line in lines:
-            match = re.match(r"\#.Stores.partition.with.([0-9a-zA-Z ]*)", line)
+            match = re.match(r'\#.Stores.partition.with.([0-9a-zA-Z ]*)', line)
             if match:
                 identifier = match.group(1)
                 identifier = identifier.replace(' ', '_')
