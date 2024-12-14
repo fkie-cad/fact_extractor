@@ -57,6 +57,17 @@ DEPENDENCIES = {
             'openjdk-19-jdk',
         ]
     },
+    'noble': {
+        'apt': [
+            # binwalk
+            'libqt5opengl5',
+            'python3-pyqt5',
+            'python3-pyqt5.qtopengl',
+            'libcapstone4',
+            # patool and unpacking backends
+            'openjdk-21-jdk',
+        ]
+    },
     # Debian
     'buster': {
         'apt': [
@@ -152,7 +163,7 @@ DEPENDENCIES = {
             'unzip',
             'wget',
             # android sparse image
-            'simg2img',
+            'android-sdk-libsparse-utils',
             # 7z
             'yasm',
         ],
