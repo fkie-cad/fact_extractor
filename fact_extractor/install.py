@@ -30,8 +30,9 @@ try:
     from helperFunctions.install import OperateInDirectory
     from install.common import main as common
     from install.unpacker import main as unpacker
-except ImportError:
-    sys.exit('Could not import install dependencies. Please (re-)run install/pre_install.sh')
+except (ImportError, ModuleNotFoundError) as error:
+    logging.error(f'Could not import install dependencies. Please (re-)run install/pre_install.sh. Error: {error}')
+    sys.exit(1)
 
 PROGRAM_NAME = 'FACT_extractor Installer'
 PROGRAM_VERSION = __VERSION__
