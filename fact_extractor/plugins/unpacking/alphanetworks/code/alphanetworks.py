@@ -62,10 +62,6 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
     }
 
 
-def _fw_header_contains_name(file_name: bytes) -> bool:
-    return file_name and all(c in PRINTABLE_CHARS for c in file_name)
-
-
 def _fw_is_inverted(fw_content: bytes) -> bool:
     return fw_content.startswith(_invert_bytes(b'REDSONIC'))
 
