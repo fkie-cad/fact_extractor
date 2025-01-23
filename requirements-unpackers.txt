@@ -8,8 +8,7 @@ git+https://github.com/sviehb/jefferson.git@v0.4.1
 cstruct==2.1
 python-lzo==1.14
 # generic_carver: binwalk
-# ToDo: pin to fork (?)
-git+https://github.com/ReFirmLabs/binwalk@v2.3.2
+git+https://github.com/OSPG/binwalk@v2.4.3
 pyqtgraph~=0.13.4
 capstone~=5.0.1
 numpy~=1.26.4
