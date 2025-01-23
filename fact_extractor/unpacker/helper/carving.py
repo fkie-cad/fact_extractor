@@ -26,7 +26,7 @@ class CarvedArea:
     def __str__(self):
         ret_val = ''
         for area in self.non_carved_areas:
-            ret_val += '({}:{}) '.format(area[0], area[1])
+            ret_val += f'({area[0]}:{area[1]}) '
 
         return ret_val
 

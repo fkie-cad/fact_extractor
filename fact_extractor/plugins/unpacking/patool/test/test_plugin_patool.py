@@ -15,7 +15,7 @@ class TestPaToolUnpacker(TestUnpackerBase):
         self.check_unpacker_selection('application/x-lzh-compressed', 'PaTool')
 
     @pytest.mark.parametrize(
-        'in_file, ignore',
+        ('in_file', 'ignore'),
         [
             ('test.cab', None),
             ('test.cpio', None),
@@ -61,10 +61,10 @@ class TestPaToolUnpacker(TestUnpackerBase):
         assert get_sha256(Path(files[0]).read_bytes()).startswith('deadc0de')
 
     def test_extraction_arc(self):
-        '''
+        """
         special case arc: arguments (i.e. paths) and names of packed files must not be too long.
         Unfortunately, the name of the third test file as well as the path of the test folder are too long.
-        '''
+        """
         with TemporaryDirectory() as tmp_dir:
             target_file = Path(tmp_dir) / 'test.arc'
             target_file.write_bytes((TEST_DATA_DIR / 'test.arc').read_bytes())

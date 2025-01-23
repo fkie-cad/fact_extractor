@@ -1,21 +1,21 @@
 #! /usr/bin/env python3
-'''
-    fact_extractor installer
-    Copyright (C) 2015-2020  Fraunhofer FKIE
+"""
+fact_extractor installer
+Copyright (C) 2015-2020  Fraunhofer FKIE
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-'''
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 
 import argparse
 import logging
@@ -30,8 +30,9 @@ try:
     from helperFunctions.install import OperateInDirectory
     from install.common import main as common
     from install.unpacker import main as unpacker
-except ImportError:
-    sys.exit('Could not import install dependencies. Please (re-)run install/pre_install.sh')
+except (ImportError, ModuleNotFoundError) as error:
+    logging.error(f'Could not import install dependencies. Please (re-)run install/pre_install.sh. Error: {error}')
+    sys.exit(1)
 
 PROGRAM_NAME = 'FACT_extractor Installer'
 PROGRAM_VERSION = __VERSION__
@@ -67,7 +68,7 @@ def _setup_logging(debug_flag=False):
 
 
 def check_python_version():
-    if sys.version_info.major != 3 or sys.version_info.minor < 7:
+    if sys.version_info.major != 3 or sys.version_info.minor < 7:  # noqa: PLR2004
         sys.exit(f'Error: Incompatible Python version! You need at least version 3.7! Your Version: {sys.version}')
 
 

@@ -1,6 +1,7 @@
-'''
+"""
 This plugin unpacks JFFS2 filesystem images
-'''
+"""
+
 import logging
 from pathlib import Path
 
@@ -12,10 +13,10 @@ VERSION = '0.5'
 
 
 def unpack_function(file_path, tmp_dir):
-    '''
+    """
     file_path specifies the input file.
     local_tmp_dir should be used to store the extracted files.
-    '''
+    """
 
     extract_dir = Path(tmp_dir) / 'jffs-root'
     output = execute_shell_command(f'fakeroot jefferson -v -d {extract_dir} {file_path}') + '\n'

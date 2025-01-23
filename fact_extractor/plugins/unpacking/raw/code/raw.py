@@ -1,4 +1,4 @@
-'''
+"""
 This plug-in is intended to be used on flash-dumps and unknown file types.
 It dumps ff-padded data-sections and encoded regions.
 Additionally it trys to detect and extract lzma streams.
@@ -7,7 +7,8 @@ Supported encodings are:
  - motorola s-record
  - tektronix
  - tektronix extended
-'''
+"""
+
 from common_helper_extraction import EXTRACTOR_LIST, dump_files
 from common_helper_files import get_binary_from_file
 
@@ -18,7 +19,7 @@ VERSION = '0.3'
 
 def unpack_function(file_path, tmp_dir):
     raw_binary = get_binary_from_file(file_path)
-    meta_data = dict()
+    meta_data = {}
     for extractor in EXTRACTOR_LIST:
         data_sections = extractor.extract_function(raw_binary, *extractor.optional_parameters)
         dump_files(data_sections, tmp_dir, suffix=extractor.file_suffix)

@@ -35,7 +35,10 @@ def _get_end_postion_of_first_preamble(raw_binary):
 
 
 def _get_name_of_upgrade(raw_binary, upgrade_command):
-    tmp = re.search(rb'\xa8\x01([\w ]+)  [\w ]+', raw_binary[upgrade_command['end_offset']:upgrade_command['end_offset'] + NAME_FIELD_MAX])
+    tmp = re.search(
+        rb'\xa8\x01([\w ]+)  [\w ]+',
+        raw_binary[upgrade_command['end_offset'] : upgrade_command['end_offset'] + NAME_FIELD_MAX],
+    )
     if tmp is not None:
         tmp = tmp.group(1).decode('utf-8', 'ignore')
         tmp = _remove_uneccessary_spaces(tmp)
@@ -44,8 +47,7 @@ def _get_name_of_upgrade(raw_binary, upgrade_command):
 
 def _get_size_of_upgrade(upgrade_command):
     tmp = re.match(rb'SIZE=([0-9]+)', upgrade_command['value'])
-    tmp = int(tmp.group(1))
-    return tmp
+    return int(tmp.group(1))
 
 
 def _get_type_and_value(raw_command):
@@ -61,8 +63,7 @@ def _is_upgrade(pjl_command):
 
 def _remove_uneccessary_spaces(input_string):
     tmp = input_string.split()
-    tmp = ' '.join(tmp)
-    return tmp
+    return ' '.join(tmp)
 
 
 def _get_file_fingerprint(input_data):
@@ -70,7 +71,7 @@ def _get_file_fingerprint(input_data):
     if prefix:
         suffix = re.search(rb'\-\-\=\<\/End HP Signed File Fingerprint\\\>\=\-\-', input_data)
         if suffix:
-            return input_data[prefix.start():suffix.end()]
+            return input_data[prefix.start() : suffix.end()]
     return None
 
 
@@ -85,7 +86,7 @@ def _extract_file_from_upgrade(binary_data, upgrade_command, extraction_dir):
     file_name = _get_name_of_upgrade(binary_data, upgrade_command)
     file_binary = _get_binary_of_upgrade(binary_data, upgrade_command, file_name)
     if file_name:
-        file_name = '{}.bin'.format(get_safe_name(file_name, max_size=80))
+        file_name = f'{get_safe_name(file_name, max_size=80)}.bin'
     else:
         file_name = '{}.bin'.format(upgrade_command['begin_offset'])
     file_path = Path(extraction_dir, file_name)
@@ -97,6 +98,11 @@ def _get_binary_of_upgrade(binary_data, upgrade_command, file_name):
         data_begin_offset = upgrade_command['end_offset'] + NAME_FIELD_MAX
         data_end_offset = upgrade_command['end_offset'] + _get_size_of_upgrade(upgrade_command) + 2
     else:
-        data_begin_offset = _get_end_postion_of_first_preamble(binary_data[upgrade_command['end_offset']:upgrade_command['end_offset'] + NAME_FIELD_MAX]) + upgrade_command['end_offset']
+        data_begin_offset = (
+            _get_end_postion_of_first_preamble(
+                binary_data[upgrade_command['end_offset'] : upgrade_command['end_offset'] + NAME_FIELD_MAX]
+            )
+            + upgrade_command['end_offset']
+        )
         data_end_offset = data_begin_offset + _get_size_of_upgrade(upgrade_command)
     return binary_data[data_begin_offset:data_end_offset]

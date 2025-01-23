@@ -1,10 +1,11 @@
-'''
+"""
 This plugin unpacks several formats that the linux kernel can be compressed with
 Implementation logic taken from https://github.com/torvalds/linux/blob/master/scripts/extract-vmlinux
 FAQ:
  Why not just call this script directly? Well it relies on readelf to determine success, and the readelf on x86 doesn't read
 header information of different architectures, eg ARM. So we can do better.
-'''
+"""
+
 import os
 import sys
 from pathlib import Path
@@ -16,9 +17,7 @@ sys.path.append(str(INTERNAL_DIR))
 from extractor import Extractor  # noqa: E402 pylint: disable=import-error,wrong-import-position
 
 NAME = 'LinuxKernel'
-MIME_PATTERNS = [
-    'linux/kernel'
-]
+MIME_PATTERNS = ['linux/kernel']
 VERSION = '0.0.1'
 
 STRINGS_PATH = execute_shell_command('which strings').strip()
@@ -34,7 +33,7 @@ def is_kernel(file_path):
     found_cnt = 0
     for i in KERNEL_STRINGS_TO_MATCH:
         output, ret_code = execute_shell_command_get_return_code(f'{STRINGS_PATH} {file_path} | grep -q "{i}"')
-        if 0 == ret_code:
+        if ret_code == 0:
             found_cnt += 1
 
     # if any two or more criteria match, then we found what is likely a kernel
@@ -63,13 +62,13 @@ def command_absolute_path(cmd):
     """
     tool = cmd[0]
     if tool not in TOOL_PATHS:
-        TOOL_PATHS[tool] = execute_shell_command('which {}'.format(tool)).strip()
+        TOOL_PATHS[tool] = execute_shell_command(f'which {tool}').strip()
     cmd[0] = TOOL_PATHS[tool]
     return ' '.join(cmd)
 
 
 def strip_extension(filename):
-    return filename[:filename.rfind('.')]
+    return filename[: filename.rfind('.')]
 
 
 def unpack_function(file_path, tmp_dir):
@@ -103,9 +102,7 @@ def unpack_function(file_path, tmp_dir):
         output += cmd + '\n'
         output += execute_shell_command(cmd, timeout=600)
 
-    return {
-        'output': output
-    }
+    return {'output': output}
 
 
 # ----> Do not edit below this line <----

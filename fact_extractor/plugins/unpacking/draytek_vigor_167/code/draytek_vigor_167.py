@@ -1,8 +1,10 @@
-'''
+"""
 This plugin extracts the squashfs root filesystem in Draytek Vigor 167 firmware containers.
-'''
+"""
+
 import struct
 from pathlib import Path
+
 from common_helper_files import write_binary_to_file
 
 NAME = 'Draytek Vigor 167'
@@ -35,21 +37,21 @@ FOOTER = struct.Struct(FOOTER_LAYOUT)
 
 
 def unpack_function(file_path, tmp_dir):
-    '''
+    """
     file_path specifies the input file.
     tmp_dir must be used to store the extracted files.
     Optional: Return a dict with meta information
-    '''
+    """
     try:
         with open(file_path, 'rb') as f:
             signature = HEADER.unpack(f.read(HEADER.size))
             kernel_image = f.read(signature[4])
             squashfs = f.read(signature[5])
             footer = FOOTER.unpack(f.read(FOOTER.size))
-    except IOError as io_error:
-        return {'output': 'failed to read file: {}'.format(str(io_error))}
+    except OSError as io_error:
+        return {'output': f'failed to read file: {io_error!s}'}
     except struct.error as struct_error:
-        return {'output': 'failed to recognize firmware container: {}'.format(str(struct_error))}
+        return {'output': f'failed to recognize firmware container: {struct_error!s}'}
 
     output_file_path_kernel = Path(tmp_dir) / 'kernel_image'
     write_binary_to_file(kernel_image, output_file_path_kernel)
@@ -67,7 +69,7 @@ def unpack_function(file_path, tmp_dir):
             'kernel_size': signature[4],
             'squashfs_size': signature[5],
             'magic_field_footer': footer[0],
-            'md5_checksum': footer[1]
+            'md5_checksum': footer[1],
         },
     }
 

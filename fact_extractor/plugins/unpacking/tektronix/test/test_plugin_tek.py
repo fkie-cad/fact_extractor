@@ -1,9 +1,8 @@
 import os
+from binascii import Error
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
-
-from binascii import Error
 
 from helperFunctions.file_system import get_test_data_dir
 from plugins.unpacking.tektronix.code.tek import unpack_function
@@ -21,13 +20,11 @@ def i_always_crash_file_not_found(*args, **kwargs):
 
 
 class TestTektronixHex(TestUnpackerBase):
-
     def test_unpacker_selection_generic(self):
         self.check_unpacker_selection('firmware/tek', 'Tektronix HEX')
 
     def test_extraction(self):
-        files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, 'testfile.tek'),
-                                                                 self.tmp_dir.name)
+        files, meta_data = self.unpacker.extract_files_from_file(Path(TEST_DATA_DIR, 'testfile.tek'), self.tmp_dir.name)
         assert files
         content = Path(files[0]).read_bytes()
         assert b'Hello world.' in content
