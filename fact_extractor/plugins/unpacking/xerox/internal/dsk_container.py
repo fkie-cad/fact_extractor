@@ -1,20 +1,20 @@
-from base64 import b64decode
-from common_helper_files import get_binary_from_file
 import logging
 import re
-from struct import unpack
 import sys
+from base64 import b64decode
+from struct import unpack
+
+from common_helper_files import get_binary_from_file
 
 from helperFunctions.dataConversion import make_unicode_string
-
 
 ENCODING_OVERHEAD = 0.33
 
 
-class DskOne(object):
-    '''
+class DskOne:
+    """
     DSK 1.0 Container Format used by Xerox
-    '''
+    """
 
     HEADERSIZE = 0x18
 
@@ -44,7 +44,7 @@ class DskOne(object):
         try:
             self.header = unpack('<c6sxxxcxI', self.raw[0:16])
         except Exception as e:
-            self.errors.append('could not parse header: {} - {}'.format(sys.exc_info()[0].__name__, e))
+            self.errors.append(f'could not parse header: {sys.exc_info()[0].__name__} - {e}')
             self.header = None
             self.payload_size = None
         else:
@@ -53,7 +53,7 @@ class DskOne(object):
 
     def extract_payload(self):
         if len(self.errors) == 0:
-            self.encoded_payload = self.raw[self.HEADERSIZE:self.HEADERSIZE + self.payload_size]
+            self.encoded_payload = self.raw[self.HEADERSIZE : self.HEADERSIZE + self.payload_size]
             self.decoded_payload = b64decode(self.encoded_payload)
         else:
             logging.error('extraction aborted due to errors')
@@ -62,7 +62,7 @@ class DskOne(object):
         if self.header[1] != b'DSK1.0':
             self.errors.append('DSK magic string missing')
         if self.payload_size > len(self.raw) - self.HEADERSIZE:
-            self.errors.append('payload length longer than file: {} -> {}'.format(self.payload_size, len(self.raw)))
+            self.errors.append(f'payload length longer than file: {self.payload_size} -> {len(self.raw)}')
         if self.payload_size + self.HEADERSIZE < len(self.raw):
             self.warnings.append('data after payload')
 
@@ -73,8 +73,7 @@ class DskOne(object):
             logging.warning('Warnings occured: {}'.format('\n'.join(self.warnings)))
 
 
-class ExtendedDskOne(object):
-
+class ExtendedDskOne:
     DSK_HEADER = re.compile(b'\x1bDSK1.0')
 
     def __init__(self, file_path):
@@ -90,7 +89,7 @@ class ExtendedDskOne(object):
         dsk_match = self.DSK_HEADER.search(self.raw)
         if dsk_match:
             self.dsk_file_postion = dsk_match.start()
-            dsk_file_raw = self.raw[self.dsk_file_postion:]
+            dsk_file_raw = self.raw[self.dsk_file_postion :]
             self.dsk_file = DskOne(None, raw=dsk_file_raw)
             self.meta = self.dsk_file.get_meta_dict()
             self.decoded_payload = self.dsk_file.decoded_payload
@@ -100,4 +99,4 @@ class ExtendedDskOne(object):
             self.decoded_payload = None
 
     def _get_identifier(self):
-        self.meta['Extended DSK Identifier'] = make_unicode_string(self.raw[0:self.dsk_file_postion])
+        self.meta['Extended DSK Identifier'] = make_unicode_string(self.raw[0 : self.dsk_file_postion])

@@ -4,7 +4,10 @@ from helperFunctions.install import InstallationError, run_shell_command_raise_o
 
 
 def _patch_shell_command(patch, mock_output: str, mock_return_code: int):
-    patch.setattr('helperFunctions.install.execute_shell_command_get_return_code', lambda shell_command, timeout=None: (mock_output, mock_return_code))
+    patch.setattr(
+        'helperFunctions.install.execute_shell_command_get_return_code',
+        lambda shell_command, timeout=None: (mock_output, mock_return_code),
+    )
 
 
 def test_run_command_succeeds():

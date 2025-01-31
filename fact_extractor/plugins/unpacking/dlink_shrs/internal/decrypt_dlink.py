@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-import sys
-import hashlib
-import binascii
-import pathlib
 import argparse
-
+import binascii
+import hashlib
+import pathlib
+import sys
 from contextlib import suppress
+
 from Crypto.Cipher import AES
 
 CIPHERTEXT_OFF = 0x6DC
@@ -53,9 +53,9 @@ class DcryptLink:
     @staticmethod
     def verify(calculated, expected):
         if expected != calculated:
-            print('\t[!] Failed!')
+            print('\t[!] Failed!')  # noqa: T201
             raise ValueError
-        print('\t[+] OK!')
+        print('\t[+] OK!')  # noqa: T201
         return 0
 
     def decrypt_aes128_cbc(self):
@@ -69,7 +69,7 @@ class DcryptLink:
     def verify_magic_bytes(self):
         expected = b'SHRS'
         actual = pathlib.Path(self.enc_fw).open('rb').read(4)
-        print('[*] Checking magic bytes...')
+        print('[*] Checking magic bytes...')  # noqa: T201
         self.verify(actual, expected)
 
     def set_datalen_variables(self):
@@ -85,7 +85,7 @@ class DcryptLink:
             self.ivec = enc_fw.read(IVEC_LEN)
 
     def set_decryption_key(self):
-        print('[*] Calculating decryption key...')
+        print('[*] Calculating decryption key...')  # noqa: T201
 
         in_file = bytes.fromhex('C8D32F409CACB347C8D26FDCB9090B3C')
         user_key = bytes.fromhex('358790034519F8C8235DB6492839A73F')
@@ -107,14 +107,14 @@ def main():
     try:
         dlink.verify_magic_bytes()
 
-        print('[*] Verifying SHA512 message digest of encrypted payload...')
+        print('[*] Verifying SHA512 message digest of encrypted payload...')  # noqa: T201
         md = dlink.calc_sha512_from_fd_at_offset_of_len(dlink.enc_fw, CIPHERTEXT_OFF, dlink.data_len_dec_fw_no_padding)
         expected_md = dlink.get_expected_sha512_from_fd_at_offset(dlink.enc_fw, SHA512_ENC_FW)
         dlink.verify(md, expected_md)
 
         dlink.decrypt_aes128_cbc()
 
-        print('[*] Verifying SHA512 message digests of decrypted payload...')
+        print('[*] Verifying SHA512 message digests of decrypted payload...')  # noqa: T201
         md = dlink.calc_sha512_from_fd_at_offset_of_len(dlink.dec_fw, 0, dlink.data_len_dec_fw)
         expected_md = dlink.get_expected_sha512_from_fd_at_offset(dlink.enc_fw, SHA512_DEC_FW)
         dlink.verify(md, expected_md)
@@ -123,11 +123,11 @@ def main():
         expected_md = dlink.get_expected_sha512_from_fd_at_offset(dlink.enc_fw, SHA512_DEC_FW_W_KEY_OFF)
         dlink.verify(md, expected_md)
 
-        print(f'[+] Successfully decrypted {pathlib.Path(dlink.enc_fw).name}!')
+        print(f'[+] Successfully decrypted {pathlib.Path(dlink.enc_fw).name}!')  # noqa: T201
     except ValueError:
         with suppress(FileNotFoundError):
             pathlib.Path(dlink.dec_fw).unlink()
-        print('[!] Failed!')
+        print('[!] Failed!')  # noqa: T201
         sys.exit(1)
 
 

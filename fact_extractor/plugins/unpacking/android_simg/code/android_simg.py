@@ -1,6 +1,7 @@
-'''
+"""
 This plugin "unpacks" Android sparse image by converting them to regular filesystem images using the simg2img tool
-'''
+"""
+
 import logging
 from pathlib import Path
 

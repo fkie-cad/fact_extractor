@@ -1,6 +1,6 @@
+import binascii
 import json
 import types
-import binascii
 
 
 class ReportEncoder(json.JSONEncoder):
@@ -34,5 +34,4 @@ def make_unicode_string(code):
 
 def remove_uneccessary_spaces(input_string):
     tmp = input_string.split()
-    tmp = ' '.join(tmp)
-    return tmp
+    return ' '.join(tmp)
