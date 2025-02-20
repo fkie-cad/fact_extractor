@@ -9,7 +9,7 @@ from common_helper_process import execute_shell_command
 
 NAME = 'JFFS2'
 MIME_PATTERNS = ['filesystem/jffs2', 'filesystem/jffs2-big']
-VERSION = '0.5'
+VERSION = '0.6.0'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -18,8 +18,8 @@ def unpack_function(file_path, tmp_dir):
     local_tmp_dir should be used to store the extracted files.
     """
 
-    extract_dir = Path(tmp_dir) / 'jffs-root'
-    output = execute_shell_command(f'fakeroot jefferson -v -d {extract_dir} {file_path}') + '\n'
+    tmp_dir_path = Path(tmp_dir)
+    output = execute_shell_command(f'fakeroot jefferson -vfd {tmp_dir_path} {file_path}')
     meta_data = {'output': output}
     logging.debug(output)
     return meta_data
