@@ -37,3 +37,6 @@ extract-dtb~=1.2.3
 # uefi
 uefi-firmware~=1.11
 pylibfdt ~= 1.7.1
+# xiaomi hdr
+structlog~=25.1.0
+unblob~=25.1.8
