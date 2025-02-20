@@ -106,7 +106,7 @@ def main():
 
     with OperateInDirectory(installation_directory):
         common(distribution)
-        unpacker(distribution)
+        unpacker()
 
     logging.info('installation complete')
 

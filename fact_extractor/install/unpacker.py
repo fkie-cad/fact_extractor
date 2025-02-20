@@ -22,151 +22,92 @@ from helperFunctions.install import (
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
 
-DEPENDENCIES = {
-    # Ubuntu
-    'bionic': {
-        'apt': [
-            # binwalk
-            'libqt4-opengl',
-            'python3-pyqt4',
-            'python3-pyqt4.qtopengl',
-            'libcapstone3',
-            # patool and unpacking backends
-            'openjdk-8-jdk',
-        ]
-    },
-    'focal': {
-        'apt': [
-            # binwalk
-            'libqt5opengl5',
-            'python3-pyqt5',
-            'python3-pyqt5.qtopengl',
-            'libcapstone3',
-            # patool and unpacking backends
-            'openjdk-16-jdk',
-        ]
-    },
-    'jammy': {
-        'apt': [
-            # binwalk
-            'libqt5opengl5',
-            'python3-pyqt5',
-            'python3-pyqt5.qtopengl',
-            'libcapstone4',
-            # patool and unpacking backends
-            'openjdk-19-jdk',
-        ]
-    },
-    # Debian
-    'buster': {
-        'apt': [
-            # binwalk
-            'libqt4-opengl',
-            'python3-pyqt4',
-            'python3-pyqt4.qtopengl',
-            'libcapstone3',
-            # patool and unpacking backends
-            'openjdk-8-jdk',
-            # freetz
-        ]
-    },
-    'bullseye': {
-        'apt': [
-            # binwalk
-            'libqt5opengl5',
-            'python3-pyqt5',
-            'python3-pyqt5.qtopengl',
-            'libcapstone3',
-            # patool and unpacking backends
-            'openjdk-14-jdk',
-        ]
-    },
+APT_DEPENDENCIES = {
     # Packages common to all platforms
-    'common': {
-        'apt': [
-            'libjpeg-dev',
-            'liblzma-dev',
-            'liblzo2-dev',
-            'zlib1g-dev',
-            'unzip',
-            'libffi-dev',
-            'libfuzzy-dev',
-            'fakeroot',
-            'python3-opengl',
-            # binwalk
-            'mtd-utils',
-            'gzip',
-            'bzip2',
-            'tar',
-            'arj',
-            'lhasa',
-            'cabextract',
-            'cramfsswap',
-            'squashfs-tools',
-            'liblzma-dev',
-            'liblzo2-dev',
-            'xvfb',
-            'libcapstone-dev',
-            # patool
-            'arj',
-            'cabextract',
-            'cpio',
-            'flac',
-            'gzip',
-            'lhasa',
-            'libchm-dev',
-            'lrzip',
-            'lzip',
-            'lzop',
-            'ncompress',
-            'nomarch',
-            'rpm2cpio',
-            'rzip',
-            'sharutils',
-            'unace',
-            'unadf',
-            'unalz',
-            'unar',
-            'unrar',
-            'xdms',
-            'zpaq',
-            # Freetz
-            'autoconf',
-            'automake',
-            'bison',
-            'flex',
-            'g++',
-            'gawk',
-            'gcc',
-            'gettext',
-            'file',
-            'libacl1-dev',
-            'libcap-dev',
-            'libncurses5-dev',
-            'libsqlite3-dev',
-            'libtool-bin',
-            'libzstd-dev',
-            'make',
-            'pkg-config',
-            'subversion',
-            'unzip',
-            'wget',
-            # android sparse image
-            'simg2img',
-            # 7z
-            'yasm',
-        ],
-        'github': [
-            (
-                'rampageX/firmware-mod-kit',
-                [
-                    '(cd src && make untrx && make -C tpl-tool/src && make -C yaffs2utils)',
-                    'cp src/untrx src/yaffs2utils/unyaffs2 src/tpl-tool/src/tpl-tool ../../bin/',
-                ],
-            ),
-        ],
-    },
+    'libjpeg-dev',
+    'liblzma-dev',
+    'liblzo2-dev',
+    'zlib1g-dev',
+    'unzip',
+    'libffi-dev',
+    'libfuzzy-dev',
+    'fakeroot',
+    'python3-opengl',
+    # patool
+    'arc',
+    'archmage',
+    'arj',
+    'binutils',
+    'bzip2',
+    'cabextract',
+    'clzip',
+    'cpio',
+    'flac',
+    'genisoimage',
+    'lbzip2',
+    'lhasa',
+    'libarchive-tools',
+    'lrzip',
+    'lz4',
+    'lzip',
+    'lzop',
+    'ncompress',
+    'nomarch',
+    # FixMe: p7zip-full installed in 7z plugin
+    'pbzip2',
+    'pdlzip',
+    'plzip',
+    'rpm2cpio',
+    'rzip',
+    'sharutils',
+    'tar',
+    'unace',
+    'unalz',
+    'unar',
+    'xdms',
+    'zip',
+    'zopfli',
+    'zpaq',
+    'zstd',
+    # Freetz
+    'autoconf',
+    'automake',
+    'bison',
+    'flex',
+    'g++',
+    'gawk',
+    'gcc',
+    'gettext',
+    'file',
+    'libacl1-dev',
+    'libcap-dev',
+    'libncurses5-dev',
+    'libsqlite3-dev',
+    'libtool-bin',
+    'libzstd-dev',
+    'make',
+    'pkg-config',
+    'subversion',
+    'wget',
+    # android sparse image
+    'simg2img',
+    # 7z
+    'yasm',
+    # unblob
+    'android-sdk-libsparse-utils',
+    'e2fsprogs',
+    'libhyperscan-dev',
+    'lziprecover',
 }
+GITHUB_DEPENDENCIES = [
+    (
+        'rampageX/firmware-mod-kit',
+        [
+            '(cd src && make untrx && make -C tpl-tool/src && make -C yaffs2utils)',
+            'cp src/untrx src/yaffs2utils/unyaffs2 src/tpl-tool/src/tpl-tool ../../bin/',
+        ],
+    ),
+]
 PIP_DEPENDENCY_FILE = Path(__file__).parent.parent.parent / 'requirements-unpackers.txt'
 if platform.machine() == 'x86_64':
     EXTERNAL_DEB_DEPS = [
@@ -200,16 +141,19 @@ elif platform.machine() == 'aarch64':
     ]
 
 
-def install_dependencies(dependencies):
-    apt = dependencies.get('apt', [])
-    github = dependencies.get('github', [])
-    apt_install_packages(*apt)
-    pip_install_packages(*load_requirements_file(PIP_DEPENDENCY_FILE))
-    for repo in github:
+def check_mod_kit_installed() -> bool:
+    return all((Path(__file__).parent.parent / 'bin' / tool).exists() for tool in ['tpl-tool', 'untrx', 'unyaffs2'])
+
+
+def install_github_dependencies():
+    for repo in GITHUB_DEPENDENCIES:
+        if repo[0].endswith('firmware-mod-kit') and check_mod_kit_installed():
+            logging.info('Skipping firmware-mod-kit since it is already installed')
+            continue
         install_github_project(*repo)
 
 
-def main(distribution):
+def main():
     # removes due to compatibility reasons
     try:
         apt_remove_packages('python-lzma')
@@ -217,8 +161,9 @@ def main(distribution):
         logging.debug('python-lzma not removed because present already')
 
     # install dependencies
-    install_dependencies(DEPENDENCIES['common'])
-    install_dependencies(DEPENDENCIES[distribution])
+    apt_install_packages(*APT_DEPENDENCIES)
+    pip_install_packages(*load_requirements_file(PIP_DEPENDENCY_FILE))
+    install_github_dependencies()
 
     # installing freetz
     if platform.machine() == 'x86_64':
@@ -252,7 +197,7 @@ def _edit_sudoers():
             '/bin/chown',
         )
     )
-    Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n')  # pylint: disable=unspecified-encoding
+    Path('/tmp/fact_overrides').write_text(f'{sudoers_content}\n', encoding='utf-8')
     _, chown_code = execute_shell_command_get_return_code('sudo chown root:root /tmp/fact_overrides')
     _, mv_code = execute_shell_command_get_return_code('sudo mv /tmp/fact_overrides /etc/sudoers.d/fact_overrides')
     if not chown_code == mv_code == 0:
@@ -278,7 +223,27 @@ def _sha256_hash_file(file_path: Path) -> str:
     return hashlib.sha256(file_path.read_bytes()).hexdigest()
 
 
+def _freetz_is_already_installed():
+    return all(
+        (Path(__file__).parent.parent / 'bin' / tool).exists()
+        for tool in [
+            'find-squashfs',
+            'unpack-kernel',
+            'freetz_bin_functions',
+            'unlzma',
+            'sfk',
+            'unsquashfs4-avm-be',
+            'unsquashfs4-avm-le',
+            'unsquashfs3-multi',
+        ]
+    )
+
+
 def _install_freetz():
+    if _freetz_is_already_installed():
+        logging.info('Skipping FREETZ installation (already installed)')
+        return
+
     logging.info('Installing FREETZ')
     current_user = getuser()
     freetz_build_config = Path(__file__).parent / 'freetz.config'
