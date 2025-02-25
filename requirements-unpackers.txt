@@ -2,18 +2,11 @@
 pluginbase~=1.0.1
 git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git
 python-magic
-patool~=2.2.0
+patool~=3.1.3
 # jffs2: jefferson + deps
 git+https://github.com/sviehb/jefferson.git@v0.4.1
 cstruct==2.1
 python-lzo==1.14
-# generic_carver: binwalk
-# ToDo: pin to fork (?)
-git+https://github.com/ReFirmLabs/binwalk@v2.3.2
-pyqtgraph~=0.13.4
-capstone~=5.0.1
-numpy~=1.26.4
-scipy~=1.13.0
 # ubi
 ubi-reader~=0.8.9
 # dji / dlink_shrs
@@ -39,4 +32,5 @@ uefi-firmware~=1.11
 pylibfdt ~= 1.7.1
 # xiaomi hdr
 structlog~=25.1.0
+# unblob
 unblob~=25.1.8
