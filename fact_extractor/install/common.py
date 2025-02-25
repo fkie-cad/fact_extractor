@@ -27,14 +27,14 @@ def install_apt_dependencies():
     apt_install_packages(*APT_DEPENDENCIES)
 
 
-def _install_magic():
+def _install_magic(version='v0.2.4'):
     with OperateInDirectory(BIN_DIR):
         sp.run(
             [
                 'wget',
                 '--output-document',
                 'firmware.xz',
-                'https://github.com/fkie-cad/firmware-magic-database/releases/download/v0.2.4/firmware.xz',
+                f'https://github.com/fkie-cad/firmware-magic-database/releases/download/{version}/firmware.xz',
             ],
             check=True,
         )
