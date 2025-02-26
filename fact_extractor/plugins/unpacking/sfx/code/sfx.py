@@ -6,11 +6,12 @@ from plugins.unpacking.sevenz.code.sevenz import unpack_function as sevenz
 
 NAME = 'SFX'
 MIME_PATTERNS = [
+    'application/vnd.microsoft.portable-executable',
     'application/x-dosexec',
     'application/x-executable',
     'application/x-pie-executable',
 ]
-VERSION = '0.2.0'
+VERSION = '0.2.1'
 
 EXCLUDED_FILE_NAMES_1 = {'.bss', '.data', '.text'}
 EXCLUDED_FILE_NAMES_2 = {str(i) for i in range(20)}

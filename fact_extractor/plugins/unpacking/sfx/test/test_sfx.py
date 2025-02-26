@@ -7,7 +7,11 @@ TEST_DATA_DIR = Path(__file__).parent / 'data'
 
 class TestSfxUnpacker(TestUnpackerBase):
     def test_unpacker_selection_generic(self):
-        for mime in ['application/x-executable', 'application/x-dosexec']:
+        for mime in [
+            'application/x-executable',
+            'application/x-dosexec',
+            'application/vnd.microsoft.portable-executable',
+        ]:
             self.check_unpacker_selection(mime, 'SFX')
 
     def test_normal_elf_is_skipped(self):

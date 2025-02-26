@@ -1,14 +1,18 @@
+from __future__ import annotations
+
 import struct
 from contextlib import suppress
 from pathlib import Path
-from tempfile import TemporaryDirectory
-from typing import Dict
+from shlex import split
+from subprocess import run
+from typing import TYPE_CHECKING
 
-from common_helper_process import execute_shell_command
+if TYPE_CHECKING:
+    from tempfile import TemporaryDirectory
 
 NAME = 'BoschFirmwareTool'
 MIME_PATTERNS = ['firmware/bosch']
-VERSION = '0.1'
+VERSION = '0.1.1'
 
 TOOL_PATH = Path(__file__).parent.parent / 'bin' / 'boschfwtool'
 
@@ -91,19 +95,27 @@ def get_header_info(file_path: str) -> str:
     return '\n'.join([str(header) for header in FirmwareHeaderIterator(content)])
 
 
-def unpack_function(file_path: str, tmp_dir: TemporaryDirectory) -> Dict[str, str]:
+def unpack_function(file_path: str, tmp_dir: TemporaryDirectory) -> dict[str, str]:
     """
     Extract Bosch .fw files
     Source: https://github.com/anvilventures/BoschFirmwareTool
     """
     command = f'{TOOL_PATH} {file_path} -o {tmp_dir}'
-    output = execute_shell_command(command, timeout=30)
+    proc = run(
+        split(command),
+        timeout=30,
+        capture_output=True,
+        env={'DOTNET_SYSTEM_GLOBALIZATION_INVARIANT': '1'},
+        check=False,
+        text=True,
+    )
+
     try:
         header_info = get_header_info(file_path)
     except IndexError:
-        header_info = 'Error during header parsing'
+        header_info = f'Error during header parsing: {proc.stderr}'
 
-    return {'output': output, 'header': header_info}
+    return {'output': proc.stdout, 'header': header_info}
 
 
 # ----> Do not edit below this line <----

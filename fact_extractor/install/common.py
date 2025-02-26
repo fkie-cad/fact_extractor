@@ -11,34 +11,20 @@ from helperFunctions.install import (
     pip_install_packages,
 )
 
-APT_DEPENDENCIES = {
-    # Ubuntu
-    'bionic': [],
-    'focal': [],
-    'jammy': [],
-    # Debian
-    'buster': [],
-    'bullseye': [],
-    # Packages common to all platforms
-    'common': [
-        # Non python dependencies
-        'build-essential',
-        'automake',
-        'autoconf',
-        'libtool',
-        # Python dependencies
-        'python3',
-        'python3-dev',
-        'python-wheel-common',
-    ],
-}
+APT_DEPENDENCIES = [
+    # Non python dependencies
+    'build-essential',
+    'automake',
+    'autoconf',
+    'libtool',
+]
+
 PIP_DEPENDENCY_FILE = Path(__file__).parent.parent.parent / 'requirements-common.txt'
 BIN_DIR = Path(__file__).parent.parent / 'bin'
 
 
-def install_apt_dependencies(distribution: str):
-    apt_install_packages(*APT_DEPENDENCIES['common'])
-    apt_install_packages(*APT_DEPENDENCIES[distribution])
+def install_apt_dependencies():
+    apt_install_packages(*APT_DEPENDENCIES)
 
 
 def _install_magic():
@@ -62,12 +48,12 @@ def _install_magic():
         )
 
 
-def main(distribution):
+def main():
     logging.info('Updating package lists')
     apt_update_sources()
 
     # install dependencies
-    install_apt_dependencies(distribution)
+    install_apt_dependencies()
     pip_install_packages(*load_requirements_file(PIP_DEPENDENCY_FILE))
 
     BIN_DIR.mkdir(exist_ok=True)
