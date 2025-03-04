@@ -90,14 +90,15 @@ APT_DEPENDENCIES = {
     'subversion',
     'wget',
     # android sparse image
-    'simg2img',
+    'android-sdk-libsparse-utils',
     # 7z
     'yasm',
     # unblob
-    'android-sdk-libsparse-utils',
     'e2fsprogs',
     'libhyperscan-dev',
     'lziprecover',
+    # boschtool
+    'libicu-dev',
 }
 GITHUB_DEPENDENCIES = [
     (
