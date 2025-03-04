@@ -1,5 +1,6 @@
 from pathlib import Path
-from subprocess import check_output
+from shlex import split
+from subprocess import run
 
 from plugins.unpacking.boschtool.code.boschtool import TOOL_PATH
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
@@ -29,5 +30,11 @@ class TestBoschToolUnpacker(TestUnpackerBase):
 
 
 def test_boschtool_works():
-    output = check_output(f'{TOOL_PATH} --version', shell=True)
-    assert output.strip() == b'1.0.0'
+    proc = run(
+        split(f'{TOOL_PATH} --version'),
+        capture_output=True,
+        env={'DOTNET_SYSTEM_GLOBALIZATION_INVARIANT': '1'},
+        check=True,
+        text=True,
+    )
+    assert proc.stdout.strip() == '1.0.0'
