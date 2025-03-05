@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from helperFunctions.file_system import decompress_test_file
-from plugins.unpacking.sevenz.code.sevenz import MIME_PATTERNS
+from helperFunctions.file_system import decompress_test_file, get_test_data_dir
+from plugins.unpacking.sevenz.code.sevenz import MIME_PATTERNS, unpack_function
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
@@ -64,3 +64,14 @@ class TestSevenZUnpacker(TestUnpackerBase):
         assert Path(files[0]).name == 'test.data'
         assert 'Type = gzip' in meta_data['output']
         assert 'Everything is Ok' in meta_data['output']
+
+    @pytest.mark.parametrize('file_format', ['zip', 'lzma'])
+    def test_trailing_data(self, file_format):
+        in_file = Path(get_test_data_dir()) / f'trailing_data.{file_format}'
+        assert Path(in_file).is_file()
+        meta = unpack_function(str(in_file), self.tmp_dir.name)
+        assert 'data after the end' in meta['output']
+        files = {f.name: f for f in Path(self.tmp_dir.name).iterdir()}
+        assert len(files) > 0
+        assert 'trailing_data' in files, 'trailing data not extracted'
+        assert files['trailing_data'].stat().st_size == 100, 'trailing data offset is wrong'
