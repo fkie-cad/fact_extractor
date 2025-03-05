@@ -57,7 +57,7 @@ class TestGenericCarver(TestUnpackerBase):
 
     @pytest.mark.parametrize(('file_format', 'expected_size'), [('bz2', 52), ('zip', 170)])
     def test_trailing_data(self, file_format, expected_size):
-        in_file = TEST_DATA_DIR / f'trailing_data.{file_format}'
+        in_file = Path(get_test_data_dir()) / f'trailing_data.{file_format}'
         assert Path(in_file).is_file()
         meta = unpack_function(str(in_file), self.tmp_dir.name)
         carved_size = int(re.search(r'size: (\d+)', meta['output']).group(1))
