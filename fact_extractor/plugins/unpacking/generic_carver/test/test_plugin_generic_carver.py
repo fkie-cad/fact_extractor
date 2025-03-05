@@ -1,4 +1,5 @@
 import re
+import zlib
 from pathlib import Path
 
 import pytest
@@ -23,6 +24,17 @@ class TestGenericCarver(TestUnpackerBase):
         assert len(files) == 3, 'file number incorrect'
         assert f'{self.tmp_dir.name}/100-887.zip' in files, 'hidden zip not identified correctly'
         assert 'output' in meta_data
+
+    def test_zlib_carving(self):
+        in_file = TEST_DATA_DIR / 'zlib_carving_test'
+        files, meta_data = self.unpacker._extract_files_from_file_using_specific_unpacker(
+            in_file, self.tmp_dir.name, self.unpacker.unpacker_plugins['generic/carver']
+        )
+        assert len(files) == 9, 'file number incorrect'
+        assert sum(1 if f.endswith('.zlib_carver') else 0 for f in files), 'wrong number of carved zlib streams'
+        zlib_file_1 = files[1]
+        content = zlib.decompress(Path(zlib_file_1).read_bytes())
+        assert b'test file' in content, 'test file not carved correctly'
 
     def test_filter(self):
         in_file = TEST_DATA_DIR / 'carving_test_file'
