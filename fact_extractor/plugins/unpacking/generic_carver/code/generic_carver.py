@@ -18,23 +18,16 @@ from unblob.finder import search_chunks
 from unblob.handlers import BUILTIN_HANDLERS
 from unblob.handlers.compression.zlib import ZlibHandler
 from unblob.models import Chunk, HexString, PaddingChunk, TaskResult, UnknownChunk
-from unblob.plugins import hookimpl
 from unblob.processing import Task, calculate_unknown_chunks, remove_inner_chunks
 
 NAME = 'generic_carver'
 MIME_PATTERNS = ['generic/carver']
-VERSION = '1.0.0'
+VERSION = '1.0.1'
 
 MIN_FILE_ENTROPY = 0.01
 
 # deactivate internal logger of unblob because it can slow down searching chunks
 structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(logging.CRITICAL))
-
-
-# register custom zlib handler to allow carving zlib chunks from inside files
-@hookimpl
-def unblob_register_handlers():
-    yield from [ZlibCarvingHandler]
 
 
 class ZlibCarvingHandler(ZlibHandler):
@@ -46,6 +39,9 @@ class ZlibCarvingHandler(ZlibHandler):
         HexString('78 da'),  # best compression
         HexString('78 5e'),  # compressed
     ]
+
+
+HANDLERS = (*BUILTIN_HANDLERS, ZlibCarvingHandler)
 
 
 def unpack_function(file_path: str, tmp_dir: str) -> dict:
@@ -80,7 +76,7 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
 
 def _find_chunks(file_path: Path, file: File) -> Iterable[Chunk]:
     task = Task(path=file_path, depth=0, blob_id='')
-    known_chunks = remove_inner_chunks(search_chunks(file, file.size(), BUILTIN_HANDLERS, TaskResult(task)))
+    known_chunks = remove_inner_chunks(search_chunks(file, file.size(), HANDLERS, TaskResult(task)))
     unknown_chunks = calculate_unknown_chunks(known_chunks, file.size())
     yield from chain(known_chunks, unknown_chunks)
 
