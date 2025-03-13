@@ -22,6 +22,7 @@ class TestLinuxKernelUnpacker(TestUnpackerBase):
             ('bzImage_lzma', 'vmlinux_LZMA_17001'),
             ('bzImage_lzo', 'vmlinux_LZOP_17001'),
             ('bzImage_xz', 'vmlinux_XZ_17001'),
+            ('zImage_be32', 'vmlinux_GZIP_BE32_13068'),
         ],
     )
     def test_extraction_valid_bz_image(self, input_file, expected):
