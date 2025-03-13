@@ -2,19 +2,15 @@
 This plugin unpacks several formats that the linux kernel can be compressed with
 Implementation logic taken from https://github.com/torvalds/linux/blob/master/scripts/extract-vmlinux
 FAQ:
- Why not just call this script directly? Well it relies on readelf to determine success, and the readelf on x86 doesn't read
-header information of different architectures, eg ARM. So we can do better.
+Why not just call this script directly? Well it relies on readelf to determine success, and the readelf on x86 doesn't
+read header information of different architectures, eg ARM. So we can do better.
 """
 
-import os
-import sys
 from pathlib import Path
 
 from common_helper_process import execute_shell_command, execute_shell_command_get_return_code
 
-INTERNAL_DIR = Path(__file__).parent.parent / 'internal'
-sys.path.append(str(INTERNAL_DIR))
-from extractor import Extractor  # noqa: E402 pylint: disable=import-error,wrong-import-position
+from plugins.unpacking.linuxkernel.internal.extractor import Extractor
 
 NAME = 'LinuxKernel'
 MIME_PATTERNS = ['linux/kernel']
@@ -23,7 +19,14 @@ VERSION = '0.0.1'
 STRINGS_PATH = execute_shell_command('which strings').strip()
 VMLINUX_TO_ELF_PATH = execute_shell_command('which vmlinux-to-elf').strip()
 TOOL_PATHS = {}
-KERNEL_STRINGS_TO_MATCH = ['Linux version', 'jiffies', 'syscall']
+KERNEL_STRINGS_TO_MATCH = [
+    'Linux version',
+    'jiffies',
+    'syscall',
+    'This kernel requires',
+    'Uncompressing Linux...',
+    'rpmocsser gniuniL...x',  # the same string as 32 bit big endian data blob
+]
 
 
 def is_kernel(file_path):
@@ -37,7 +40,7 @@ def is_kernel(file_path):
             found_cnt += 1
 
     # if any two or more criteria match, then we found what is likely a kernel
-    return found_cnt > 1
+    return found_cnt > 0
 
 
 def check_dir_for_extracted_kernel(tmp_dir):
@@ -67,28 +70,24 @@ def command_absolute_path(cmd):
     return ' '.join(cmd)
 
 
-def strip_extension(filename):
-    return filename[: filename.rfind('.')]
-
-
-def unpack_function(file_path, tmp_dir):
+def unpack_function(file_path: str, tmp_dir: str) -> dict:
     """
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
     """
-    output = ''
+    output, output_file_name = '', None
     extractor = Extractor(file_path, tmp_dir)
     for file_data in extractor.extracted_files():
         compressed_file = file_data['file_path']
         tool = command_absolute_path(file_data['command'])
-        output_file_name = strip_extension(compressed_file)
+        output_file_name = compressed_file.with_suffix('')
 
         cmd = f'fakeroot cat {compressed_file} | {tool} > {Path(tmp_dir, output_file_name)} 2> /dev/null'
         output += cmd + '\n'
         output += execute_shell_command(cmd, timeout=600)
 
         # remove the compressed file
-        os.remove(file_data['file_path'])
+        Path(file_data['file_path']).unlink()
 
         found = check_dir_for_extracted_kernel(tmp_dir)
         if found:
