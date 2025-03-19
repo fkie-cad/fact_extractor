@@ -6,7 +6,6 @@ from common_helper_process import execute_shell_command
 
 NAME = 'PaTool'
 MIME_PATTERNS = [
-    'application/gzip',
     'application/java-archive',
     'application/vnd.debian.binary-package',
     'application/vnd.ms-cab-compressed',
@@ -22,7 +21,6 @@ MIME_PATTERNS = [
     'application/x-cpio',
     'application/x-debian-package',
     'application/x-dms',
-    'application/x-gzip',
     'application/x-lha',
     'application/x-lrzip',
     'application/x-lz4',
@@ -40,7 +38,7 @@ MIME_PATTERNS = [
     'application/zpaq',
     'audio/flac',
 ]
-VERSION = '0.6.0'
+VERSION = '0.6.1'
 
 TOOL_PATH = execute_shell_command('which patool').strip()
 
