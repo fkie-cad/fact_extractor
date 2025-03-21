@@ -3,9 +3,9 @@
 import argparse
 import binascii
 import hashlib
-import pathlib
 import sys
 from contextlib import suppress
+from pathlib import Path
 
 from Crypto.Cipher import AES
 
@@ -37,13 +37,13 @@ class DcryptLink:
 
     @staticmethod
     def get_expected_sha512_from_fd_at_offset(file, offset, size=0x40):
-        with open(file, 'rb') as enc_fw:
+        with file.open('rb') as enc_fw:
             enc_fw.seek(offset)
             return binascii.hexlify(enc_fw.read(size)).decode()
 
     @staticmethod
     def calc_sha512_from_fd_at_offset_of_len(file, offset_payload, len_payload, key=None):
-        with open(file, 'rb') as enc_fw:
+        with file.open('rb') as enc_fw:
             enc_fw.seek(offset_payload)
             data = enc_fw.read(len_payload)
             if key:
@@ -59,28 +59,29 @@ class DcryptLink:
         return 0
 
     def decrypt_aes128_cbc(self):
-        with open(self.enc_fw, 'rb') as enc_fw:
+        with self.enc_fw.open('rb') as enc_fw:
             enc_fw.seek(CIPHERTEXT_OFF)
             ciphertext = enc_fw.read(self.data_len_dec_fw_no_padding)
         cipher = AES.new(self.dec_key, AES.MODE_CBC, self.ivec)
         plaintext = cipher.decrypt(ciphertext)
-        pathlib.Path(self.dec_fw).open('wb').write(plaintext)
+        self.dec_fw.write_bytes(plaintext)
 
     def verify_magic_bytes(self):
         expected = b'SHRS'
-        actual = pathlib.Path(self.enc_fw).open('rb').read(4)
+        with self.enc_fw.open('rb') as fp:
+            actual = fp.read(4)
         print('[*] Checking magic bytes...')  # noqa: T201
         self.verify(actual, expected)
 
     def set_datalen_variables(self):
-        with open(self.enc_fw, 'rb') as enc_fw:
+        with self.enc_fw.open('rb') as enc_fw:
             enc_fw.seek(DATA_LEN_DEC_FW_OFF)
             self.data_len_dec_fw = int.from_bytes(enc_fw.read(DATA_LEN), byteorder='big', signed=False)
             enc_fw.seek(DATALEN_DEC_FW_NO_PADDING_OFF)
             self.data_len_dec_fw_no_padding = int.from_bytes(enc_fw.read(DATA_LEN), byteorder='big', signed=False)
 
     def set_ivec(self):
-        with open(self.enc_fw, 'rb') as enc_fw:
+        with self.enc_fw.open('rb') as enc_fw:
             enc_fw.seek(IVEC_OFF)
             self.ivec = enc_fw.read(IVEC_LEN)
 
@@ -98,8 +99,8 @@ class DcryptLink:
 
 def main():
     arg_parser = argparse.ArgumentParser(description='D-Link SHRS decyption tool')
-    arg_parser.add_argument('-i', '--inp', type=str, help='Path to the encrypted D-Link firmware image', required=True)
-    arg_parser.add_argument('-o', '--out', type=str, help='Path to the decrypted firmware image', required=True)
+    arg_parser.add_argument('-i', '--inp', type=Path, help='Path to the encrypted D-Link firmware image', required=True)
+    arg_parser.add_argument('-o', '--out', type=Path, help='Path to the decrypted firmware image', required=True)
     cli_args = arg_parser.parse_args()
 
     dlink = DcryptLink(cli_args.inp, cli_args.out)
@@ -123,10 +124,10 @@ def main():
         expected_md = dlink.get_expected_sha512_from_fd_at_offset(dlink.enc_fw, SHA512_DEC_FW_W_KEY_OFF)
         dlink.verify(md, expected_md)
 
-        print(f'[+] Successfully decrypted {pathlib.Path(dlink.enc_fw).name}!')  # noqa: T201
+        print(f'[+] Successfully decrypted {dlink.enc_fw.name}!')  # noqa: T201
     except ValueError:
         with suppress(FileNotFoundError):
-            pathlib.Path(dlink.dec_fw).unlink()
+            dlink.dec_fw.unlink()
         print('[!] Failed!')  # noqa: T201
         sys.exit(1)
 
