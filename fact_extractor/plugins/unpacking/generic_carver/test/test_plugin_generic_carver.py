@@ -32,7 +32,7 @@ class TestGenericCarver(TestUnpackerBase):
         )
         assert len(files) == 9, 'file number incorrect'
         assert sum(1 if f.endswith('.zlib_carver') else 0 for f in files), 'wrong number of carved zlib streams'
-        zlib_file_1 = files[1]
+        zlib_file_1 = sorted(files)[1]
         content = zlib.decompress(Path(zlib_file_1).read_bytes())
         assert b'test file' in content, 'test file not carved correctly'
 
