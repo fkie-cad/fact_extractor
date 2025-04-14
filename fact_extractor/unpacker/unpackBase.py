@@ -5,15 +5,16 @@ import fnmatch
 import logging
 from os import getgid, getuid
 from pathlib import Path
-from subprocess import PIPE, Popen
 from time import time
-from typing import Callable, Dict, List, Tuple
+from typing import Any, Iterable
 
 from common_helper_files import get_files_in_dir
 
 from helperFunctions import magic
 from helperFunctions.config import read_list_from_config
-from helperFunctions.plugin import import_plugins
+from helperFunctions.file_system import change_owner_of_output_files
+from helperFunctions.plugin import find_plugin_classes, import_plugins
+from plugins.base_class import UnpackingPlugin
 
 
 class UnpackBase:
@@ -27,94 +28,90 @@ class UnpackBase:
         self._setup_plugins()
 
     def _setup_plugins(self):
-        self.unpacker_plugins = {}
+        self.unpacking_plugins: dict[str, UnpackingPlugin] = {}
+        self.plugin_by_mime: dict[str, str] = {}
         self.load_plugins()
-        logging.debug(f'Plugins available: {self.source.list_plugins()}')
-        self._set_whitelist()
+        logging.info(f'Plugins available: {", ".join(self.unpacking_plugins)}')
+        self._set_blacklist()
 
     def load_plugins(self):
-        self.source = import_plugins('unpacker.plugins', 'plugins/unpacking')
-        for plugin_name in self.source.list_plugins():
-            plugin = self.source.load_plugin(plugin_name)
-            plugin.setup(self)
+        for module in import_plugins():
+            for plugin in self._get_unpackers_from_module(module):
+                self.register_plugin(plugin)
 
-    def _set_whitelist(self):
+    @staticmethod
+    def _get_unpackers_from_module(module) -> Iterable[UnpackingPlugin]:
+        classes = list(find_plugin_classes(module))
+        if not classes:
+            # fallback for old plugins without the base class
+            classes = [UnpackingPlugin.from_old_module(module)]
+        for plugin_class in classes:
+            try:
+                plugin = plugin_class()
+                plugin.validate()
+                yield plugin
+            except Exception as error:
+                logging.exception(f'Could not instantiate plugin from {module}: {error}')
+
+    def _set_blacklist(self):
         self.blacklist = read_list_from_config(self.config, 'unpack', 'blacklist')
         logging.debug(f"""Ignore (Blacklist): {', '.join(self.blacklist)}""")
-        for item in self.blacklist:
-            self.register_plugin(item, self.unpacker_plugins['generic/nop'])
+        for mime in self.blacklist:
+            self.plugin_by_mime[mime] = 'NOP'
 
-    def register_plugin(self, mime_type: str, unpacker_name_and_function: Tuple[Callable[[str, str], Dict], str, str]):
-        self.unpacker_plugins[mime_type] = unpacker_name_and_function
+    def register_plugin(self, plugin: UnpackingPlugin):
+        self.unpacking_plugins[plugin.NAME] = plugin
+        for mime in plugin.MIME_PATTERNS:
+            self.plugin_by_mime[mime] = plugin.NAME
 
-    def get_unpacker(self, mime_type: str):
-        if mime_type in list(self.unpacker_plugins.keys()):
-            return self.unpacker_plugins[mime_type]
-        return self.unpacker_plugins['generic/carver']
+    def get_unpacker(self, mime_type: str) -> UnpackingPlugin:
+        plugin = self.plugin_by_mime.get(mime_type)
+        return self.unpacking_plugins.get(plugin if plugin else 'generic_carver')
 
-    def extract_files_from_file(self, file_path: str | Path, tmp_dir) -> Tuple[List, Dict]:
+    def extract_files_from_file(self, file_path: str | Path, tmp_dir) -> tuple[list, dict]:
         current_unpacker = self.get_unpacker(magic.from_file(file_path, mime=True))
         return self._extract_files_from_file_using_specific_unpacker(str(file_path), tmp_dir, current_unpacker)
 
-    def unpacking_fallback(self, file_path, tmp_dir, old_meta, fallback_plugin_mime) -> Tuple[List, Dict]:
-        fallback_plugin = self.unpacker_plugins[fallback_plugin_mime]
+    def unpacking_fallback(self, file_path, tmp_dir, old_meta, fallback_plugin_mime) -> tuple[list, dict]:
+        fallback_plugin = self.get_unpacker(fallback_plugin_mime)
         old_meta[f"""0_FALLBACK_{old_meta['plugin_used']}"""] = (
             f"""{old_meta['plugin_used']} (failed) -> {fallback_plugin_mime} (fallback)"""
         )
         if 'output' in old_meta:
             old_meta[f"""0_ERROR_{old_meta['plugin_used']}"""] = old_meta['output']
-        return self._extract_files_from_file_using_specific_unpacker(
-            file_path, tmp_dir, fallback_plugin, meta_data=old_meta
-        )
+        return self._extract_files_from_file_using_specific_unpacker(file_path, tmp_dir, fallback_plugin, old_meta)
 
     def should_ignore(self, file):
         path = str(file)
         return any(fnmatch.fnmatchcase(path, pattern) for pattern in self.exclude)
 
     def _extract_files_from_file_using_specific_unpacker(
-        self, file_path: str, tmp_dir: str, selected_unpacker, meta_data: dict | None = None
-    ) -> Tuple[List, Dict]:
-        unpack_function, name, version = (
-            selected_unpacker  # TODO Refactor register method to directly use four parameters instead of three
-        )
+        self, file_path: str, tmp_dir: str, selected_unpacker: UnpackingPlugin, old_meta: dict | None = None
+    ) -> tuple[list[str], dict[str, Any]]:
+        meta_data = old_meta or {}
+        meta_data |= {'plugin_used': selected_unpacker.NAME, 'plugin_version': selected_unpacker.VERSION}
 
-        if meta_data is None:
-            meta_data = {}
-        meta_data['plugin_used'] = name
-        meta_data['plugin_version'] = version
-
-        logging.info(f'Trying to unpack "{Path(file_path).name}" with plugin {name}')
-
+        logging.debug(f'Trying to unpack {Path(file_path).name} with {selected_unpacker.NAME} plugin...')
         try:
-            additional_meta = unpack_function(file_path, tmp_dir)
+            additional_meta = selected_unpacker.unpack_file(file_path, tmp_dir)
         except Exception as error:
             logging.debug(f'Unpacking of {file_path} failed: {error}', exc_info=True)
             additional_meta = {'error': f'{type(error)}: {error!s}'}
         if isinstance(additional_meta, dict):
             meta_data.update(additional_meta)
 
-        self.change_owner_back_to_me(directory=tmp_dir)
         meta_data['analysis_date'] = time()
+        change_owner_of_output_files(Path(tmp_dir), f'{getuid()}:{getgid()}')
+        unpacked_files = get_files_in_dir(tmp_dir)
+        meta_data['number_of_excluded_files'] = self._remove_excluded_files(unpacked_files)
 
-        out = get_files_in_dir(tmp_dir)
+        return unpacked_files, meta_data
 
+    def _remove_excluded_files(self, file_list: list[str]) -> int:
+        count = 0
         if self.exclude:
-            # Remove paths that should be ignored
-            excluded_count = len(out)
-            out = [f for f in out if not self.should_ignore(f)]
-            excluded_count -= len(out)
-        else:
-            excluded_count = 0
-
-        meta_data['number_of_excluded_files'] = excluded_count
-        return out, meta_data
-
-    def change_owner_back_to_me(self, directory: str, permissions: str = 'u+r'):
-        with Popen(f'sudo chown -R {getuid()}:{getgid()} {directory}', shell=True, stdout=PIPE, stderr=PIPE) as pl:
-            pl.communicate()
-        self.grant_read_permission(directory, permissions)
-
-    @staticmethod
-    def grant_read_permission(directory: str, permissions: str):
-        with Popen(f'chmod --recursive {permissions} {directory}', shell=True, stdout=PIPE, stderr=PIPE) as pl:
-            pl.communicate()
+            for path in list(file_list):
+                if self.should_ignore(path):
+                    count += 1
+                    file_list.remove(path)
+        return count
