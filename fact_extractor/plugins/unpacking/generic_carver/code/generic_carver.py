@@ -33,7 +33,6 @@ logger.debug = lambda *_, **__: None
 # global loglevel gets set to critical when importing Unblob -> reset it
 logging.getLogger().setLevel(logging.DEBUG)
 
-
 HANDLERS = (*BUILTIN_HANDLERS, *CUSTOM_HANDLERS)
 
 
