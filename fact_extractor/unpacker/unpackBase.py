@@ -21,11 +21,10 @@ class UnpackBase:
     The unpacker module unpacks all files included in a file
     """
 
-    def __init__(self, config=None, extract_everything: bool = False):
+    def __init__(self, config=None):
         self.config = config
         self.exclude = read_list_from_config(config, 'unpack', 'exclude')
         self._setup_plugins()
-        self.extract_everything = extract_everything
 
     def _setup_plugins(self):
         self.unpacker_plugins = {}
@@ -68,7 +67,7 @@ class UnpackBase:
             file_path, tmp_dir, fallback_plugin, meta_data=old_meta
         )
 
-    def _should_ignore(self, file):
+    def should_ignore(self, file):
         path = str(file)
         return any(fnmatch.fnmatchcase(path, pattern) for pattern in self.exclude)
 
@@ -102,7 +101,7 @@ class UnpackBase:
         if self.exclude:
             # Remove paths that should be ignored
             excluded_count = len(out)
-            out = [f for f in out if not self._should_ignore(f)]
+            out = [f for f in out if not self.should_ignore(f)]
             excluded_count -= len(out)
         else:
             excluded_count = 0
