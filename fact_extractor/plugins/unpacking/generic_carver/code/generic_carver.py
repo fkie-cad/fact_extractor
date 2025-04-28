@@ -4,14 +4,13 @@ This plugin unpacks all files via carving
 
 from __future__ import annotations
 
-import logging
 import traceback
 from itertools import chain
 from pathlib import Path
 from typing import Iterable
 
-import structlog
 from common_helper_unpacking_classifier import avg_entropy
+from structlog.testing import capture_logs
 from unblob.extractor import carve_unknown_chunk, carve_valid_chunk
 from unblob.file_utils import File
 from unblob.finder import search_chunks
@@ -25,9 +24,6 @@ MIME_PATTERNS = ['generic/carver']
 VERSION = '1.0.1'
 
 MIN_FILE_ENTROPY = 0.01
-
-# deactivate internal logger of unblob because it can slow down searching chunks
-structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(logging.CRITICAL))
 
 
 class ZlibCarvingHandler(ZlibHandler):
@@ -51,7 +47,8 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
     path = Path(file_path)
 
     try:
-        with File.from_path(path) as file:
+        with File.from_path(path) as file, capture_logs() as log_list:
+            # unblob uses structlog for logging, but we can capture the logs with this convenient testing function
             for chunk in _find_chunks(path, file):
                 if isinstance(chunk, PaddingChunk):
                     continue
@@ -66,12 +63,21 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
                     carve_valid_chunk(extraction_dir, file, chunk)
                 chunks.append(chunk.as_report(None).asdict())
 
-        report = _create_report(chunks) if chunks else 'No valid chunks found.'
+        report = _format_logs(log_list)
         if filter_report:
             report += f'\nFiltered chunks:\n{filter_report}'
+        if not chunks:
+            report += '\nNo valid chunks found.'
     except Exception as error:
         report = f'Error {error} during unblob extraction:\n{traceback.format_exc()}'
     return {'output': report}
+
+
+def _format_logs(logs: list[dict]) -> str:
+    output = ''
+    for entry in logs:
+        output += '\n'.join(f'{key}: {value}' for key, value in entry.items() if key not in {'_verbosity', 'log_level'})
+    return output
 
 
 def _find_chunks(file_path: Path, file: File) -> Iterable[Chunk]:
@@ -79,16 +85,6 @@ def _find_chunks(file_path: Path, file: File) -> Iterable[Chunk]:
     known_chunks = remove_inner_chunks(search_chunks(file, file.size(), HANDLERS, TaskResult(task)))
     unknown_chunks = calculate_unknown_chunks(known_chunks, file.size())
     yield from chain(known_chunks, unknown_chunks)
-
-
-def _create_report(chunk_list: list[dict]) -> str:
-    report = ['Extracted chunks:']
-    for chunk in sorted(chunk_list, key=lambda c: c['start_offset']):
-        chunk_type = chunk.get('handler_name', 'unknown')
-        report.append(
-            f'start: {chunk["start_offset"]}, end: {chunk["end_offset"]}, size: {chunk["size"]}, type: {chunk_type}'
-        )
-    return '\n'.join(report)
 
 
 def _has_low_entropy(file: File, chunk: UnknownChunk) -> bool:
