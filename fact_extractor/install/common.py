@@ -34,7 +34,7 @@ def _install_magic():
                 'wget',
                 '--output-document',
                 'firmware.xz',
-                'https://github.com/fkie-cad/firmware-magic-database/releases/download/v0.2.2/firmware.xz',
+                'https://github.com/fkie-cad/firmware-magic-database/releases/download/v0.2.4/firmware.xz',
             ],
             check=True,
         )
