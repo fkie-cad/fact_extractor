@@ -4,17 +4,16 @@ This plugin unpacks all files via carving
 
 from __future__ import annotations
 
-import logging
 import traceback
 from itertools import chain
 from pathlib import Path
 from typing import Iterable
 
-import structlog
 from common_helper_unpacking_classifier import avg_entropy
+from structlog.testing import capture_logs
 from unblob.extractor import carve_unknown_chunk, carve_valid_chunk
 from unblob.file_utils import File
-from unblob.finder import search_chunks
+from unblob.finder import logger, search_chunks
 from unblob.handlers import BUILTIN_HANDLERS
 from unblob.handlers.compression.zlib import ZlibHandler
 from unblob.models import Chunk, HexString, PaddingChunk, TaskResult, UnknownChunk
@@ -22,12 +21,12 @@ from unblob.processing import Task, calculate_unknown_chunks, remove_inner_chunk
 
 NAME = 'generic_carver'
 MIME_PATTERNS = ['generic/carver']
-VERSION = '1.0.1'
+VERSION = '1.0.2'
 
 MIN_FILE_ENTROPY = 0.01
 
-# deactivate internal logger of unblob because it can slow down searching chunks
-structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(logging.CRITICAL))
+# deactivate internal debug logging of unblob finder because it can slow down chunks search significantly
+logger.debug = lambda *_, **__: None
 
 
 class ZlibCarvingHandler(ZlibHandler):
@@ -51,7 +50,7 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
     path = Path(file_path)
 
     try:
-        with File.from_path(path) as file:
+        with File.from_path(path) as file, capture_logs() as _:
             for chunk in _find_chunks(path, file):
                 if isinstance(chunk, PaddingChunk):
                     continue
