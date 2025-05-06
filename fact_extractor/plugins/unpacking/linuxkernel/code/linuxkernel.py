@@ -7,6 +7,7 @@ read header information of different architectures, eg ARM. So we can do better.
 """
 
 from pathlib import Path
+from subprocess import run
 
 from common_helper_process import execute_shell_command, execute_shell_command_get_return_code
 
@@ -25,7 +26,7 @@ KERNEL_STRINGS_TO_MATCH = [
     'syscall',
     'This kernel requires',
     'Uncompressing Linux...',
-    'rpmocsser gniuniL...x',  # the same string as 32 bit big endian data blob
+    'rpmocsser gniuniL...x',  # the same string as 32-bit big endian data blob
 ]
 
 
@@ -38,25 +39,7 @@ def is_kernel(file_path):
         output, ret_code = execute_shell_command_get_return_code(f'{STRINGS_PATH} {file_path} | grep -q "{i}"')
         if ret_code == 0:
             found_cnt += 1
-
-    # if any two or more criteria match, then we found what is likely a kernel
     return found_cnt > 0
-
-
-def check_dir_for_extracted_kernel(tmp_dir):
-    """
-    loop through the tmp_dir, find all files and check if any of them are a kernel
-    remove files that aren't valid kernels.
-    """
-    files_in_dir = [f for f in Path(tmp_dir).iterdir() if f.is_file()]
-    found = False
-    for file in files_in_dir:
-        if is_kernel(file):
-            found = True
-        else:
-            file.unlink()
-
-    return found
 
 
 def command_absolute_path(cmd):
@@ -75,29 +58,29 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
     file_path specifies the input file.
     tmp_dir should be used to store the extracted files.
     """
-    output, output_file_name = '', None
+    output = ''
     extractor = Extractor(file_path, tmp_dir)
-    for file_data in extractor.extracted_files():
-        compressed_file = file_data['file_path']
-        tool = command_absolute_path(file_data['command'])
-        output_file_name = compressed_file.with_suffix('')
+    for compressed_file, command in extractor.get_extracted_files():
+        tool = command_absolute_path(command)
+        output_file = Path(tmp_dir) / compressed_file.with_suffix('').name
 
-        cmd = f'fakeroot cat {compressed_file} | {tool} > {Path(tmp_dir, output_file_name)} 2> /dev/null'
+        cmd = f'fakeroot cat {compressed_file} | {tool} > {output_file}'
         output += cmd + '\n'
-        output += execute_shell_command(cmd, timeout=600)
-
+        proc = run(cmd, shell=True, check=False, timeout=600, capture_output=True)
+        output += proc.stdout.decode(errors='replace')
         # remove the compressed file
-        Path(file_data['file_path']).unlink()
+        compressed_file.unlink()
 
-        found = check_dir_for_extracted_kernel(tmp_dir)
-        if found:
-            output += f'Found Kernel {output_file_name}\n'
-            break
+        if proc.returncode != 0 and b'decompression OK' not in proc.stderr:
+            output += f"return code: {proc.returncode}: {proc.stderr.decode(errors='replace')}"
 
-    # The resulting output could be a variety of formats, what we want to do is rebuild it as a non-stripped ELF
-    # that is then easily analyzable in your favorite tools. Use vmlinux-to-elf for this.
-    if output_file_name:
-        cmd = f'fakeroot {VMLINUX_TO_ELF_PATH} {output_file_name} {output_file_name}.elf'
+        if not output_file.is_file():
+            continue
+        if not is_kernel(output_file):
+            output_file.unlink()
+            continue
+        output += f'Found Kernel {output_file}\n'
+        cmd = f'fakeroot {VMLINUX_TO_ELF_PATH} {output_file} {output_file.with_suffix(".elf")}'
         output += cmd + '\n'
         output += execute_shell_command(cmd, timeout=600)
 

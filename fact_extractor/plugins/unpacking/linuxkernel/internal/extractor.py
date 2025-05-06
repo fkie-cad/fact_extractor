@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Iterable
 
@@ -19,7 +21,7 @@ class Extractor:
         for i in range(offset, len(data), chunk_size):
             yield data[i : i + chunk_size][::-1]
 
-    def extracted_files(self):
+    def get_extracted_files(self) -> Iterable[tuple[Path, str]]:
         for algo in self.offsets:
             for offset in self.offsets[algo]:
                 filename = f'vmlinux_{algo}_{offset}.{self.ps.algorithms[algo]["suffix"]}'
@@ -32,4 +34,4 @@ class Extractor:
                 else:
                     data = self.raw_data[offset:]
                 file_path.write_bytes(data)
-                yield {'file_path': file_path, 'command': self.ps.algorithms[algo]['command']}
+                yield file_path, self.ps.algorithms[algo]['command']
