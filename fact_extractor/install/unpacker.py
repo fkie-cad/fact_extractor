@@ -105,7 +105,17 @@ GITHUB_DEPENDENCIES = [
         'rampageX/firmware-mod-kit',
         [
             '(cd src && make untrx && make -C tpl-tool/src && make -C yaffs2utils)',
-            'cp src/untrx src/yaffs2utils/unyaffs2 src/tpl-tool/src/tpl-tool ../../bin/',
+            f'cp src/untrx src/yaffs2utils/unyaffs2 src/tpl-tool/src/tpl-tool {BIN_DIR}',
+        ],
+    ),
+    (
+        'openwrt/firmware-utils',
+        [
+            '(cd src && '
+            'gcc -c -o buffalo-enc.o buffalo-enc.c -I./ && '
+            'gcc -c -o buffalo-lib.o buffalo-lib.c -I./ && '
+            'gcc -o buffalo-enc buffalo-enc.o buffalo-lib.o)',
+            f'cp src/buffalo-enc {BIN_DIR}',
         ],
     ),
 ]
