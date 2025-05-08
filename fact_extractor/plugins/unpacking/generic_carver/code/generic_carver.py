@@ -15,13 +15,14 @@ from unblob.extractor import carve_unknown_chunk, carve_valid_chunk
 from unblob.file_utils import File
 from unblob.finder import logger, search_chunks
 from unblob.handlers import BUILTIN_HANDLERS
-from unblob.handlers.compression.zlib import ZlibHandler
-from unblob.models import Chunk, HexString, PaddingChunk, TaskResult, UnknownChunk
+from unblob.models import Chunk, PaddingChunk, TaskResult, UnknownChunk
 from unblob.processing import Task, calculate_unknown_chunks, remove_inner_chunks
+
+from plugins.unpacking.generic_carver.internal.handlers import CUSTOM_HANDLERS
 
 NAME = 'generic_carver'
 MIME_PATTERNS = ['generic/carver']
-VERSION = '1.0.2'
+VERSION = '1.1.0'
 
 MIN_FILE_ENTROPY = 0.01
 
@@ -29,18 +30,7 @@ MIN_FILE_ENTROPY = 0.01
 logger.debug = lambda *_, **__: None
 
 
-class ZlibCarvingHandler(ZlibHandler):
-    NAME = 'zlib_carver'
-
-    PATTERNS = [  # noqa: RUF012
-        HexString('78 01'),  # low compression
-        HexString('78 9c'),  # default compression
-        HexString('78 da'),  # best compression
-        HexString('78 5e'),  # compressed
-    ]
-
-
-HANDLERS = (*BUILTIN_HANDLERS, ZlibCarvingHandler)
+HANDLERS = (*BUILTIN_HANDLERS, *CUSTOM_HANDLERS)
 
 
 def unpack_function(file_path: str, tmp_dir: str) -> dict:
