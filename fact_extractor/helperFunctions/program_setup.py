@@ -23,7 +23,6 @@ def setup_argparser(name, description, command_line_options, version=__VERSION__
 
 
 def setup_logging(debug, log_file=None, log_level=None):
-    log_level = log_level if log_level else logging.WARNING
     log_format = logging.Formatter(
         fmt='[%(asctime)s][%(module)s][%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S'
     )
@@ -33,13 +32,12 @@ def setup_logging(debug, log_file=None, log_level=None):
     if log_file:
         create_dir_for_file(log_file)
         file_log = logging.FileHandler(log_file)
-        file_log.setLevel(log_level)
+        file_log.setLevel(log_level or logging.WARNING)
         file_log.setFormatter(log_format)
         logger.addHandler(file_log)
 
-    log_level = log_level if log_level else logging.INFO
     console_log = logging.StreamHandler()
-    console_log.setLevel(logging.DEBUG if debug else log_level)
+    console_log.setLevel(logging.DEBUG if debug else log_level or logging.INFO)
     console_log.setFormatter(log_format)
     logger.addHandler(console_log)
 
@@ -47,10 +45,10 @@ def setup_logging(debug, log_file=None, log_level=None):
 def check_ulimits():
     # Get number of openable files
     soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
-    if soft < 1024:
+    if soft < 1024:  # noqa: PLR2004
         resource.setrlimit(resource.RLIMIT_NOFILE, (min(1024, hard), hard))
         logging.info(f'The number of openable files has been raised from {soft} to {min(1024, hard)}.')
-    elif soft == resource.RLIM_INFINITY or soft > 100000:
+    elif soft == resource.RLIM_INFINITY or soft > 100000:  # noqa: PLR2004
         logging.warning('Warning: A very high (or no) nofile limit will slow down fakeroot and cause other problems.')
 
 
