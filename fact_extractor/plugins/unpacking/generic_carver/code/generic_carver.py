@@ -4,6 +4,7 @@ This plugin unpacks all files via carving
 
 from __future__ import annotations
 
+import logging
 import traceback
 from itertools import chain
 from pathlib import Path
@@ -28,6 +29,9 @@ MIN_FILE_ENTROPY = 0.01
 
 # deactivate internal debug logging of unblob finder because it can slow down chunks search significantly
 logger.debug = lambda *_, **__: None
+
+# global loglevel gets set to critical when importing Unblob -> reset it
+logging.getLogger().setLevel(logging.DEBUG)
 
 
 HANDLERS = (*BUILTIN_HANDLERS, *CUSTOM_HANDLERS)
