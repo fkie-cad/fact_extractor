@@ -4,18 +4,16 @@ from __future__ import annotations
 import fnmatch
 import logging
 from os import getgid, getuid
+from pathlib import Path
 from subprocess import PIPE, Popen
 from time import time
-from typing import TYPE_CHECKING, Callable, Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple
 
 from common_helper_files import get_files_in_dir
 
 from helperFunctions import magic
 from helperFunctions.config import read_list_from_config
 from helperFunctions.plugin import import_plugins
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 class UnpackBase:
@@ -32,7 +30,7 @@ class UnpackBase:
     def _setup_plugins(self):
         self.unpacker_plugins = {}
         self.load_plugins()
-        logging.info(f'Plug-ins available: {self.source.list_plugins()}')
+        logging.debug(f'Plugins available: {self.source.list_plugins()}')
         self._set_whitelist()
 
     def load_plugins(self):
@@ -86,7 +84,7 @@ class UnpackBase:
         meta_data['plugin_used'] = name
         meta_data['plugin_version'] = version
 
-        logging.debug(f'Try to unpack {file_path} with {name} plugin...')
+        logging.info(f'Trying to unpack "{Path(file_path).name}" with plugin {name}')
 
         try:
             additional_meta = unpack_function(file_path, tmp_dir)
