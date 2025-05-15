@@ -29,6 +29,7 @@ MIME_PATTERNS = [
     'application/x-rpm',
     'application/x-vhd',
     'application/x-vhdx',
+    'application/x-xar',
     'application/x-zip-compressed',
     'application/zip',
     # file systems

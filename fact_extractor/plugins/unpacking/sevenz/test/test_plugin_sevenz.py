@@ -15,20 +15,19 @@ class TestSevenZUnpacker(TestUnpackerBase):
             self.check_unpacker_selection(item, '7z')
 
     @pytest.mark.parametrize(
-        ('test_file', 'prefix'),
+        ('test_file', 'prefix', 'ignore'),
         [
-            ('test.7z', 'get_files_test'),
-            ('test.rar', 'get_files_test'),
-            ('test.arj', 'get_files_test'),
-            ('cramfs.img', ''),
-            ('test.iso', ''),
+            ('test.7z', 'get_files_test', set()),
+            ('test.rar', 'get_files_test', set()),
+            ('test.arj', 'get_files_test', set()),
+            ('test.xar', 'get_files_test', {'[TOC].xml'}),
+            ('cramfs.img', '', set()),
+            ('test.iso', '', set()),
         ],
     )
-    def test_extraction(self, test_file, prefix):
+    def test_extraction(self, test_file, prefix, ignore):
         meta = self.check_unpacking_of_standard_unpack_set(
-            TEST_DATA_DIR / test_file,
-            additional_prefix_folder=prefix,
-            output=True,
+            TEST_DATA_DIR / test_file, additional_prefix_folder=prefix, output=True, ignore=ignore
         )
         assert 'password' not in meta, 'password incorrectly set'
 
