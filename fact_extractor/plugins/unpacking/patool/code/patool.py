@@ -36,9 +36,10 @@ MIME_PATTERNS = [
     'application/x-xz',
     'application/x-zoo',
     'application/zpaq',
+    'application/zstd',
     'audio/flac',
 ]
-VERSION = '0.6.1'
+VERSION = '0.7.0'
 
 TOOL_PATH = execute_shell_command('which patool').strip()
 
