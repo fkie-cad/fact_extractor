@@ -2,6 +2,7 @@ import argparse
 import configparser
 import logging
 import resource
+from pathlib import Path
 
 from common_helper_files import create_dir_for_file
 
@@ -18,6 +19,12 @@ def setup_argparser(name, description, command_line_options, version=__VERSION__
     )
     parser.add_argument('-d', '--debug', action='store_true', default=False, help='print debug messages')
     parser.add_argument('-C', '--config_file', help='set path to config File', default=f'{get_config_dir()}/main.cfg')
+    parser.add_argument(
+        '-p',
+        '--password-list',
+        help='path to a password list for archive password cracking',
+        type=Path,
+    )
     parser.add_argument('FILE_PATH', type=str, help='Path to file that should be extracted')
     return parser.parse_args(command_line_options[1:])
 

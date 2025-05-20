@@ -41,9 +41,10 @@ MIME_PATTERNS = [
 ]
 VERSION = '0.9.0'
 
+CUSTOM_PW_LIST = Path('/tmp/custom_pw_list')
 UNPACKER_EXECUTABLE = '7z'
 
-# Empty password must be first in list to correctly detect if archive has no password
+# Empty password must be first in list to correctly detect if the archive has no password
 PW_LIST = ['']
 PW_LIST.extend(get_merged_password_set(Path(get_src_dir()) / 'unpacker/passwords'))
 TAIL_REGEX = re.compile(r'Tail Size = (\d+)')
@@ -55,7 +56,7 @@ def unpack_function(file_path, tmp_dir):
     tmp_dir should be used to store the extracted files.
     """
     meta = {}
-    for password in PW_LIST:
+    for password in _get_pw_list():
         output = execute_shell_command(f'fakeroot {UNPACKER_EXECUTABLE} x -y -p{password} -o{tmp_dir} {file_path}')
 
         meta['output'] = output
@@ -72,6 +73,13 @@ def unpack_function(file_path, tmp_dir):
         logging.warning(f'Password for {file_path} not found in fact_extractor/unpacker/passwords directory')
 
     return meta
+
+
+def _get_pw_list() -> list[str]:
+    pw_list = [*PW_LIST]
+    if CUSTOM_PW_LIST.is_file():
+        pw_list.extend(CUSTOM_PW_LIST.read_text().splitlines())
+    return pw_list
 
 
 def _contains_trailing_data(output: str) -> bool:

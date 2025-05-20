@@ -21,15 +21,18 @@ import sys
 from pathlib import Path
 
 from helperFunctions.program_setup import load_config, setup_argparser, setup_logging
+from plugins.unpacking.sevenz.code.sevenz import CUSTOM_PW_LIST
 from unpacker.unpack import unpack
 
 
 def main():
     arguments = setup_argparser('FACT extractor', 'Standalone extraction utility', sys.argv)
+    if arguments.password_list:
+        CUSTOM_PW_LIST.write_text(arguments.password_list.read_text())
     config = load_config(arguments.config_file)
     setup_logging(arguments.debug, log_file=arguments.log_file, log_level=arguments.log_level)
 
-    # Make sure report folder exists some meta.json can be written
+    # Make sure the report folder exists some meta.json can be written
     report_folder = Path(config.get('unpack', 'data_folder'), 'reports')
     report_folder.mkdir(parents=True, exist_ok=True)
     unpack(arguments.FILE_PATH, config)
