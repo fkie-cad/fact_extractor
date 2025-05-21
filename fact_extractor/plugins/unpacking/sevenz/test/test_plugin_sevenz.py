@@ -75,3 +75,16 @@ class TestSevenZUnpacker(TestUnpackerBase):
         assert len(files) > 0
         assert 'trailing_data' in files, 'trailing data not extracted'
         assert files['trailing_data'].stat().st_size == 100, 'trailing data offset is wrong'
+
+    def test_iso9660_extraction(self):
+        files, meta_data = self.unpacker.extract_files_from_file(
+            str(TEST_DATA_DIR / 'test_zisofs.iso'), self.tmp_dir.name
+        )
+        assert len(files) == 2
+        files_by_name = {p.name: p for f in files if (p := Path(f)).is_file()}
+        assert sorted(files_by_name) == ['FOO', 'LOREM']
+        assert files_by_name['FOO'].read_text() == 'foo\n', 'uncompressed file not extracted correctly'
+        assert (
+            files_by_name['LOREM'].read_text().startswith('Lorem ipsum')
+        ), 'zisofs compressed file not extracted correctly'
+        assert 'unpacked 1 zisofs compressed files' in meta_data['output']
