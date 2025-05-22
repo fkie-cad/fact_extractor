@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import gc
 import json
-import os
 import shutil
 from configparser import ConfigParser
 from pathlib import Path
@@ -29,8 +28,8 @@ class TestUnpackerBase:
         self.config.set('ExpertSettings', 'unpack_threshold', '0.8')
 
         self.unpacker = Unpacker(config=self.config)
-        os.makedirs(str(self.unpacker._report_folder), exist_ok=True)  # pylint: disable=protected-access
-        os.makedirs(str(self.unpacker._file_folder), exist_ok=True)  # pylint: disable=protected-access
+        self.unpacker._report_folder.mkdir(exist_ok=True)
+        self.unpacker._file_folder.mkdir(exist_ok=True)
 
         self.test_file_path = Path(get_test_data_dir(), 'get_files_test/testfile1')
 
@@ -45,7 +44,7 @@ class TestUnpackerBase:
         )
 
     def check_unpacker_selection(self, mime_type, plugin_name):
-        name = self.unpacker.get_unpacker(mime_type)[1]
+        name = self.unpacker.base.get_unpacker(mime_type)[1]
         assert name == plugin_name, 'wrong unpacker plugin selected'
 
     def check_unpacking_of_standard_unpack_set(
@@ -55,13 +54,13 @@ class TestUnpackerBase:
         output: bool = True,
         ignore: set[str] | None = None,
     ):
-        files, meta_data = self.unpacker.extract_files_from_file(str(in_file), self.tmp_dir.name)
+        files, meta_data = self.unpacker.base.extract_files_from_file(str(in_file), self.tmp_dir.name)
         files = {f for f in files if not any(rule in f for rule in ignore or set())}
         assert len(files) == 3, f'file number incorrect: {meta_data}'
         assert files == {
-            os.path.join(self.tmp_dir.name, additional_prefix_folder, 'testfile1'),
-            os.path.join(self.tmp_dir.name, additional_prefix_folder, 'testfile2'),
-            os.path.join(self.tmp_dir.name, additional_prefix_folder, 'generic folder/test file 3_.txt'),
+            str(Path(self.tmp_dir.name, additional_prefix_folder, 'testfile1')),
+            str(Path(self.tmp_dir.name, additional_prefix_folder, 'testfile2')),
+            str(Path(self.tmp_dir.name, additional_prefix_folder, 'generic folder/test file 3_.txt')),
         }, f'not all files found: {meta_data}'
         if output:
             assert 'output' in meta_data
@@ -70,8 +69,8 @@ class TestUnpackerBase:
 
 class TestUnpackerCore(TestUnpackerBase):
     def test_generic_carver_found(self):
-        assert 'generic/carver' in list(self.unpacker.unpacker_plugins), 'generic carver plugin not found'
-        name = self.unpacker.unpacker_plugins['generic/carver'][1]
+        assert 'generic/carver' in list(self.unpacker.base.unpacker_plugins), 'generic carver plugin not found'
+        name = self.unpacker.base.unpacker_plugins['generic/carver'][1]
         assert name == 'generic_carver', 'generic_carver plugin not found'
 
     def test_unpacker_selection_unknown(self):
@@ -169,15 +168,15 @@ class TestUnpackerCoreMain(TestUnpackerBase):
 
     def test_main_unpack_exclude_archive(self):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
-        self.unpacker.exclude = ['*test.zip']
+        self.unpacker.base.exclude = ['*test.zip']
         self.main_unpack_check(test_file_path, 0, 1, None)
 
     def test_main_unpack_exclude_subdirectory(self):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
-        self.unpacker.exclude = ['*/generic folder/*']
+        self.unpacker.base.exclude = ['*/generic folder/*']
         self.main_unpack_check(test_file_path, 2, 1, '7z')
 
     def test_main_unpack_exclude_files(self):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
-        self.unpacker.exclude = ['*/get_files_test/*test*']
+        self.unpacker.base.exclude = ['*/get_files_test/*test*']
         self.main_unpack_check(test_file_path, 0, 3, '7z')

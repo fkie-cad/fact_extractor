@@ -21,8 +21,8 @@ class TestRawUnpacker(TestUnpackerBase):
 
     def test_extraction_encoded(self):
         input_file = Path(TEST_DATA_DIR, 'encoded.bin')
-        unpacked_files, meta_data = self.unpacker._extract_files_from_file_using_specific_unpacker(
-            str(input_file), self.tmp_dir.name, self.unpacker.unpacker_plugins['data/raw']
+        unpacked_files, meta_data = self.unpacker.base._extract_files_from_file_using_specific_unpacker(
+            str(input_file), self.tmp_dir.name, self.unpacker.base.unpacker_plugins['data/raw']
         )
         assert meta_data['Intel Hex'] == 1
         assert meta_data['Motorola S-Record'] == 1
