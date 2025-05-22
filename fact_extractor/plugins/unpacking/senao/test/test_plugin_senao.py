@@ -15,7 +15,7 @@ class TestGenericCarver(TestUnpackerBase):
         files, meta_data = self.unpacker._extract_files_from_file_using_specific_unpacker(
             str(in_file),
             self.tmp_dir.name,
-            self.unpacker.unpacker_plugins['firmware/senao-v2b'],
+            self.unpacker.unpacking_plugins['senao'],
         )
         assert len(files) == 1, 'unpacked file number incorrect'
         file = Path(files[0])
