@@ -168,7 +168,7 @@ DEPENDENCIES = {
             'cstruct==2.1',
             'python-lzo',
             # binwalk
-            'git+https://github.com/ReFirmLabs/binwalk@v2.3.2',
+            'git+https://github.com/ReFirmLabs/binwalk@v2.3.2@b669dfa077ac4cf207c073f5fcd9e2db0bc8700a',
             'pyqtgraph',
             'capstone',
             'numpy',
