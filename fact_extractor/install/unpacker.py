@@ -161,14 +161,14 @@ DEPENDENCIES = {
             'git+https://github.com/armbues/python-entropy',  # To be checked. Original dependency was deleted.
             'git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git',
             'git+https://github.com/fkie-cad/fact_helper_file.git',
-            'git+https://github.com/wummel/patool.git',
+            'git+https://github.com/wummel/patool.git@b669dfa077ac4cf207c073f5fcd9e2db0bc8700a',
             'archmage',
             # jefferson + deps
             'git+https://github.com/sviehb/jefferson.git',
             'cstruct==2.1',
             'python-lzo',
             # binwalk
-            'git+https://github.com/ReFirmLabs/binwalk@v2.3.2@b669dfa077ac4cf207c073f5fcd9e2db0bc8700a',
+            'git+https://github.com/ReFirmLabs/binwalk@v2.3.2',
             'pyqtgraph',
             'capstone',
             'numpy',
