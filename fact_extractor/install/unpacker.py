@@ -161,7 +161,7 @@ DEPENDENCIES = {
             'git+https://github.com/armbues/python-entropy',  # To be checked. Original dependency was deleted.
             'git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git',
             'git+https://github.com/fkie-cad/fact_helper_file.git',
-            'git+https://github.com/wummel/patool.git@b669dfa077ac4cf207c073f5fcd9e2db0bc8700a',
+            'git+https://github.com/wummel/patool.git@4.0.0',
             'archmage',
             # jefferson + deps
             'git+https://github.com/sviehb/jefferson.git',
