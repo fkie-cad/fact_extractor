@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import gc
 import json
 import shutil
 from configparser import ConfigParser
@@ -11,32 +10,43 @@ from tempfile import TemporaryDirectory
 from unittest.mock import Mock, patch
 
 from helperFunctions.file_system import get_test_data_dir
+from plugins.base_class import UnpackingPlugin
 from unpacker.unpack import Unpacker
 
 
 class TestUnpackerBase:
+    @classmethod
+    def setup_class(cls):
+        cls.config = ConfigParser()
+        cls.ds_tmp_dir = TemporaryDirectory(prefix='fact_tests_')
+        cls.files_dir = Path(cls.ds_tmp_dir.name) / 'files'
+        cls.reports_dir = Path(cls.ds_tmp_dir.name) / 'reports'
+
+        cls.config.add_section('unpack')
+        cls.config.set('unpack', 'data_folder', cls.ds_tmp_dir.name)
+        cls.config.set('unpack', 'blacklist', 'text/plain, image/png')
+        cls.config.add_section('ExpertSettings')
+        cls.config.set('ExpertSettings', 'header_overhead', '256')
+        cls.config.set('ExpertSettings', 'unpack_threshold', '0.8')
+
+        cls.unpacker = Unpacker(config=cls.config)
+
+        cls.test_file_path = Path(get_test_data_dir(), 'get_files_test/testfile1')
+
     def setup_method(self):
-        self.config = ConfigParser()
-        self.ds_tmp_dir = TemporaryDirectory(prefix='fact_tests_')
         self.tmp_dir = TemporaryDirectory(prefix='fact_tests_')
 
-        self.config.add_section('unpack')
-        self.config.set('unpack', 'data_folder', self.ds_tmp_dir.name)
-        self.config.set('unpack', 'blacklist', 'text/plain, image/png')
-        self.config.add_section('ExpertSettings')
-        self.config.set('ExpertSettings', 'header_overhead', '256')
-        self.config.set('ExpertSettings', 'unpack_threshold', '0.8')
-
-        self.unpacker = Unpacker(config=self.config)
-        self.unpacker._report_folder.mkdir(exist_ok=True)
-        self.unpacker._file_folder.mkdir(exist_ok=True)
-
-        self.test_file_path = Path(get_test_data_dir(), 'get_files_test/testfile1')
+        self.unpacker._report_folder.mkdir(parents=True, exist_ok=True)
+        self.unpacker._file_folder.mkdir(parents=True, exist_ok=True)
 
     def teardown_method(self):
-        self.ds_tmp_dir.cleanup()
         self.tmp_dir.cleanup()
-        gc.collect()
+        shutil.rmtree(self.unpacker._report_folder)
+        shutil.rmtree(self.unpacker._file_folder)
+
+    @classmethod
+    def teardown_class(cls):
+        cls.ds_tmp_dir.cleanup()
 
     def get_unpacker_meta(self):
         return json.loads(
@@ -44,8 +54,8 @@ class TestUnpackerBase:
         )
 
     def check_unpacker_selection(self, mime_type, plugin_name):
-        name = self.unpacker.base.get_unpacker(mime_type)[1]
-        assert name == plugin_name, 'wrong unpacker plugin selected'
+        unpacker = self.unpacker.base.get_unpacker(mime_type)
+        assert unpacker.NAME == plugin_name, 'wrong unpacker plugin selected'  # noqa: SIM300
 
     def check_unpacking_of_standard_unpack_set(
         self,
@@ -69,9 +79,11 @@ class TestUnpackerBase:
 
 class TestUnpackerCore(TestUnpackerBase):
     def test_generic_carver_found(self):
-        assert 'generic/carver' in list(self.unpacker.base.unpacker_plugins), 'generic carver plugin not found'
-        name = self.unpacker.base.unpacker_plugins['generic/carver'][1]
-        assert name == 'generic_carver', 'generic_carver plugin not found'
+        assert 'generic_carver' in self.unpacker.base.unpacking_plugins, 'generic carver plugin not found'
+        assert 'generic/carver' in self.unpacker.base.plugin_by_mime, 'generic carver MIME type not found'
+        plugin = self.unpacker.base.get_unpacker('generic/carver')
+        assert isinstance(plugin, UnpackingPlugin)
+        assert plugin.NAME == 'generic_carver', 'generic_carver plugin not found'
 
     def test_unpacker_selection_unknown(self):
         self.check_unpacker_selection('unknown/blah', 'generic_carver')
@@ -166,17 +178,17 @@ class TestUnpackerCoreMain(TestUnpackerBase):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
         self.main_unpack_check(test_file_path, 3, 0, '7z')
 
-    def test_main_unpack_exclude_archive(self):
+    def test_main_unpack_exclude_archive(self, monkeypatch):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
-        self.unpacker.base.exclude = ['*test.zip']
+        monkeypatch.setattr(self.unpacker.base, 'exclude', ['*test.zip'])
         self.main_unpack_check(test_file_path, 0, 1, None)
 
-    def test_main_unpack_exclude_subdirectory(self):
+    def test_main_unpack_exclude_subdirectory(self, monkeypatch):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
-        self.unpacker.base.exclude = ['*/generic folder/*']
+        monkeypatch.setattr(self.unpacker.base, 'exclude', ['*/generic folder/*'])
         self.main_unpack_check(test_file_path, 2, 1, '7z')
 
-    def test_main_unpack_exclude_files(self):
+    def test_main_unpack_exclude_files(self, monkeypatch):
         test_file_path = Path(get_test_data_dir(), 'container/test.zip')
-        self.unpacker.base.exclude = ['*/get_files_test/*test*']
+        monkeypatch.setattr(self.unpacker.base, 'exclude', ['*/get_files_test/*test*'])
         self.main_unpack_check(test_file_path, 0, 3, '7z')
