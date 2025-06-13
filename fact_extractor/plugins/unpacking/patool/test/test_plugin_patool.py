@@ -44,6 +44,7 @@ class TestPaToolUnpacker(TestUnpackerBase):
         [
             'test.a',
             'test.bz2',
+            'test.bz3',
             'test.lrz',
             'test.lz',
             'test.lz4',
@@ -54,7 +55,9 @@ class TestPaToolUnpacker(TestUnpackerBase):
         ],
     )
     def test_file_extraction(self, in_file):
-        files, meta = self.unpacker.extract_files_from_file(TEST_DATA_DIR / in_file, self.tmp_dir.name)
+        test_file = TEST_DATA_DIR / in_file
+        assert test_file.is_file()
+        files, meta = self.unpacker.extract_files_from_file(test_file, self.tmp_dir.name)
         assert len(files) == 1, f'unpacking of {in_file} unsuccessful: {meta}'
         assert meta['plugin_used'] == 'PaTool'
         assert get_sha256(Path(files[0]).read_bytes()).startswith('deadc0de')
@@ -67,10 +70,11 @@ class TestPaToolUnpacker(TestUnpackerBase):
         with TemporaryDirectory() as tmp_dir:
             target_file = Path(tmp_dir) / 'test.arc'
             target_file.write_bytes((TEST_DATA_DIR / 'test.arc').read_bytes())
-            files, _ = self.unpacker.extract_files_from_file(target_file, self.tmp_dir.name)
+            files, meta = self.unpacker.extract_files_from_file(target_file, self.tmp_dir.name)
         assert len(files) == 2
         unpacked_files = sorted(Path(f).name for f in files)
         assert unpacked_files == ['testfile1', 'testfile2']
+        assert 'running /usr/bin/arc x' in meta['output']
 
     def test_extract_deb(self):
         test_file = TEST_DATA_DIR / 'test.deb'
