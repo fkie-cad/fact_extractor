@@ -2,10 +2,11 @@
 This plugin unpacks several formats utilizing patool
 """
 
-from common_helper_process import execute_shell_command
+from helperFunctions.process import run_command
 
 NAME = 'PaTool'
 MIME_PATTERNS = [
+    'application/bzip3',
     'application/java-archive',
     'application/vnd.debian.binary-package',
     'application/vnd.ms-cab-compressed',
@@ -41,18 +42,12 @@ MIME_PATTERNS = [
 ]
 VERSION = '0.7.0'
 
-TOOL_PATH = execute_shell_command('which patool').strip()
+TOOL_PATH = run_command('which patool')
 
 
-def unpack_function(file_path, tmp_dir):
-    """
-    file_path specifies the input file.
-    tmp_dir should be used to store the extracted files.
-    """
+def unpack_function(file_path: str, tmp_dir: str):
     return {
-        'output': execute_shell_command(
-            f'fakeroot python3 {TOOL_PATH} extract --outdir {tmp_dir} {file_path}', timeout=600
-        )
+        'output': run_command(f'fakeroot python3 {TOOL_PATH} extract --outdir {tmp_dir} {file_path}'),
     }
 
 
