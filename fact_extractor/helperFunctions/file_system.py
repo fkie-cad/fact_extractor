@@ -1,5 +1,6 @@
 import logging
 import lzma
+import os
 from contextlib import contextmanager
 from pathlib import Path
 from re import match
@@ -66,3 +67,10 @@ def decompress_test_file(test_file: Path) -> Path:
         with lzma.open(test_file) as decompressed_file:
             target_file.write_bytes(decompressed_file.read())
         yield target_file
+
+
+def get_environ_with_bin_dir():
+    """
+    Return the environment variables but with the bin directory of the extractor added to PATH.
+    """
+    return {**os.environ, 'PATH': f'{get_fact_bin_dir()}:{os.environ["PATH"]}'}

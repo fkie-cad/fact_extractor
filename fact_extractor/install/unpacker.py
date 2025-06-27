@@ -164,6 +164,13 @@ def install_github_dependencies():
         install_github_project(*repo)
 
 
+def _install_bz3():
+    # FixMe: as soon as jammy support ends, install with apt
+    url = 'https://github.com/kspalaiologos/bzip3/releases/download/1.5.2/bzip3-x86_64-linux'
+    with OperateInDirectory(BIN_DIR):
+        run(split(f'wget --output-document bzip3 {url}'), check=True)
+
+
 def main():
     # removes due to compatibility reasons
     try:
