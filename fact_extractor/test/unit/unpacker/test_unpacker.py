@@ -54,7 +54,7 @@ class TestUnpackerBase:
         output: bool = True,
         ignore: set[str] | None = None,
     ):
-        files, meta_data = self.unpacker.base.extract_files_from_file(str(in_file), self.tmp_dir.name)
+        files, meta_data = self.unpacker.extract_files_from_file(in_file, self.tmp_dir.name)
         files = {f for f in files if not any(rule in f for rule in ignore or set())}
         assert len(files) == 3, f'file number incorrect: {meta_data}'
         assert files == {
