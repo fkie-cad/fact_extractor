@@ -29,7 +29,7 @@ class RestRoute(Resource):
         try:
             input_file = list(input_dir.iterdir())[0]
             unpacker = Unpacker(config, folder=folder, base=self.unpacking_base)
-            unpacker.unpack(str(input_file))
+            unpacker.unpack(input_file)
             if self.owner:
                 change_owner_of_output_files(input_dir.parent, self.owner)
         except Exception:  # pylint: disable=broad-except
