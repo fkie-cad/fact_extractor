@@ -19,5 +19,5 @@ class TestFITUnpacker(TestUnpackerBase):
 
         assert len(extracted_files) == EXPECTED_FILE_COUNT, 'not all files extracted'
         assert all(
-            Path(element).name in ['kernel', 'fdt', 'rootfs', 'trailing_data'] for element in extracted_files
+            Path(element).name in ['kernel', 'fdt', 'rootfs', 'trailing.bin'] for element in extracted_files
         ), 'not all files extracted'

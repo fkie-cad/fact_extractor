@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from re import match
 from tempfile import TemporaryDirectory
+from typing import Iterable
 
 from common_helper_process import execute_shell_command_get_return_code
 
@@ -60,9 +61,19 @@ def change_owner_of_output_files(files_dir: Path, owner: str) -> int:
 
 
 @contextmanager
-def decompress_test_file(test_file: Path) -> Path:
+def decompress_test_file(test_file: Path) -> Iterable[Path]:
     with TemporaryDirectory() as tmp_dir:
         target_file = Path(tmp_dir) / 'fs.img'
         with lzma.open(test_file) as decompressed_file:
             target_file.write_bytes(decompressed_file.read())
         yield target_file
+
+
+def copy_file_offset_to_file(input_file: Path, output_file: Path, offset: int = 0, chunk_size: int = 2**20):
+    """
+    Copy contents of `input_file` from offset `offset` to `output_file`. The file is copied in chunks to save memory.
+    """
+    with output_file.open('wb') as fp_out, input_file.open('rb') as fp_in:
+        fp_in.seek(offset)
+        while chunk := fp_in.read(chunk_size):
+            fp_out.write(chunk)

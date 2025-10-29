@@ -44,14 +44,7 @@ def unpack_function(file_path, tmp_dir):
         return {'output': f'failed to read file: {io_error!s}'}
     message = 'successfully unpacked FIT image'
 
-    dtb_size = dtb.size_dt_struct()
-    trailing_data_size = len(fit_data) - dtb_size
-    if trailing_data_size > TRAILING_DATA_MIN_SIZE:
-        outfile = Path(tmp_dir) / 'trailing_data'
-        outfile.write_bytes(fit_data[dtb_size:])
-        message += f'\nfound trailing data and saved it to {outfile.name} ({trailing_data_size} bytes)'
-
-    return {'output': message}
+    return {'output': message, 'size': dtb.size_dt_struct()}
 
 
 # ----> Do not edit below this line <----
