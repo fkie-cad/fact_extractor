@@ -2,6 +2,7 @@
 This plugin unpacks Flattened Image Trees.
 """
 
+from contextlib import suppress
 from pathlib import Path
 
 import libfdt as fdt
@@ -9,16 +10,11 @@ from common_helper_files import write_binary_to_file
 
 NAME = 'FIT'
 MIME_PATTERNS = ['linux/device-tree']
-VERSION = '0.1'
+VERSION = '0.2.0'
+TRAILING_DATA_MIN_SIZE = 100
 
 
 def unpack_function(file_path, tmp_dir):
-    """
-    file_path specifies the input file.
-    tmp_dir must be used to store the extracted files.
-    Optional: Return a dict with meta information
-    """
-
     file = Path(file_path)
 
     try:
@@ -34,7 +30,10 @@ def unpack_function(file_path, tmp_dir):
                 while True:
                     try:
                         outfile = Path(tmp_dir) / dtb.get_name(component_offset)
-                        write_binary_to_file(bytes(dtb.getprop(component_offset, 'data')), outfile)
+                        with suppress(TypeError):
+                            data = dtb.getprop(component_offset, 'data')
+                            if data:
+                                write_binary_to_file(bytes(data), outfile)
                         component_offset = dtb.next_subnode(component_offset)
                     except fdt.FdtException:
                         break
@@ -43,8 +42,16 @@ def unpack_function(file_path, tmp_dir):
                 break
     except OSError as io_error:
         return {'output': f'failed to read file: {io_error!s}'}
+    message = 'successfully unpacked FIT image'
 
-    return {'output': 'successfully unpacked FIT image'}
+    dtb_size = dtb.size_dt_struct()
+    trailing_data_size = len(fit_data) - dtb_size
+    if trailing_data_size > TRAILING_DATA_MIN_SIZE:
+        outfile = Path(tmp_dir) / 'trailing_data'
+        outfile.write_bytes(fit_data[dtb_size:])
+        message += f'\nfound trailing data and saved it to {outfile.name} ({trailing_data_size} bytes)'
+
+    return {'output': message}
 
 
 # ----> Do not edit below this line <----
