@@ -4,7 +4,7 @@ from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 
-EXPECTED_FILE_COUNT = 3
+EXPECTED_FILE_COUNT = 4
 
 
 class TestFITUnpacker(TestUnpackerBase):
@@ -19,5 +19,5 @@ class TestFITUnpacker(TestUnpackerBase):
 
         assert len(extracted_files) == EXPECTED_FILE_COUNT, 'not all files extracted'
         assert all(
-            Path(element).name in ['kernel', 'fdt', 'rootfs'] for element in extracted_files
+            Path(element).name in ['kernel', 'fdt', 'rootfs', 'trailing_data'] for element in extracted_files
         ), 'not all files extracted'
