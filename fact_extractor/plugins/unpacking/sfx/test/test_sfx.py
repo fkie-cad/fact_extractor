@@ -33,3 +33,9 @@ class TestSfxUnpacker(TestUnpackerBase):
             self.check_unpacking_of_standard_unpack_set(
                 TEST_DATA_DIR / file, additional_prefix_folder='get_files_test', output=True
             )
+
+    def test_piggy_extraction(self):
+        test_file = TEST_DATA_DIR / 'piggy.elf'
+        files, meta_data = self.unpacker.extract_files_from_file(str(test_file), self.tmp_dir.name)
+        assert len(files) == 1
+        assert Path(files[0]).read_bytes() == b'foobar\\ntest 1234\n'
