@@ -32,6 +32,7 @@ MIME_PATTERNS = [
     'application/x-vhd',
     'application/x-vhdx',
     'application/x-xar',
+    'application/x-xz',
     'application/x-zip-compressed',
     'application/zip',
     # file systems
@@ -43,7 +44,7 @@ MIME_PATTERNS = [
     'filesystem/hfs',
     'filesystem/ntfs',
 ]
-VERSION = '0.11.0'
+VERSION = '0.12.0'
 
 UNPACKER_EXECUTABLE = '7zzs'
 ZISOFS_MAGIC = bytes.fromhex('37 E4 53 96 C9 DB D6 07')

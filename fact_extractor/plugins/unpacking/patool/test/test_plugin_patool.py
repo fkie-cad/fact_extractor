@@ -26,7 +26,6 @@ class TestPaToolUnpacker(TestUnpackerBase):
             ('test.tar.bz2', None),
             ('test.tar', None),
             ('test.tar.lz', None),
-            ('test.tar.xz', None),
             ('test.zoo', None),
             ('test.zpaq', None),
         ],
@@ -49,7 +48,6 @@ class TestPaToolUnpacker(TestUnpackerBase):
             'test.lz4',
             'test.lzo',
             'test.rz',
-            'test.xz',
             'test.zst',
         ],
     )

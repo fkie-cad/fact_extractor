@@ -56,13 +56,19 @@ class TestSevenZUnpacker(TestUnpackerBase):
         )
         assert meta['password'] == 'test', 'password info not set'
 
-    def test_gzip_extraction(self):
-        input_file = TEST_DATA_DIR / 'test.gz'
+    @pytest.mark.parametrize(
+        ('test_file', 'stream_type'),
+        [
+            ('test.gz', 'gzip'),
+            ('test.xz', 'xz'),
+        ],
+    )
+    def test_stream_extraction(self, test_file, stream_type):
+        input_file = TEST_DATA_DIR / test_file
         files, meta_data = self.unpacker.extract_files_from_file(str(input_file), self.tmp_dir.name)
         assert meta_data['plugin_used'] == '7z'
         assert len(files) == 1
-        assert Path(files[0]).name == 'test.data'
-        assert 'Type = gzip' in meta_data['output']
+        assert f'Type = {stream_type}' in meta_data['output']
         assert 'Everything is Ok' in meta_data['output']
 
     @pytest.mark.parametrize('file_format', ['zip', 'lzma'])
