@@ -17,13 +17,13 @@ UNSQUASHFS3_MULTI = Path(get_fact_bin_dir()) / 'unsquashfs3-multi'
 
 NAME = 'SquashFS'
 MIME_PATTERNS = ['filesystem/squashfs']
-VERSION = '0.11.0'
+VERSION = '0.11.1'
 SQUASH_UNPACKER = [
     (SASQUATCH, ''),
     (SASQUATCH_BE, ''),
     (UNSQUASHFS4_AVM_BE, '-scan'),
     (UNSQUASHFS4_AVM_LE, '-scan'),
-    (UNSQUASHFS3_MULTI, '-scan'),
+    (UNSQUASHFS3_MULTI, ''),
 ]
 
 
