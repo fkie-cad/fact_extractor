@@ -88,3 +88,14 @@ class TestSevenZUnpacker(TestUnpackerBase):
             files_by_name['LOREM'].read_text().startswith('Lorem ipsum')
         ), 'zisofs compressed file not extracted correctly'
         assert 'unpacked 1 zisofs compressed files' in meta_data['output']
+
+    def test_extraction_szdd(self):
+        in_file = TEST_DATA_DIR / 'test.szdd'
+        assert Path(in_file).is_file()
+        meta_data = unpack_function(str(in_file), self.tmp_dir.name)
+        assert 'Type = MsLZ' in meta_data['output']
+        assert 'Everything is Ok' in meta_data['output']
+        files = {f.name: f for f in Path(self.tmp_dir.name).iterdir()}
+        assert len(files) == 1
+        assert 'test' in files
+        assert files['test'].read_bytes() == b'foobar\\ntest 1234\n'
