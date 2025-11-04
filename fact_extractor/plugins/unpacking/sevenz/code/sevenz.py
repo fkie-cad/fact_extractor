@@ -27,6 +27,7 @@ MIME_PATTERNS = [
     'application/x-arj',
     'application/x-iso9660-image',
     'application/x-lzma',
+    'application/x-ms-compress-szdd',
     'application/x-rar',
     'application/x-rpm',
     'application/x-vhd',
@@ -43,7 +44,7 @@ MIME_PATTERNS = [
     'filesystem/hfs',
     'filesystem/ntfs',
 ]
-VERSION = '0.11.0'
+VERSION = '0.12.0'
 
 UNPACKER_EXECUTABLE = '7zzs'
 ZISOFS_MAGIC = bytes.fromhex('37 E4 53 96 C9 DB D6 07')
