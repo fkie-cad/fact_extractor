@@ -54,7 +54,7 @@ DEPENDENCIES = {
             'python3-pyqt5.qtopengl',
             'libcapstone4',
             # patool and unpacking backends
-            'openjdk-19-jdk',
+            'openjdk-21-jdk',
         ]
     },
     # Debian
