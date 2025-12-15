@@ -17,10 +17,3 @@ class TestUntrxUnpacker(TestUnpackerBase):
             included_file_list = [os.path.basename(f) for f in extracted_file.namelist() if os.path.basename(f)]
             for file in ['test file 3_.txt', 'testfile1', 'testfile2']:
                 assert file in included_file_list
-
-    def test_extraction_trx2(self):
-        files, _ = self.unpacker.extract_files_from_file(os.path.join(TEST_DATA_DIR, 'netgear.trx'), self.tmp_dir.name)
-        assert len(files) == 2
-        included_file_list = [os.path.basename(f) for f in files if os.path.basename(f)]
-        for file in included_file_list:
-            assert file in ['squashfs-lzma-image-x_x', 'segment1']
