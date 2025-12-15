@@ -1,5 +1,4 @@
-from os import path
-from tempfile import NamedTemporaryFile
+from pathlib import Path
 
 from common_helper_process.fail_safe_subprocess import execute_shell_command
 
@@ -9,7 +8,7 @@ NAME = 'untrx'
 MIME_PATTERNS = ['firmware/trx']
 VERSION = '0.4.1'
 
-UNPACKER_EXECUTEABLE = path.join(get_fact_bin_dir(), 'untrx')
+UNPACKER_EXECUTABLE = Path(get_fact_bin_dir()) / 'untrx'
 
 
 def unpack_function(file_path, tmp_dir):
@@ -19,7 +18,7 @@ def unpack_function(file_path, tmp_dir):
 
 
 def _unpack_trx(file_path, target_dir):
-    return execute_shell_command(f'fakeroot {UNPACKER_EXECUTEABLE} {file_path} {target_dir}')
+    return execute_shell_command(f'fakeroot {UNPACKER_EXECUTABLE} {file_path} {target_dir}')
 
 
 # ----> Do not edit below this line <----
