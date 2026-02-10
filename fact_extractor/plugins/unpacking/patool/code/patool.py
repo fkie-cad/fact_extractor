@@ -33,13 +33,12 @@ MIME_PATTERNS = [
     'application/x-rzip',
     'application/x-shar',
     'application/x-tar',
-    'application/x-xz',
     'application/x-zoo',
     'application/zpaq',
     'application/zstd',
     'audio/flac',
 ]
-VERSION = '0.7.0'
+VERSION = '0.8.0'
 
 TOOL_PATH = execute_shell_command('which patool').strip()
 
