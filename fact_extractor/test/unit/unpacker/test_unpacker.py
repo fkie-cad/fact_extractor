@@ -53,17 +53,22 @@ class TestUnpackerBase:
         additional_prefix_folder: str = '',
         output: bool = True,
         ignore: set[str] | None = None,
+        trailing_data: bool = False,
     ):
         files, meta_data = self.unpacker.base.extract_files_from_file(str(in_file), self.tmp_dir.name)
         files = {f for f in files if not any(rule in f for rule in ignore or set())}
-        assert len(files) == 3, f'file number incorrect: {meta_data}'
-        assert files == {
-            str(Path(self.tmp_dir.name, additional_prefix_folder, 'testfile1')),
-            str(Path(self.tmp_dir.name, additional_prefix_folder, 'testfile2')),
-            str(Path(self.tmp_dir.name, additional_prefix_folder, 'generic folder/test file 3_.txt')),
-        }, f'not all files found: {meta_data}'
+        assert len(files) == 3 if not trailing_data else 4, f'file number incorrect: {meta_data}'
+        expected_files = ['testfile1', 'testfile2', 'generic folder/test file 3_.txt']
+        if trailing_data:
+            expected_files.append('trailing.bin')
+        for path in expected_files:
+            assert (
+                str(Path(self.tmp_dir.name, additional_prefix_folder, path)) in files
+            ), f'file {path} missing from unpacked files'
         if output:
             assert 'output' in meta_data
+        if trailing_data:
+            assert 'trailing_data' in meta_data
         return meta_data
 
 
