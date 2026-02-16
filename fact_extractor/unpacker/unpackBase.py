@@ -4,16 +4,18 @@ from __future__ import annotations
 import fnmatch
 import logging
 from os import getgid, getuid
-from pathlib import Path
 from subprocess import PIPE, Popen
 from time import time
-from typing import Callable, Dict, List, Tuple
+from typing import TYPE_CHECKING, Callable, Dict, List, Tuple
 
 from common_helper_files import get_files_in_dir
 
 from helperFunctions import magic
 from helperFunctions.config import read_list_from_config
 from helperFunctions.plugin import import_plugins
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class UnpackBase:
@@ -52,11 +54,11 @@ class UnpackBase:
             return self.unpacker_plugins[mime_type]
         return self.unpacker_plugins['generic/carver']
 
-    def extract_files_from_file(self, file_path: str | Path, tmp_dir) -> Tuple[List, Dict]:
+    def extract_files_from_file(self, file_path: Path, tmp_dir) -> Tuple[List, Dict]:
         current_unpacker = self.get_unpacker(magic.from_file(file_path, mime=True))
-        return self._extract_files_from_file_using_specific_unpacker(str(file_path), tmp_dir, current_unpacker)
+        return self._extract_files_from_file_using_specific_unpacker(file_path, tmp_dir, current_unpacker)
 
-    def unpacking_fallback(self, file_path, tmp_dir, old_meta, fallback_plugin_mime) -> Tuple[List, Dict]:
+    def unpacking_fallback(self, file_path: Path, tmp_dir, old_meta, fallback_plugin_mime) -> Tuple[List, Dict]:
         fallback_plugin = self.unpacker_plugins[fallback_plugin_mime]
         old_meta[f"""0_FALLBACK_{old_meta['plugin_used']}"""] = (
             f"""{old_meta['plugin_used']} (failed) -> {fallback_plugin_mime} (fallback)"""
@@ -67,12 +69,11 @@ class UnpackBase:
             file_path, tmp_dir, fallback_plugin, meta_data=old_meta
         )
 
-    def should_ignore(self, file):
-        path = str(file)
-        return any(fnmatch.fnmatchcase(path, pattern) for pattern in self.exclude)
+    def should_ignore(self, file: str | Path) -> bool:
+        return any(fnmatch.fnmatchcase(str(file), pattern) for pattern in self.exclude)
 
     def _extract_files_from_file_using_specific_unpacker(
-        self, file_path: str, tmp_dir: str, selected_unpacker, meta_data: dict | None = None
+        self, file_path: Path, tmp_dir: str, selected_unpacker, meta_data: dict | None = None
     ) -> Tuple[List, Dict]:
         unpack_function, name, version = (
             selected_unpacker  # TODO Refactor register method to directly use four parameters instead of three
@@ -83,10 +84,10 @@ class UnpackBase:
         meta_data['plugin_used'] = name
         meta_data['plugin_version'] = version
 
-        logging.info(f'Trying to unpack "{Path(file_path).name}" with plugin {name}')
+        logging.info(f'Trying to unpack "{file_path.name}" with plugin {name}')
 
         try:
-            additional_meta = unpack_function(file_path, tmp_dir)
+            additional_meta = unpack_function(str(file_path), tmp_dir)
         except Exception as error:
             logging.debug(f'Unpacking of {file_path} failed: {error}', exc_info=True)
             additional_meta = {'error': f'{type(error)}: {error!s}'}

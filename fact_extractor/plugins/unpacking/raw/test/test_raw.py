@@ -12,7 +12,7 @@ class TestRawUnpacker(TestUnpackerBase):
 
     def test_extraction(self):
         input_file = Path(TEST_DATA_DIR, 'raw.bin')
-        unpacked_files, meta_data = self.unpacker.extract_files_from_file(str(input_file), self.tmp_dir.name)
+        unpacked_files, meta_data = self.unpacker.extract_files_from_file(input_file, self.tmp_dir.name)
         assert meta_data['padding seperated sections'] == 3
         assert meta_data['LZMA'] == 1
         assert len(unpacked_files) == 4
@@ -22,7 +22,7 @@ class TestRawUnpacker(TestUnpackerBase):
     def test_extraction_encoded(self):
         input_file = Path(TEST_DATA_DIR, 'encoded.bin')
         unpacked_files, meta_data = self.unpacker.base._extract_files_from_file_using_specific_unpacker(
-            str(input_file), self.tmp_dir.name, self.unpacker.base.unpacker_plugins['data/raw']
+            input_file, self.tmp_dir.name, self.unpacker.base.unpacker_plugins['data/raw']
         )
         assert meta_data['Intel Hex'] == 1
         assert meta_data['Motorola S-Record'] == 1
@@ -32,5 +32,5 @@ class TestRawUnpacker(TestUnpackerBase):
 
     def test_extraction_nothing_included(self):
         input_file = Path(TEST_DATA_DIR, 'nothing.bin')
-        unpacked_files, _ = self.unpacker.extract_files_from_file(str(input_file), self.tmp_dir.name)
+        unpacked_files, _ = self.unpacker.extract_files_from_file(input_file, self.tmp_dir.name)
         assert len(unpacked_files) == 0
