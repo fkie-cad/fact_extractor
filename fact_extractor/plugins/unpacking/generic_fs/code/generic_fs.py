@@ -23,7 +23,7 @@ MIME_PATTERNS = [
     'filesystem/xfs',
     'generic/fs',
 ]
-VERSION = '0.6.1'
+VERSION = '0.6.2'
 TYPES = {
     'filesystem/btrfs': 'btrfs',
     'filesystem/f2fs': 'f2fs',
@@ -31,6 +31,7 @@ TYPES = {
     'filesystem/minix': 'minix',
     'filesystem/reiserfs': 'reiserfs',
     'filesystem/romfs': 'romfs',
+    'filesystem/squashfs': 'squashfs',
     'filesystem/udf': 'udf',
     'filesystem/xfs': 'xfs',
 }
