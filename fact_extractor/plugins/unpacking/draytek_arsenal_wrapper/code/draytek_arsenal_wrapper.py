@@ -43,11 +43,11 @@ from draytek_arsenal.compression import Lz4 as CustomLz4
 from draytek_arsenal.fs import PFSExtractor
 
 NAME = 'draytek_arsenal'
-MIME_PATTERNS = ['MIME_PATTERN_1', 'MIME_PATTERN_2', ...]
+MIME_PATTERNS = ['firmware/draytek']
 VERSION = '0.0'
 
 
-def unpack_function(file_path: str, tmp_dir: str) -> dict[]:
+def unpack_function(file_path: str, tmp_dir: str) -> dict:
     '''
     file_path specifies the input file.
     tmp_dir must be used to store the extracted files.
@@ -72,7 +72,7 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict[]:
 
     return META_DICT
 
-def structure_rtos_metadata(structured_firmware: Draytek) -> dict[]:
+def structure_rtos_metadata(structured_firmware: Draytek) -> dict:
     return {
         "type": "RTOS",
         "bin": {
@@ -132,7 +132,7 @@ def write_web_filesystem(structured_firmware: Draytek, web_output_dir: Path) -> 
         pfs_extractor = PFSExtractor()
         _ = pfs_extractor.extract(tmp_dir_for_lz4_decompression.name, str(web_output_dir))
 
-def structure_linux_metadata(structured_firmware: DraytekLinux) -> dict[]:
+def structure_linux_metadata(structured_firmware: DraytekLinux) -> dict:
     return {
         "type": "Linux",
         "nonce": structured_firmware.nonce.decode(),
