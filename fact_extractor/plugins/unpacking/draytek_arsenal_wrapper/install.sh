@@ -7,6 +7,6 @@ echo "------------------------------------"
 echo "         install draytex_arsenal    "
 echo "------------------------------------"
 
-pip install git+https://github.com/snowy-connection/draytek-arsenal@23f3469b303a0adc285d5e3f32e94e5bfe4aae82#subdirectory=draytek_arsenal
+pip install git+https://github.com/snowy-connection/draytek-arsenal@216729aefdcb1073d56d9939078ad74c866be8be#subdirectory=draytek_arsenal
 
 exit 0
