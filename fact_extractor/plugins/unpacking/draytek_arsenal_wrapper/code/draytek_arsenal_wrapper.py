@@ -34,6 +34,7 @@ SOFTWARE.
 # The refactored code however, is licensed under the GNU GPL 3 License
 from pathlib import Path
 import tempfile
+from struct import pack
 
 from draytek_arsenal.format import parse_firmware
 from draytek_arsenal.draytek_format import Draytek
