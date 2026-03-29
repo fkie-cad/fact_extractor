@@ -57,19 +57,15 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
     output_dir = Path(tmp_dir)
     structured_firmware = parse_firmware(file_path)
 
-    if isinstance(structured_firmware, Draytek):
-        META_DICT = structure_rtos_metadata(structured_firmware)
+    if not isinstance(structured_firmware, Draytek):
+        raise Exception("The given image could not be parsed as Draytek-RTOS")
 
-        unpacking_errors: str = unpack_rtos_firmware(structured_firmware, output_dir)
+    META_DICT = structure_rtos_metadata(structured_firmware)
 
-        if unpacking_errors != '':
-            META_DICT["ocurred_errors_while_unpacking"] = unpacking_errors
+    unpacking_errors: str = unpack_rtos_firmware(structured_firmware, output_dir)
 
-    elif isinstance(structured_firmware, DraytekLinux):
-        # We don't really support unpacking linux based Draytek images, but we can gather at least some information
-        META_DICT = structure_linux_metadata(structured_firmware)
-    else:
-        raise Exception("The given image could neither be parsed as Draytek-RTOS nor as Draytek-Linux")
+    if unpacking_errors != '':
+        META_DICT["ocurred_errors_while_unpacking"] = unpacking_errors
 
     return META_DICT
 
@@ -144,14 +140,6 @@ def write_web_filesystem(structured_firmware: Draytek, web_output_dir: Path) -> 
 def write_encrypted_dynamic_kernel_modules(structured_firmware: Draytek, output_file: Path) -> None:
     data = b"DLM/1.0" + structured_firmware.bin.dlm.data
     output_file.write_bytes(data)
-
-def structure_linux_metadata(structured_firmware: DraytekLinux) -> dict:
-    return {
-        "type": "Linux",
-        "nonce": structured_firmware.nonce.decode(),
-        "image_start": structured_firmware.image_start,
-        "image_len": structured_firmware.image_len
-    }
 
 # ----> Do not edit below this line <----
 def setup(unpack_tool):
