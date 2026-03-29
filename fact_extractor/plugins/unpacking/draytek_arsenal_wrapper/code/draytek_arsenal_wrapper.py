@@ -44,7 +44,7 @@ from draytek_arsenal.compression import Lz4 as CustomLz4
 from draytek_arsenal.fs import PFSExtractor
 
 NAME = 'draytek_arsenal'
-MIME_PATTERNS = ['firmware/draytek']
+MIME_PATTERNS = ['firmware/draytek-rtos']
 VERSION = '0.0'
 
 
