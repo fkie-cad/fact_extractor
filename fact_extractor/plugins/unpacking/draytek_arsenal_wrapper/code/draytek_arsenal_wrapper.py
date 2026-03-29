@@ -55,7 +55,6 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
     Optional: Return a dict with meta information
     '''
     output_dir = Path(tmp_dir)
-    # TODO INSERT YOUR UNPACKING CODE HERE
     structured_firmware = parse_firmware(file_path)
 
     if isinstance(structured_firmware, Draytek):
@@ -67,6 +66,7 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
             META_DICT["ocurred_errors_while_unpacking"] = unpacking_errors
 
     elif isinstance(structured_firmware, DraytekLinux):
+        # We don't really support unpacking linux based Draytek images, but we can gather at least some information
         META_DICT = structure_linux_metadata(structured_firmware)
     else:
         raise Exception("The given image could neither be parsed as Draytek-RTOS nor as Draytek-Linux")
