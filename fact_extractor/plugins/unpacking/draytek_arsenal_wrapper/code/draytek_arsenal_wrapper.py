@@ -64,7 +64,7 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
         unpacking_errors: str = unpack_rtos_firmware(structured_firmware, output_dir)
 
         if unpacking_errors != '':
-            META_DICT["Ocurred_errors_while_unpacking"] = unpacking_errors
+            META_DICT["ocurred_errors_while_unpacking"] = unpacking_errors
 
     elif isinstance(structured_firmware, DraytekLinux):
         META_DICT = structure_linux_metadata(structured_firmware)
@@ -106,16 +106,24 @@ def unpack_rtos_firmware(structured_firmware: Draytek, output_dir: Path) -> str:
 
     # Unpack bootloader and rtos
     if structured_firmware.bin.rtos.rtos_size != len(structured_firmware.bin.rtos.data):
-        errors_while_unpacking += f'Data length ({len(structured_firmware.bin.rtos.data)}) doesn\'t match with the header length ({structured_firmware.bin.rtos.rtos_size})'
+        errors_while_unpacking += f'Data length ({len(structured_firmware.bin.rtos.data)}) doesn\'t match with the header length ({structured_firmware.bin.rtos.rtos_size})\n'
     else:
         write_bootloader_and_rtos(structured_firmware, output_dir / 'bootloader_and_rtos')
+
+    # Write Dynamic Kernel Modules
+    if structured_firmware.has_dlm:
+        write_encrypted_dynamic_kernel_modules(structured_firmware, output_dir / 'dlms')
+    else:
+        errors_while_unpacking += 'File has no dynamic kernel images\n'
 
     # Unpack web directory
     web_output_dir = output_dir / 'web'
     web_output_dir.mkdir()
     write_web_filesystem(structured_firmware, web_output_dir)
 
-def write_bootloader_and_rtos(structured_firmware: Draytek, output_file: Path):
+    return errors_while_unpacking
+
+def write_bootloader_and_rtos(structured_firmware: Draytek, output_file: Path) -> None:
     unstructured_bootloader = b"".join([pack(">I", integer) for integer in structured_firmware.bin.bootloader.data[:-1]])
 
     lz4 = CustomLz4()
@@ -132,6 +140,10 @@ def write_web_filesystem(structured_firmware: Draytek, web_output_dir: Path) -> 
 
         pfs_extractor = PFSExtractor()
         _ = pfs_extractor.extract(tmp_dir_for_lz4_decompression.name, str(web_output_dir))
+
+def write_encrypted_dynamic_kernel_modules(structured_firmware: Draytek, output_file: Path) -> None:
+    data = b"DLM/1.0" + structured_firmware.bin.dlm.data
+    output_file.write_bytes(data)
 
 def structure_linux_metadata(structured_firmware: DraytekLinux) -> dict:
     return {
