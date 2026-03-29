@@ -48,6 +48,7 @@ class UnpackBase:
         self.unpacker_plugins[mime_type] = unpacker_name_and_function
 
     def get_unpacker(self, mime_type: str):
+        logging.debug(f'Detected mime type: {mime_type}')
         if mime_type in list(self.unpacker_plugins.keys()):
             return self.unpacker_plugins[mime_type]
         return self.unpacker_plugins['generic/carver']
