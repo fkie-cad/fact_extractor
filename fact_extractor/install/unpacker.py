@@ -250,7 +250,7 @@ def _freetz_is_already_installed():
     )
 
 
-def _install_freetz():
+def _install_freetz(version='ng26020'):
     if _freetz_is_already_installed():
         logging.info('Skipping FREETZ installation (already installed)')
         return
@@ -277,8 +277,11 @@ def _install_freetz():
                     f'tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi {BIN_DIR}',
                     'sudo userdel makeuser',
                 ],
+                branch=version,
             )
-    except PermissionError:
+    except PermissionError as error:
+        if not _freetz_is_already_installed():
+            raise InstallationError('Error during installation of Freetz-NG') from error
         logging.warning(f'Could not remove freetz build directory: {build_directory}')
     finally:
         os.umask(old_umask)
