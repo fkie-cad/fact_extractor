@@ -1,29 +1,19 @@
 import mmap
 import os
-import sys
 from pathlib import Path
 
 from common_helper_process import execute_shell_command
 
 from unpacker.helper.carving import Carver
-
-THIS_FILE = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(THIS_FILE, '..', 'internal'))
-
-from uboot_container import uBootHeader  # noqa: E402 pylint: disable=import-error,wrong-import-position
+from plugins.unpacking.uboot.internal.uboot_container import uBootHeader
 
 NAME = 'Uboot'
 MIME_PATTERNS = ['firmware/u-boot']
-VERSION = '0.2'
+VERSION = '0.2.1'
 DTB_MAGIC = b'\xd0\x0d\xfe\xed'
 
 
 def unpack_function(file_path, tmp_dir):
-    """
-    file_path specifies the input file.
-    tmp_dir should be used to store the extracted files.
-    """
-
     unpacker = Uboot(file_path)
     meta = {}
 
@@ -37,6 +27,8 @@ def unpack_function(file_path, tmp_dir):
 
     remaining = unpacker.get_remaining_blocks()
     for offset, block in remaining.items():
+        if len(block) < 10:
+            continue
         unknown_path = f'{tmp_dir}/{offset}_unknown.bin'
         with open(unknown_path, 'wb') as hdr:
             hdr.write(block)
@@ -62,11 +54,11 @@ class Uboot:
         self.ubootheader = self._set_uboot_header()
 
     def get_remaining_blocks(self):
-        non_carved_areas = self.carver.carved.non_carved_areas
+        non_carved_areas = self.carver.carved.uncarved_areas
 
         remaining = {}
         for area in non_carved_areas:
-            remaining[area[0]] = self.carver.extract_data(area[0], area[1])
+            remaining[area.start] = self.carver.extract_data(area.start, area.end)
         return remaining
 
     def extract_uboot_image(self):

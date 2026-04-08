@@ -1,62 +1,46 @@
-import gc
+import pytest
 
-from unpacker.helper.carving import CarvedArea
+from unpacker.helper.carving import CarvingArea, Area
 
 
-class TestCarvedArea:
-    def teardown_method(self):
-        gc.collect()
+@pytest.mark.parametrize('start, end, expected', [
+    # complete area
+    (0, 100, []),
+    (-1, 101, []),
+    (-1, 100, []),
+    (0, 101, []),
+    # borders
+    (0, 99, [Area(99, 100)]),
+    (1, 100, [Area(0, 1)]),
+    (-1, 99, [Area(99, 100)]),
+    (1, 101, [Area(0, 1)]),
+    # in between
+    (50, 60, [Area(0, 50), Area(60, 100)]),
+])
+def test_add_carved_area(start, end, expected):
+    carved_area = CarvingArea(100)
+    carved_area.add_carved_area(Area(start, end))
+    assert carved_area.uncarved_areas == expected
 
-    def test_carved_complete_area(self):
-        area_size = 100
-        carved_and_expected = [
-            {'carved': (0, area_size), 'expected': []},
-            {'carved': (-1, area_size + 1), 'expected': []},
-            {'carved': (-1, area_size), 'expected': []},
-            {'carved': (0, area_size + 1), 'expected': []},
-        ]
-        self.caring_test(area_size, carved_and_expected)
 
-    def test_carved_borders(self):
-        area_size = 100
-        carved_and_expected = [
-            {'carved': (0, area_size - 1), 'expected': [(100, 100)]},
-            {'carved': (1, area_size), 'expected': [(0, 0)]},
-            {'carved': (-1, area_size - 1), 'expected': [(100, 100)]},
-            {'carved': (1, area_size + 1), 'expected': [(0, 0)]},
-        ]
-        self.caring_test(area_size, carved_and_expected)
+def test_bug():
+    area_size = 8258048
+    carved_area = CarvingArea(area_size)
 
-    def test_carved_in_between(self):
-        area_size = 100
-        carved_and_expected = [{'carved': (50, 60), 'expected': [(0, 49), (61, 100)]}]
-        self.caring_test(area_size, carved_and_expected)
+    carved_area.add_carved_area(Area(0, 512))
 
-    def test_bug(self):
-        area_size = 8258048
-        carved_area = CarvedArea(area_size)
+    carved_area.add_carved_area(Area(15440, 15504))
+    carved_area.add_carved_area(Area(15504, 48257))
 
-        carved_area.carved((0, 512))
+    carved_area.add_carved_area(Area(131584, 132096))
+    carved_area.add_carved_area(Area(132096, 1066830))
 
-        carved_area.carved((15440, 15504))
-        carved_area.carved((15504, 48257))
+    carved_area.add_carved_area(Area(1180160, 8258048))
 
-        carved_area.carved((131584, 132096))
-        carved_area.carved((132096, 1066830))
+    expected = [Area(512, 15440), Area(48257, 131584), Area(1066830, 1180160)]
+    assert len(carved_area.uncarved_areas) == len(expected)
 
-        carved_area.carved((1180160, 8258048))
+    for area in expected:
+        assert area in carved_area.uncarved_areas
 
-        expected = [(513, 15439), (48258, 131583), (1066831, 1180159)]
-        assert len(carved_area.non_carved_areas) == len(expected)
-
-        for area in expected:
-            assert area in carved_area.non_carved_areas
-
-        assert str(carved_area) == '(513:15439) (48258:131583) (1066831:1180159) '
-
-    def caring_test(self, area_size, carved_and_expected):
-        for test_data in carved_and_expected:
-            carved_area = CarvedArea(area_size)
-            carved_area.carved(test_data['carved'])
-
-            assert test_data['expected'] == carved_area.non_carved_areas, test_data
+    assert str(carved_area) == '(512:15440) (48257:131584) (1066830:1180160)'

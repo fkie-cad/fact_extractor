@@ -7,7 +7,7 @@ from unpacker.helper.carving import Carver
 
 NAME = 'TP-WR702N'
 MIME_PATTERNS = ['firmware/tp-wr702n']
-VERSION = '0.1.1'
+VERSION = '0.1.2'
 
 
 class InvalidImg0InformationException(Exception):
@@ -37,8 +37,10 @@ def unpack_function(file_path, tmp_dir):
     write_binary_to_file(tpwr702n.get_fs(), f'{tmp_dir}/main.owfs')
 
     remaining = tpwr702n.get_remaining_blocks()
-    for offset in remaining:
-        write_binary_to_file(remaining[offset], f'{tmp_dir}/{offset}_unknown.bin')
+    for offset, block in remaining.items():
+        if len(block) < 10:
+            continue
+        write_binary_to_file(block, f'{tmp_dir}/{offset}_unknown.bin')
 
     return tpwr702n.get_meta_dict()
 
@@ -66,11 +68,11 @@ class TPWR702N:
         return f'MD5: {self.get_md5string()} \n Included Header:\n{self.img0!s}'
 
     def get_remaining_blocks(self):
-        non_carved_areas = self.carver.carved.non_carved_areas
+        non_carved_areas = self.carver.carved.uncarved_areas
 
         remaining = {}
         for area in non_carved_areas:
-            remaining[area[0]] = self.carver.extract_data(area[0], area[1])
+            remaining[area.start] = self.carver.extract_data(area.start, area.end)
         return remaining
 
     def get_container_header(self):
@@ -85,7 +87,7 @@ class TPWR702N:
         meta_data['os_offset'] = self.OS_OFFSET
         meta_data['md5'] = self.get_md5string()
         meta_data['img0'] = self.img0.get_meta_dict()
-        meta_data['uncarved_area'] = self.carver.carved.non_carved_areas
+        meta_data['uncarved_area'] = self.carver.carved.uncarved_areas
         return meta_data
 
     def _read_container_information(self):
