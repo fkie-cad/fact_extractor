@@ -1,22 +1,25 @@
 import pytest
 
-from unpacker.helper.carving import CarvingArea, Area
+from unpacker.helper.carving import Area, CarvingArea
 
 
-@pytest.mark.parametrize('start, end, expected', [
-    # complete area
-    (0, 100, []),
-    (-1, 101, []),
-    (-1, 100, []),
-    (0, 101, []),
-    # borders
-    (0, 99, [Area(99, 100)]),
-    (1, 100, [Area(0, 1)]),
-    (-1, 99, [Area(99, 100)]),
-    (1, 101, [Area(0, 1)]),
-    # in between
-    (50, 60, [Area(0, 50), Area(60, 100)]),
-])
+@pytest.mark.parametrize(
+    ('start', 'end', 'expected'),
+    [
+        # complete area
+        (0, 100, []),
+        (-1, 101, []),
+        (-1, 100, []),
+        (0, 101, []),
+        # borders
+        (0, 99, [Area(99, 100)]),
+        (1, 100, [Area(0, 1)]),
+        (-1, 99, [Area(99, 100)]),
+        (1, 101, [Area(0, 1)]),
+        # in between
+        (50, 60, [Area(0, 50), Area(60, 100)]),
+    ],
+)
 def test_add_carved_area(start, end, expected):
     carved_area = CarvingArea(100)
     carved_area.add_carved_area(Area(start, end))

@@ -1,36 +1,37 @@
-import mmap
-import os
+from __future__ import annotations
+
 from pathlib import Path
 
 from common_helper_process import execute_shell_command
 
-from unpacker.helper.carving import Carver
 from plugins.unpacking.uboot.internal.uboot_container import uBootHeader
+from unpacker.helper.carving import Carver
 
 NAME = 'Uboot'
 MIME_PATTERNS = ['firmware/u-boot']
 VERSION = '0.2.1'
 DTB_MAGIC = b'\xd0\x0d\xfe\xed'
+MIN_CARVING_SIZE = 10
 
 
 def unpack_function(file_path, tmp_dir):
     unpacker = Uboot(file_path)
     meta = {}
 
-    uboot_path = f'{tmp_dir}/uboot.{uBootHeader.COMPRESSION[unpacker.ubootheader.compression_type]}'
-    with open(uboot_path, 'wb') as uboot:
+    uboot_path = Path(f'{tmp_dir}/uboot.{uBootHeader.COMPRESSION[unpacker.ubootheader.compression_type]}')
+    with uboot_path.open('wb') as uboot:
         uboot.write(unpacker.extract_uboot_image())
 
-    uboot_header_path = f'{tmp_dir}/uboot_header.bin'
-    with open(uboot_header_path, 'wb') as uboot:
+    uboot_header_path = Path(f'{tmp_dir}/uboot_header.bin')
+    with uboot_header_path.open('wb') as uboot:
         uboot.write(unpacker.extract_uboot_header())
 
     remaining = unpacker.get_remaining_blocks()
     for offset, block in remaining.items():
-        if len(block) < 10:
+        if len(block) < MIN_CARVING_SIZE:
             continue
-        unknown_path = f'{tmp_dir}/{offset}_unknown.bin'
-        with open(unknown_path, 'wb') as hdr:
+        unknown_path = Path(f'{tmp_dir}/{offset}_unknown.bin')
+        with unknown_path.open('wb') as hdr:
             hdr.write(block)
 
     # scan for device tree blobs
@@ -44,11 +45,10 @@ def unpack_function(file_path, tmp_dir):
 
 
 class Uboot:
-    def __init__(self, filename):
-        self.firmware_filepath = filename
+    def __init__(self, filename: str | Path):
+        self.firmware_filepath = Path(filename)
 
-        statinfo = os.stat(self.firmware_filepath)
-        self.firmware_size = statinfo.st_size
+        self.firmware_size = self.firmware_filepath.stat().st_size
 
         self.carver = Carver(self.firmware_filepath)
         self.ubootheader = self._set_uboot_header()
@@ -67,11 +67,9 @@ class Uboot:
         )
 
     def _set_uboot_header(self):
-        with open(self.firmware_filepath, 'r+b') as raw_file:
-            mm = mmap.mmap(raw_file.fileno(), 0)
-
+        with self.firmware_filepath.open('rb') as raw_file:
             ubootheader = uBootHeader()
-            ubootheader.create_from_binary(mm.read(uBootHeader.HEADER_LENGTH))
+            ubootheader.create_from_binary(raw_file.read(uBootHeader.HEADER_LENGTH))
         return ubootheader
 
     def extract_uboot_header(self):

@@ -70,6 +70,5 @@ class Carver:
             if end is not None:
                 self.carved.add_carved_area(Area(start, end))
                 return opened_file.read(end - start)
-            else:
-                self.carved.add_carved_area(Area(start, self.file_size))
-                return opened_file.read()
+            self.carved.add_carved_area(Area(start, self.file_size))
+            return opened_file.read()
