@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import fnmatch
 import logging
+import re
 from os import getgid, getuid
 from pathlib import Path
 from subprocess import PIPE, Popen
@@ -13,7 +14,12 @@ from common_helper_files import get_files_in_dir
 
 from helperFunctions import magic
 from helperFunctions.config import read_list_from_config
+from helperFunctions.file_system import copy_file_offset_to_file
 from helperFunctions.plugin import import_plugins
+
+PADDING_END_REGEX = re.compile(rb'[^\x00\xff]')
+TRAILING_DATA_MIN_SIZE = 2**10
+CHUNK_SIZE = 2**20
 
 
 class UnpackBase:
@@ -83,7 +89,8 @@ class UnpackBase:
         meta_data['plugin_used'] = name
         meta_data['plugin_version'] = version
 
-        logging.info(f'Trying to unpack "{Path(file_path).name}" with plugin {name}')
+        path = Path(file_path)
+        logging.info(f'Trying to unpack "{path.name}" with plugin {name}')
 
         try:
             additional_meta = unpack_function(file_path, tmp_dir)
@@ -92,6 +99,8 @@ class UnpackBase:
             additional_meta = {'error': f'{type(error)}: {error!s}'}
         if isinstance(additional_meta, dict):
             meta_data.update(additional_meta)
+
+        _check_for_trailing_data(meta_data, path, tmp_dir)
 
         self.change_owner_back_to_me(directory=tmp_dir)
         meta_data['analysis_date'] = time()
@@ -118,3 +127,29 @@ class UnpackBase:
     def grant_read_permission(directory: str, permissions: str):
         with Popen(f'chmod --recursive {permissions} {directory}', shell=True, stdout=PIPE, stderr=PIPE) as pl:
             pl.communicate()
+
+
+def _check_for_trailing_data(meta: dict, path: Path, tmp_dir: str):
+    # If we find trailing data, save it to a file in the output folder (otherwise the data is lost).
+    if 'size' not in meta:
+        return  # Only works with plugins that store the size of the unpacked file in meta['size']!
+    file_end: int = meta['size']
+    padding_end = _find_padding_end(path, file_end)
+    file_size = path.stat().st_size
+    if (file_size - padding_end) > TRAILING_DATA_MIN_SIZE:
+        copy_file_offset_to_file(path, Path(tmp_dir) / 'trailing.bin', padding_end)
+        meta['trailing_data'] = (
+            f'found trailing data at {padding_end} ({file_size - padding_end} bytes). Saved as trailing.bin'
+        )
+
+
+def _find_padding_end(file: Path, fs_end_offset: int) -> int:
+    with file.open('rb') as fp:
+        fp.seek(fs_end_offset)
+        relative_offset = fs_end_offset
+        while chunk := fp.read(CHUNK_SIZE):
+            if match := PADDING_END_REGEX.search(chunk):
+                relative_offset += match.start()
+                break
+            relative_offset += len(chunk)
+        return relative_offset
