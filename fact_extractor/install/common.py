@@ -27,7 +27,7 @@ def install_apt_dependencies():
     apt_install_packages(*APT_DEPENDENCIES)
 
 
-def _install_magic(version='v0.2.8'):
+def _install_magic(version='v0.2.9'):
     with OperateInDirectory(BIN_DIR):
         sp.run(
             [
