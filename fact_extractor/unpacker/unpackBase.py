@@ -14,6 +14,7 @@ from common_helper_files import get_files_in_dir
 from helperFunctions import magic
 from helperFunctions.config import read_list_from_config
 from helperFunctions.plugin import import_plugins
+from helperFunctions.yara import get_yara_magic
 
 
 class UnpackBase:
@@ -53,8 +54,15 @@ class UnpackBase:
         return self.unpacker_plugins['generic/carver']
 
     def extract_files_from_file(self, file_path: str | Path, tmp_dir) -> Tuple[List, Dict]:
-        current_unpacker = self.get_unpacker(magic.from_file(file_path, mime=True))
+        current_unpacker = self.get_unpacker(self._get_mime(file_path))
         return self._extract_files_from_file_using_specific_unpacker(str(file_path), tmp_dir, current_unpacker)
+
+    @staticmethod
+    def _get_mime(file_path: str | Path) -> str:
+        mime = magic.from_file(file_path, mime=True)
+        if mime == 'application/octet-stream':
+            mime = get_yara_magic(file_path)
+        return mime
 
     def unpacking_fallback(self, file_path, tmp_dir, old_meta, fallback_plugin_mime) -> Tuple[List, Dict]:
         fallback_plugin = self.unpacker_plugins[fallback_plugin_mime]
