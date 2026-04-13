@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import lzma
 from contextlib import contextmanager
@@ -31,7 +33,7 @@ def get_fact_bin_dir() -> str:
     return str(SRC_DIR_PATH / 'bin')
 
 
-def file_is_empty(file_path) -> bool:
+def file_is_empty(file_path: str | Path) -> bool:
     """
     Returns True if file in file_path has 0 Bytes
     Returns False otherwise

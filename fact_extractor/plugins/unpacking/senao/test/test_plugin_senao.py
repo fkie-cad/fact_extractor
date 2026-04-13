@@ -13,7 +13,7 @@ class TestGenericCarver(TestUnpackerBase):
         in_file = TEST_DATA_DIR / 'testfw_1.enc'
         assert in_file.is_file(), 'test file is missing'
         files, meta_data = self.unpacker.base._extract_files_from_file_using_specific_unpacker(
-            str(in_file),
+            in_file,
             self.tmp_dir.name,
             self.unpacker.base.unpacker_plugins['firmware/senao-v2b'],
         )

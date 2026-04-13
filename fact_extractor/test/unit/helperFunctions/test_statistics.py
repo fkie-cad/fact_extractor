@@ -26,20 +26,22 @@ def test_unpack_status_packed_file(config_fixture):
     test_packed_file_path = Path(get_test_data_dir(), 'container/test.7z')
 
     result = {}
-    get_unpack_status(test_packed_file_path, test_packed_file_path.read_bytes(), [], result, config_fixture)
+    get_unpack_status(test_packed_file_path, [], result, config_fixture)
 
     assert result['entropy'] > 0.7, 'entropy not valid'
     assert result['summary'] == ['packed'], '7z file should be packed'
 
     result = {}
     config_fixture.set('ExpertSettings', 'compressed_file_types', 'application/x-7z-compressed, ')
-    get_unpack_status(test_packed_file_path, test_packed_file_path.read_bytes(), [], result, config_fixture)
+    get_unpack_status(test_packed_file_path, [], result, config_fixture)
     assert result['summary'] == ['unpacked'], 'Unpacking Whitelist does not work'
 
 
-def test_unpack_status_unpacked_file(config_fixture):
+def test_unpack_status_unpacked_file(config_fixture, common_tmpdir):
     result = {}
-    get_unpack_status(Path('/dev/null'), b'aaaaa', [], result, config_fixture)
+    test_file = Path(common_tmpdir) / 'testfile'
+    test_file.write_bytes(b'aaaaa')
+    get_unpack_status(test_file, [], result, config_fixture)
 
     assert result['entropy'] < 0.7, 'entropy not valid'
     assert result['summary'] == ['unpacked']
@@ -49,15 +51,10 @@ def test_detect_unpack_loss_data_lost(config_fixture, common_tmpdir):
     included_file = Path(str(common_tmpdir), 'inner')
     included_file.write_bytes(256 * b'ABCDEFGH')
     result = {'summary': []}
+    test_file = Path(common_tmpdir) / 'testfile'
+    test_file.write_bytes(512 * b'ABCDEFGH')
 
-    _detect_unpack_loss(
-        512 * b'ABCDEFGH',
-        [
-            included_file,
-        ],
-        result,
-        256,
-    )
+    _detect_unpack_loss(test_file, [included_file], result, 256)
     assert 'data lost' in result['summary']
     assert result['size_packed'] == 512 * len(b'ABCDEFGH') - 256
     assert result['size_unpacked'] == 256 * len(b'ABCDEFGH')
@@ -67,13 +64,8 @@ def test_detect_unpack_loss_no_data_lost(config_fixture, common_tmpdir):
     included_file = Path(str(common_tmpdir), 'inner')
     included_file.write_bytes(512 * b'ABCDEFGH')
     result = {'summary': []}
+    test_file = Path(common_tmpdir) / 'testfile'
+    test_file.write_bytes(512 * b'ABCDEFGH')
 
-    _detect_unpack_loss(
-        512 * b'ABCDEFGH',
-        [
-            included_file,
-        ],
-        result,
-        256,
-    )
+    _detect_unpack_loss(test_file, [included_file], result, 256)
     assert 'no data lost' in result['summary']

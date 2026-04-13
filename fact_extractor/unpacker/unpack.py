@@ -31,7 +31,8 @@ class Unpacker:
             self._file_folder = data_folder / 'files'
             self._report_folder = data_folder / 'reports'
 
-    def unpack(self, file_path):
+    def unpack(self, file_path: str | Path):
+        file_path = Path(file_path)
         if self.base.should_ignore(file_path):
             meta_data = {
                 'plugin_used': None,
@@ -42,7 +43,7 @@ class Unpacker:
             }
             extracted_files = []
         else:
-            logging.debug(f'Extracting {Path(file_path).name}')
+            logging.debug(f'Extracting {file_path.name}')
 
             tmp_dir = TemporaryDirectory(prefix='fact_unpack_')
 
@@ -55,9 +56,8 @@ class Unpacker:
 
             compute_stats = self.config.getboolean('ExpertSettings', 'statistics', fallback=True)
             if compute_stats:
-                binary = Path(file_path).read_bytes()
                 add_unpack_statistics(self._file_folder, meta_data)
-                get_unpack_status(file_path, binary, extracted_files, meta_data, self.config)
+                get_unpack_status(file_path, extracted_files, meta_data, self.config)
 
             self.cleanup(tmp_dir)
 
@@ -66,7 +66,7 @@ class Unpacker:
         return extracted_files
 
     def _do_fallback_if_necessary(
-        self, extracted_files: List, meta_data: Dict, tmp_dir: str, file_path: str
+        self, extracted_files: List, meta_data: Dict, tmp_dir: str, file_path: Path
     ) -> Tuple[List, Dict]:
         if meta_data.get('number_of_excluded_files', 0) > 0:
             # If files have been excluded, extracted_files might be empty, but
@@ -90,7 +90,7 @@ class Unpacker:
         try:
             tmp_dir.cleanup()
         except OSError as error:
-            logging.error(f'Could not CleanUp tmp_dir: {error}', exc_info=True)
+            logging.error(f'Could not clean up tmp_dir: {error}', exc_info=True)
 
     def move_extracted_files(self, file_paths: List[str], extraction_dir: Path) -> List[Path]:
         extracted_files = []
@@ -110,10 +110,12 @@ class Unpacker:
 
     def extract_files_from_file(self, file_path: str | Path, tmp_dir) -> Tuple[List, Dict]:
         """For backwards compatibility of tests"""
+        if not isinstance(file_path, Path):
+            file_path = Path(file_path)
         return self.base.extract_files_from_file(file_path, tmp_dir)
 
 
-def unpack(file_path: str, config, extract_everything: bool = False, folder: str | None = None):
+def unpack(file_path: str | Path, config, extract_everything: bool = False, folder: str | None = None):
     extracted_objects = Unpacker(config, extract_everything, folder).unpack(file_path)
     logging.info(f'{len(extracted_objects)} files extracted')
     path_extracted_files = '\n'.join(str(path) for path in extracted_objects)

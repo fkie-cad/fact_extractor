@@ -16,7 +16,7 @@ class TestGenericCarver(TestUnpackerBase):
         self.check_unpacker_selection('generic/carver', 'generic_carver')
 
     def test_extraction(self):
-        in_file = f'{get_test_data_dir()}/generic_carver_test'
+        in_file = Path(get_test_data_dir()) / 'generic_carver_test'
         files, meta_data = self.unpacker.base._extract_files_from_file_using_specific_unpacker(
             in_file, self.tmp_dir.name, self.unpacker.base.unpacker_plugins['generic/carver']
         )
@@ -40,7 +40,7 @@ class TestGenericCarver(TestUnpackerBase):
         in_file = TEST_DATA_DIR / 'carving_test_file'
         assert Path(in_file).is_file()
         files, meta_data = self.unpacker.base._extract_files_from_file_using_specific_unpacker(
-            str(in_file), self.tmp_dir.name, self.unpacker.base.unpacker_plugins['generic/carver']
+            in_file, self.tmp_dir.name, self.unpacker.base.unpacker_plugins['generic/carver']
         )
         files = set(files)
         assert len(files) == 4, 'file number incorrect'

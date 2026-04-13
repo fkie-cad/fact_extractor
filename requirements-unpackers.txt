@@ -1,6 +1,6 @@
 # FixMe: deprecated
 pluginbase~=1.0.1
-git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git
+git+https://github.com/fkie-cad/common_helper_unpacking_classifier.git@0.6.0
 python-magic
 patool~=3.1.3
 # jffs2: jefferson + deps
