@@ -48,11 +48,6 @@ VERSION = '0.0'
 
 
 def unpack_function(file_path: str, tmp_dir: str) -> dict:
-    """
-    file_path specifies the input file.
-    tmp_dir must be used to store the extracted files.
-    Optional: Return a dict with meta information
-    """
     output_dir = Path(tmp_dir)
     structured_firmware = parse_firmware(file_path)
 
