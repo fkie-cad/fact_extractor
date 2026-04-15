@@ -2,12 +2,21 @@
 This plugin unpacks draytek update files.
 """
 
+import tempfile
+from pathlib import Path
+from struct import pack
+
+from draytek_arsenal.compression import Lz4 as CustomLz4
+from draytek_arsenal.draytek_format import Draytek
+from draytek_arsenal.format import parse_firmware
+from draytek_arsenal.fs import PFSExtractor
+
 # This file essentially is a refactor of
-#https://github.com/infobyte/draytek-arsenal/blob/d601252b2e6a62e3cd3e5962e164d32dabf1c6ae/draytek_arsenal/src/draytek_arsenal/commands/parse.py
-#https://github.com/infobyte/draytek-arsenal/blob/d601252b2e6a62e3cd3e5962e164d32dabf1c6ae/draytek_arsenal/src/draytek_arsenal/commands/extract.py
+# https://github.com/infobyte/draytek-arsenal/blob/d601252b2e6a62e3cd3e5962e164d32dabf1c6ae/draytek_arsenal/src/draytek_arsenal/commands/parse.py
+# https://github.com/infobyte/draytek-arsenal/blob/d601252b2e6a62e3cd3e5962e164d32dabf1c6ae/draytek_arsenal/src/draytek_arsenal/commands/extract.py
 
 # The original code comes with the following license:
-'''
+"""
 MIT License
 
 Copyright (c) 2024 Faraday
@@ -29,17 +38,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-'''
+"""
 
 # The refactored code however, is licensed under the GNU GPL 3 License
-import tempfile
-from pathlib import Path
-from struct import pack
-
-from draytek_arsenal.compression import Lz4 as CustomLz4
-from draytek_arsenal.draytek_format import Draytek
-from draytek_arsenal.format import parse_firmware
-from draytek_arsenal.fs import PFSExtractor
 
 NAME = 'draytek_arsenal'
 MIME_PATTERNS = ['firmware/draytek-rtos']
