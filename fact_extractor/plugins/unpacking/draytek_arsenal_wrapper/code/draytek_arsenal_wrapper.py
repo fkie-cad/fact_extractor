@@ -1,6 +1,6 @@
-'''
+"""
 This plugin unpacks draytek update files.
-'''
+"""
 
 # This file essentially is a refactor of
 #https://github.com/infobyte/draytek-arsenal/blob/d601252b2e6a62e3cd3e5962e164d32dabf1c6ae/draytek_arsenal/src/draytek_arsenal/commands/parse.py
@@ -32,15 +32,13 @@ SOFTWARE.
 '''
 
 # The refactored code however, is licensed under the GNU GPL 3 License
-from pathlib import Path
 import tempfile
+from pathlib import Path
 from struct import pack
 
-from draytek_arsenal.format import parse_firmware
-from draytek_arsenal.draytek_format import Draytek
-from draytek_arsenal.linux import DraytekLinux
-
 from draytek_arsenal.compression import Lz4 as CustomLz4
+from draytek_arsenal.draytek_format import Draytek
+from draytek_arsenal.format import parse_firmware
 from draytek_arsenal.fs import PFSExtractor
 
 NAME = 'draytek_arsenal'
@@ -49,51 +47,51 @@ VERSION = '0.0'
 
 
 def unpack_function(file_path: str, tmp_dir: str) -> dict:
-    '''
+    """
     file_path specifies the input file.
     tmp_dir must be used to store the extracted files.
     Optional: Return a dict with meta information
-    '''
+    """
     output_dir = Path(tmp_dir)
     structured_firmware = parse_firmware(file_path)
 
     if not isinstance(structured_firmware, Draytek):
-        raise Exception("The given image could not be parsed as Draytek-RTOS")
+        raise Exception('The given image could not be parsed as Draytek-RTOS')
 
     META_DICT = structure_rtos_metadata(structured_firmware)
 
     unpacking_errors: str = unpack_rtos_firmware(structured_firmware, output_dir)
 
     if unpacking_errors != '':
-        META_DICT["ocurred_errors_while_unpacking"] = unpacking_errors
+        META_DICT['ocurred_errors_while_unpacking'] = unpacking_errors
 
     return META_DICT
 
 def structure_rtos_metadata(structured_firmware: Draytek) -> dict:
     return {
-        "type": "RTOS",
-        "bin": {
-            "header": {
-                "size": hex(structured_firmware.bin.header.size),
-                "version_info": hex(structured_firmware.bin.header.version_info),
-                "next_section": hex(structured_firmware.bin.header.next_section.value),
-                "adjusted_size": hex(structured_firmware.bin.header.adj_size),
-                "bootloader_version": structured_firmware.bin.header.bootloader_version,
-                "product_number": structured_firmware.bin.header.product_number
+        'type': 'RTOS',
+        'bin': {
+            'header': {
+                'size': hex(structured_firmware.bin.header.size),
+                'version_info': hex(structured_firmware.bin.header.version_info),
+                'next_section': hex(structured_firmware.bin.header.next_section.value),
+                'adjusted_size': hex(structured_firmware.bin.header.adj_size),
+                'bootloader_version': structured_firmware.bin.header.bootloader_version,
+                'product_number': structured_firmware.bin.header.product_number
             },
-            "rtos": {
-                "size": hex(structured_firmware.bin.rtos.rtos_size)
+            'rtos': {
+                'size': hex(structured_firmware.bin.rtos.rtos_size)
             },
-            "checksum": hex(structured_firmware.bin.checksum)
+            'checksum': hex(structured_firmware.bin.checksum)
 
         },
-        "web": {
-            "header": {
-                "size": hex(structured_firmware.web.header.size),
-                "adjusted_size": hex(structured_firmware.web.header.adj_size),
-                "next_section": hex(structured_firmware.web.header.next_section)
+        'web': {
+            'header': {
+                'size': hex(structured_firmware.web.header.size),
+                'adjusted_size': hex(structured_firmware.web.header.adj_size),
+                'next_section': hex(structured_firmware.web.header.next_section)
             },
-            "checksum": hex(structured_firmware.web.checksum)
+            'checksum': hex(structured_firmware.web.checksum)
         }
     }
 
@@ -102,7 +100,7 @@ def unpack_rtos_firmware(structured_firmware: Draytek, output_dir: Path) -> str:
 
     # Unpack bootloader and rtos
     if structured_firmware.bin.rtos.rtos_size != len(structured_firmware.bin.rtos.data):
-        errors_while_unpacking += f'Data length ({len(structured_firmware.bin.rtos.data)}) doesn\'t match with the header length ({structured_firmware.bin.rtos.rtos_size})\n'
+        errors_while_unpacking += f"Data length ({len(structured_firmware.bin.rtos.data)}) doesn't match with the header length ({structured_firmware.bin.rtos.rtos_size})\n"
     else:
         write_bootloader_and_rtos(structured_firmware, output_dir / 'bootloader_and_rtos')
 
@@ -120,7 +118,7 @@ def unpack_rtos_firmware(structured_firmware: Draytek, output_dir: Path) -> str:
     return errors_while_unpacking
 
 def write_bootloader_and_rtos(structured_firmware: Draytek, output_file: Path) -> None:
-    unstructured_bootloader = b"".join([pack(">I", integer) for integer in structured_firmware.bin.bootloader.data[:-1]])
+    unstructured_bootloader = b''.join([pack('>I', integer) for integer in structured_firmware.bin.bootloader.data[:-1]])
 
     lz4 = CustomLz4()
     decompressed_rtos = lz4.decompress(structured_firmware.bin.rtos.data)
@@ -138,7 +136,7 @@ def write_web_filesystem(structured_firmware: Draytek, web_output_dir: Path) -> 
         _ = pfs_extractor.extract(tmp_dir_for_lz4_decompression.name, str(web_output_dir))
 
 def write_encrypted_dynamic_kernel_modules(structured_firmware: Draytek, output_file: Path) -> None:
-    data = b"DLM/1.0" + structured_firmware.bin.dlm.data
+    data = b'DLM/1.0' + structured_firmware.bin.dlm.data
     output_file.write_bytes(data)
 
 # ----> Do not edit below this line <----
