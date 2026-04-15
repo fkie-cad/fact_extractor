@@ -58,14 +58,14 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
     if not isinstance(structured_firmware, Draytek):
         raise Exception('The given image could not be parsed as Draytek-RTOS')
 
-    META_DICT = structure_rtos_metadata(structured_firmware)
+    meta_dict = structure_rtos_metadata(structured_firmware)
 
     unpacking_errors: str = unpack_rtos_firmware(structured_firmware, output_dir)
 
     if unpacking_errors != '':
-        META_DICT['ocurred_errors_while_unpacking'] = unpacking_errors
+        meta_dict['ocurred_errors_while_unpacking'] = unpacking_errors
 
-    return META_DICT
+    return meta_dict
 
 def structure_rtos_metadata(structured_firmware: Draytek) -> dict:
     return {
