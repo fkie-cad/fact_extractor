@@ -250,7 +250,7 @@ def _freetz_is_already_installed():
     )
 
 
-def _install_freetz():
+def _install_freetz(version='ng26020'):
     if _freetz_is_already_installed():
         logging.info('Skipping FREETZ installation (already installed)')
         return
@@ -258,25 +258,33 @@ def _install_freetz():
     logging.info('Installing FREETZ')
     current_user = getuser()
     freetz_build_config = Path(__file__).parent / 'freetz.config'
-    with TemporaryDirectory(prefix='fact_freetz') as build_directory, OperateInDirectory(build_directory):
-        os.umask(0o022)
-        install_github_project(
-            'Freetz-NG/freetz-ng',
-            [
-                # add user only if it does not exist to fix issues with re-running the installation after an error
-                'id -u makeuser || sudo useradd -M makeuser',
-                'sudo mkdir -p /home/makeuser',
-                'sudo chown -R makeuser /home/makeuser',
-                f'cp {freetz_build_config} ./.config',
-                f'sudo chown -R makeuser {build_directory}',
-                'sudo su makeuser -c "make -j$(nproc) tools"',
-                f'sudo chmod -R 777 {build_directory}',
-                f'sudo chown -R {current_user} {build_directory}',
-                'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma tools/sfk '
-                f'tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi {BIN_DIR}',
-                'sudo userdel makeuser',
-            ],
-        )
+    old_umask = os.umask(0o022)
+    try:
+        with TemporaryDirectory(prefix='fact_freetz') as build_directory, OperateInDirectory(build_directory):
+            install_github_project(
+                'Freetz-NG/freetz-ng',
+                [
+                    # add user only if it does not exist to fix issues with re-running the installation after an error
+                    'id -u makeuser || sudo useradd -M makeuser',
+                    'sudo mkdir -p /home/makeuser',
+                    'sudo chown -R makeuser /home/makeuser',
+                    f'cp {freetz_build_config} ./.config',
+                    f'sudo chown -R makeuser {build_directory}',
+                    'sudo su makeuser -c "make -j$(nproc) tools"',
+                    f'sudo chmod -R 777 {build_directory}',
+                    f'sudo chown -R {current_user} {build_directory}',
+                    'cp tools/find-squashfs tools/unpack-kernel tools/freetz_bin_functions tools/unlzma tools/sfk '
+                    f'tools/unsquashfs4-avm-be tools/unsquashfs4-avm-le tools/unsquashfs3-multi {BIN_DIR}',
+                    'sudo userdel makeuser',
+                ],
+                branch=version,
+            )
+    except PermissionError as error:
+        if not _freetz_is_already_installed():
+            raise InstallationError('Error during installation of Freetz-NG') from error
+        logging.warning(f'Could not remove freetz build directory: {build_directory}')
+    finally:
+        os.umask(old_umask)
 
 
 def _install_plugins():

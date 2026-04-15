@@ -22,7 +22,7 @@ class OperateInDirectory:
         self._remove = remove
 
     def __enter__(self):
-        self._current_working_dir = os.getcwd()
+        self._current_working_dir = os.getcwd()  # noqa: PTH109
         os.chdir(self._target_directory)
 
     def __exit__(self, *args):
@@ -124,10 +124,10 @@ def check_if_command_in_path(command):
     return return_code == 0
 
 
-def install_github_project(project_path: str, commands: List[str]):
+def install_github_project(project_path: str, commands: List[str], branch: str | None = None):
     log_current_packages([project_path])
     folder_name = Path(project_path).name
-    _checkout_github_project(project_path, folder_name)
+    _checkout_github_project(project_path, folder_name, branch)
 
     with OperateInDirectory(folder_name, remove=True):
         error = None
@@ -141,9 +141,12 @@ def install_github_project(project_path: str, commands: List[str]):
         raise InstallationError(error)
 
 
-def _checkout_github_project(github_path, folder_name):
+def _checkout_github_project(github_path, folder_name, branch: str | None = None):
     clone_url = f'https://www.github.com/{github_path}'
-    stdout, return_code = execute_shell_command_get_return_code(f'git clone {clone_url}')
+    clone_cmd = f'git clone --depth 1 {clone_url}'
+    if branch:
+        clone_cmd = f'{clone_cmd} --branch {branch}'
+    stdout, return_code = execute_shell_command_get_return_code(clone_cmd)
     if return_code != 0:
         raise InstallationError(f'Cloning from github failed for project {github_path}: {stdout}\n')
     if not Path('.', folder_name).exists():
