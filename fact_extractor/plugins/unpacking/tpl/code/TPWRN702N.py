@@ -1,4 +1,8 @@
+# noqa: N999
+from __future__ import annotations
+
 import binascii
+from pathlib import Path
 from struct import unpack
 
 from common_helper_files import write_binary_to_file
@@ -7,18 +11,19 @@ from unpacker.helper.carving import Carver
 
 NAME = 'TP-WR702N'
 MIME_PATTERNS = ['firmware/tp-wr702n']
-VERSION = '0.1.1'
+VERSION = '0.1.2'
+MIN_CARVING_SIZE = 10
 
 
-class InvalidImg0InformationException(Exception):
+class InvalidImg0InformationError(Exception):
     pass
 
 
-class Img0MissingException(Exception):
+class Img0MissingError(Exception):
     pass
 
 
-class NotLZMAException(Exception):
+class NotLZMAError(Exception):
     pass
 
 
@@ -37,8 +42,10 @@ def unpack_function(file_path, tmp_dir):
     write_binary_to_file(tpwr702n.get_fs(), f'{tmp_dir}/main.owfs')
 
     remaining = tpwr702n.get_remaining_blocks()
-    for offset in remaining:
-        write_binary_to_file(remaining[offset], f'{tmp_dir}/{offset}_unknown.bin')
+    for offset, block in remaining.items():
+        if len(block) < MIN_CARVING_SIZE:
+            continue
+        write_binary_to_file(block, f'{tmp_dir}/{offset}_unknown.bin')
 
     return tpwr702n.get_meta_dict()
 
@@ -52,13 +59,12 @@ class TPWR702N:
     BOOTLOADER_OFFSET = 26820
     OS_OFFSET = 262420
 
-    def __init__(self, filename):
+    def __init__(self, filename: str | Path):
         self.img0 = None
         self.md5_checksum = None
-        self.firmware_filepath = filename
-        self.firmware = open(filename, 'rb')
-        self._read_container_information()
-        self.firmware.close()
+        self.firmware_filepath = Path(filename)
+        with self.firmware_filepath.open('rb') as file:
+            self._read_container_information(file)
 
         self.carver = Carver(self.firmware_filepath)
 
@@ -66,11 +72,11 @@ class TPWR702N:
         return f'MD5: {self.get_md5string()} \n Included Header:\n{self.img0!s}'
 
     def get_remaining_blocks(self):
-        non_carved_areas = self.carver.carved.non_carved_areas
+        non_carved_areas = self.carver.carved.uncarved_areas
 
         remaining = {}
         for area in non_carved_areas:
-            remaining[area[0]] = self.carver.extract_data(area[0], area[1])
+            remaining[area.start] = self.carver.extract_data(area.start, area.end)
         return remaining
 
     def get_container_header(self):
@@ -85,14 +91,13 @@ class TPWR702N:
         meta_data['os_offset'] = self.OS_OFFSET
         meta_data['md5'] = self.get_md5string()
         meta_data['img0'] = self.img0.get_meta_dict()
-        meta_data['uncarved_area'] = self.carver.carved.non_carved_areas
+        meta_data['uncarved_area'] = self.carver.carved.uncarved_areas
         return meta_data
 
-    def _read_container_information(self):
-        header = unpack('>4s16s', self.firmware.read(4 + self.MD5SIZE))
+    def _read_container_information(self, file):
+        header = unpack('>4s16s', file.read(4 + self.MD5SIZE))
         self.container_format = header[0]
         self.md5_checksum = header[1]
-
         self._read_img0()
 
     def _read_img0(self):
@@ -109,9 +114,9 @@ class TPWR702N:
 
     def _get_end_of_bootloader(self):
         if self.img0 is None:
-            raise Img0MissingException('Main IMG0 is missing')
+            raise Img0MissingError('Main IMG0 is missing')
         if self.img0.sub_header is None:
-            raise Img0MissingException('Sub IMG0 is missing')
+            raise Img0MissingError('Sub IMG0 is missing')
 
         return self.img0.sub_header.offset - 1
 
@@ -119,7 +124,7 @@ class TPWR702N:
     def _check_expected_lzma_property(data_block):
         lzma_first_byte = b'\x6e'
         if data_block[0] is not lzma_first_byte[0]:
-            raise NotLZMAException
+            raise NotLZMAError
 
     def get_os_and_fs(self):
         os_and_fs = self.carver.extract_data(self.OS_OFFSET)
@@ -147,7 +152,7 @@ class TPIMG0:  # pylint: disable=too-many-instance-attributes
     LANGUAGE_TP_LINK_CHINESE = b'\x00\x01'
     LANGUAGE_TP_LINK_ENGLISH = b'\x11\x01'
 
-    def __init__(self, filename, offset):
+    def __init__(self, filename: str | Path, offset: int):
         self.offset = offset
         self.header_size = 12
 
@@ -155,17 +160,22 @@ class TPIMG0:  # pylint: disable=too-many-instance-attributes
         self.language = None
         self.container_size = -1
 
-        self.firmware_filepath = filename
-        self.firmware = open(filename, 'rb')
-        self.firmware.seek(offset)
-        self._read_container_information()
-        self.sub_header = self._read_sub_header()
-        self.firmware.close()
+        self.firmware_filepath = Path(filename)
+        with self.firmware_filepath.open('rb') as file:
+            file.seek(offset)
+            self._read_container_information(file)
+            self.sub_header = self._read_sub_header(file)
 
         self.check_header()
 
     def __str__(self):
-        return f'IMG0\nSize: {self.container_size}\nDevice ID: {self.device_id}\nLanguage: {self.language}\nSubheader: {self.sub_header}'
+        return (
+            'IMG0\n'
+            f'Size: {self.container_size}\n'
+            f'Device ID: {self.device_id}\n'
+            f'Language: {self.language}\n'
+            f'Subheader: {self.sub_header}'
+        )
 
     def get_meta_dict(self):
         meta_data = {}
@@ -185,15 +195,15 @@ class TPIMG0:  # pylint: disable=too-many-instance-attributes
             return 'English'
         return 'Unknown'
 
-    def _read_container_information(self):
-        header = unpack('>4sI2s2s', self.firmware.read(self.header_size))
+    def _read_container_information(self, file):
+        header = unpack('>4sI2s2s', file.read(self.header_size))
         self.container_size = header[1]
         self.device_id = header[2]
         self.language = header[3]
 
-    def _read_sub_header(self):
-        self.firmware.seek(self.offset + self.header_size)
-        rest_of_the_file = self.firmware.read()
+    def _read_sub_header(self, file):
+        file.seek(self.offset + self.header_size)
+        rest_of_the_file = file.read()
         sub_header_offset = rest_of_the_file.find(b'\x49\x4d\x47\x30')
         if sub_header_offset < 0:
             return None
@@ -202,13 +212,13 @@ class TPIMG0:  # pylint: disable=too-many-instance-attributes
 
     def check_header(self):
         if self.container_size <= 0:
-            raise InvalidImg0InformationException(f'Size is {self.container_size}')
+            raise InvalidImg0InformationError(f'Size is {self.container_size}')
 
         if self.device_id is None:
-            raise InvalidImg0InformationException('Device Id is missing')
+            raise InvalidImg0InformationError('Device Id is missing')
 
         if self.language is None:
-            raise InvalidImg0InformationException('Language is missing')
+            raise InvalidImg0InformationError('Language is missing')
 
         return True
 
