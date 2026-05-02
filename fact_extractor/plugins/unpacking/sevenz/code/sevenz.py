@@ -27,6 +27,7 @@ MIME_PATTERNS = [
     'application/x-arj',
     'application/x-iso9660-image',
     'application/x-lzma',
+    'application/x-ms-compress-szdd',
     'application/x-rar',
     'application/x-rpm',
     'application/x-vhd',
