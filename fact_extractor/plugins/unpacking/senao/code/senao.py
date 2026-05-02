@@ -10,8 +10,9 @@ MIME_PATTERNS = [
     'firmware/senao-v1b',
     'firmware/senao-v2a',
     'firmware/senao-v2b',
+    'firmware/senao-v2c',
 ]
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 
 SENAO_V1_MAGIC = bytes.fromhex('12 34 56 78')
 SENAO_V2_MAGIC = bytes.fromhex('30 47 16 88')
@@ -50,12 +51,17 @@ def _find_key_and_offset(contents: bytes) -> tuple[int, int]:
             payload_offset = 0xB8
         elif contents[0x7C : 0x7C + 4] == SENAO_V2_MAGIC:  # firmware/senao-v2b (short header variant)
             payload_offset = 0x80
+        elif contents[0x11C : 0x11C + 4] == SENAO_V2_MAGIC:  # firmware/senao-v2c (very long header variant)
+            payload_offset = 0x120
         elif contents[0x66 : 0x66 + 4] == V2_VERSION_STR:  # firmware/senao-v2a with different key
             key = int.from_bytes(contents[0xB4 : 0xB4 + 4], byteorder='big')
             payload_offset = 0xB8
         elif contents[0x7C : 0x7C + 4] == V2_VERSION_STR:  # firmware/senao-v2b with different key
             key = int.from_bytes(contents[0xB4 : 0xB4 + 4], byteorder='big')
             payload_offset = 0x80
+        elif contents[0xCE : 0xCE + 4] == V2_VERSION_STR:  # firmware/senao-v2c with different key
+            key = int.from_bytes(contents[0x11C : 0x11C + 4], byteorder='big')
+            payload_offset = 0x120
         else:
             raise ValueError('Invalid input data.')  # The signature should make sure that this does not happen
     return key, payload_offset
