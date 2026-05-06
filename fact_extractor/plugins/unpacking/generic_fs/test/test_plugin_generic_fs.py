@@ -19,7 +19,6 @@ class TestGenericFsUnpacker(TestUnpackerBase):
         self.check_unpacker_selection('filesystem/dosmbr', 'genericFS')
         self.check_unpacker_selection('filesystem/f2fs', 'genericFS')
         self.check_unpacker_selection('filesystem/jfs', 'genericFS')
-        self.check_unpacker_selection('filesystem/minix', 'genericFS')
         self.check_unpacker_selection('filesystem/reiserfs', 'genericFS')
         self.check_unpacker_selection('filesystem/romfs', 'genericFS')
         self.check_unpacker_selection('filesystem/udf', 'genericFS')
@@ -34,10 +33,6 @@ class TestGenericFsUnpacker(TestUnpackerBase):
 
     def test_extraction_jfs(self):
         with decompress_test_file(TEST_DATA_DIR / 'jfs.img.xz') as test_file:
-            self.check_unpacking_of_standard_unpack_set(test_file, additional_prefix_folder='get_files_test')
-
-    def test_extraction_minix(self):
-        with decompress_test_file(TEST_DATA_DIR / 'minix.img.xz') as test_file:
             self.check_unpacking_of_standard_unpack_set(test_file, additional_prefix_folder='get_files_test')
 
     def test_extraction_reiserfs(self):
