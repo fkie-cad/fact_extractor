@@ -5,33 +5,15 @@ import pytest
 
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
-from ..code.squash_fs import SQUASH_UNPACKER, _unpack_success, unpack_function
+from ..code.squash_fs import unpack_function
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 
 
-@pytest.mark.parametrize(
-    ('unpack_path', 'expected'),
-    [
-        ('/foo/bar/unpacker', False),
-        (TEST_DATA_DIR, True),
-    ],
-)
-def test_unpack_success(unpack_path, expected):
-    assert _unpack_success(unpack_path) == expected
-
-
 def test_not_unpackable_file():
     empty_test_file = TEST_DATA_DIR / 'empty'
-    with TemporaryDirectory(prefix='fact_test_') as unpack_dir:
-        result = unpack_function(empty_test_file, unpack_dir)
-    assert 'sasquatch - error' in result
-    assert 'unsquashfs4-avm-be - error' in result
-
-
-def test_tool_paths_set_correctly():
-    for unpacker, _ in SQUASH_UNPACKER:
-        assert unpacker.exists()
+    with TemporaryDirectory(prefix='fact_test_') as unpack_dir, pytest.raises(ValueError, match='not a SquashFS file'):
+        unpack_function(empty_test_file, unpack_dir)
 
 
 class TestSquashUnpacker(TestUnpackerBase):
@@ -39,25 +21,32 @@ class TestSquashUnpacker(TestUnpackerBase):
         self.check_unpacker_selection('filesystem/squashfs', 'SquashFS')
 
     @pytest.mark.parametrize(
-        ('file', 'expected'),
+        'file',
         [
-            ('avm_be.sqfs4', 'sasquatch-v4be'),
-            ('avm_le.sqfs4', 'sasquatch'),
-            ('gzip.sqfs', 'sasquatch'),
-            ('lz4.sqfs', 'sasquatch'),
-            ('lzma.sqfs', 'sasquatch'),
-            ('lzma1_be.sqfs3', 'sasquatch'),
-            ('lzma1_le.sqfs3', 'sasquatch'),
-            ('lzma_be.sqfs2', 'unsquashfs4-avm-be'),
-            ('lzma_le.sqfs2', 'unsquashfs4-avm-be'),
-            ('lzo.sqfs', 'sasquatch'),
-            ('xz.sqfs', 'sasquatch'),
-            ('zlib_be.sqfs3', 'sasquatch'),
-            ('zlib_le.sqfs3', 'sasquatch'),
-            ('zstd.sqfs', 'sasquatch'),
+            ('avm_be.sqfs4',),
+            ('avm_le.sqfs4',),
+            ('gzip.sqfs',),
+            ('lz4.sqfs',),
+            ('lzma.sqfs',),
+            ('lzma1_be.sqfs3',),
+            ('lzma1_le.sqfs3',),
+            ('lzma_be.sqfs2',),
+            ('lzma_le.sqfs2',),
+            ('lzo.sqfs',),
+            ('xz.sqfs',),
+            ('zlib_be.sqfs3',),
+            ('zlib_le.sqfs3',),
+            ('zstd.sqfs',),
+            # non-standard magic
+            ('test.sqlz',),
+            ('test.zlqs',),
+            ('test.hsqt',),
+            ('test.tqsh',),
+            ('test.qshs',),
+            ('test.shsq',),
         ],
     )
-    def test_extraction_sqfs(self, file, expected):
+    def test_extraction_sqfs(self, file):
         meta_data = self.check_unpacking_of_standard_unpack_set(TEST_DATA_DIR / file)
         assert meta_data['plugin_used'] == 'SquashFS'
-        assert meta_data['unpacking_tool'] == expected
+        assert 'Number of inodes 5' in meta_data['output']
