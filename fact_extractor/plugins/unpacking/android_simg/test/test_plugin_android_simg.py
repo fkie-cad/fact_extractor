@@ -1,10 +1,6 @@
-import sys
 from pathlib import Path
 
-root_dir = Path(__file__).parent.parent.parent.parent.parent
-sys.path.append(str(root_dir))
-
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 

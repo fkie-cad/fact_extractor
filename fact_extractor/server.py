@@ -6,11 +6,11 @@ from pathlib import Path
 from flask import Flask
 from flask_restful import Api, Resource
 
-from helperFunctions.config import load_config
-from helperFunctions.file_system import change_owner_of_output_files
-from helperFunctions.program_setup import setup_logging
-from unpacker.unpack import Unpacker
-from unpacker.unpackBase import UnpackBase
+from fact_extractor.helperFunctions.config import load_config
+from fact_extractor.helperFunctions.file_system import change_owner_of_output_files
+from fact_extractor.helperFunctions.program_setup import setup_logging
+from fact_extractor.unpacker.unpack import Unpacker
+from fact_extractor.unpacker.unpackBase import UnpackBase
 
 app = Flask(__name__)
 api = Api(app)

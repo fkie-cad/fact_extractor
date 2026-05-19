@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from helperFunctions.file_system import get_test_data_dir
-from helperFunctions.statistics import _detect_unpack_loss, get_unpack_status
+from fact_extractor.helperFunctions.file_system import get_test_data_dir
+from fact_extractor.helperFunctions.statistics import _detect_unpack_loss, get_unpack_status
 
 
 @pytest.fixture

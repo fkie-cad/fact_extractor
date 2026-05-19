@@ -5,8 +5,15 @@ import resource
 
 from common_helper_files import create_dir_for_file
 
-from helperFunctions.config import get_config_dir
-from version import __VERSION__
+from fact_extractor.helperFunctions.config import get_config_dir
+
+# Get version from package metadata, fall back to hardcoded for development
+try:
+    from importlib.metadata import version
+
+    __VERSION__ = version('fact-extractor')
+except Exception:
+    __VERSION__ = '0.0.0'
 
 
 def setup_argparser(name, description, command_line_options, version=__VERSION__):

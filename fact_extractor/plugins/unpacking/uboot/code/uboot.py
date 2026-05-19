@@ -4,8 +4,8 @@ from pathlib import Path
 
 from common_helper_process import execute_shell_command
 
-from plugins.unpacking.uboot.internal.uboot_container import uBootHeader
-from unpacker.helper.carving import Carver
+from fact_extractor.plugins.unpacking.uboot.internal.uboot_container import uBootHeader
+from fact_extractor.unpacker.helper.carving import Carver
 
 NAME = 'Uboot'
 MIME_PATTERNS = ['firmware/u-boot']

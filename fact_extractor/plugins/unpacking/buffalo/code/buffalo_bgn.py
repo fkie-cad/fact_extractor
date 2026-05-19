@@ -3,7 +3,7 @@ from pathlib import Path
 from shlex import split
 from subprocess import CompletedProcess, run
 
-from helperFunctions.file_system import get_fact_bin_dir
+from fact_extractor.helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'buffalo_bgn'
 MIME_PATTERNS = ['firmware/buffalo']

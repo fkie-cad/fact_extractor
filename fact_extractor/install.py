@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 """
 fact_extractor installer
-Copyright (C) 2015-2020  Fraunhofer FKIE
+Copyright (C) 2015-2026  Fraunhofer FKIE
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,26 +22,26 @@ import logging
 import sys
 from pathlib import Path
 
-from version import __VERSION__
-
 try:
+    from importlib.metadata import version
+
     import distro
 
-    from helperFunctions.install import OperateInDirectory
-    from install.common import main as common
-    from install.unpacker import main as unpacker
+    from fact_extractor.helperFunctions.install import OperateInDirectory
+    from fact_extractor.setup.common import main as common
+    from fact_extractor.setup.unpacker import main as unpacker
 except (ImportError, ModuleNotFoundError) as error:
-    logging.error(f'Could not import install dependencies. Please (re-)run install/pre_install.sh. Error: {error}')
+    logging.exception(f'Could not import install dependencies. Please (re-)run install/pre_install.sh. Error: {error}')
     sys.exit(1)
 
 PROGRAM_NAME = 'FACT_extractor Installer'
-PROGRAM_VERSION = __VERSION__
+PROGRAM_VERSION = version('fact-extractor')
 PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor installation script'
 
 # Compatible Ubuntu releases
 FOCAL_CODE_NAMES = ['focal', 'ulyana', 'ulyssa', 'uma', 'una']
 JAMMY_CODE_NAMES = ['jammy', 'vanessa', 'vera', 'victoria', 'virginia']
-NOBLE_CODE_NAMES = ['noble', 'wilma', 'xia']
+NOBLE_CODE_NAMES = ['noble', 'wilma', 'xia', 'zena']
 
 # Compatible Debian/Kali releases
 BULLSEYE_CODE_NAMES = ['bullseye']
@@ -102,7 +102,7 @@ def main():
     check_distribution()
 
     logging.info(f'{PROGRAM_NAME} {PROGRAM_VERSION}')
-    installation_directory = str(Path(__file__).parent / 'install')
+    installation_directory = str(Path(__file__).parent / 'setup')
 
     with OperateInDirectory(installation_directory):
         common()

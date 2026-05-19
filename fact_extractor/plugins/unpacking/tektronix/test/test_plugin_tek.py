@@ -4,9 +4,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from helperFunctions.file_system import get_test_data_dir
-from plugins.unpacking.tektronix.code.tek import unpack_function
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.helperFunctions.file_system import get_test_data_dir
+from fact_extractor.plugins.unpacking.tektronix.code.tek import unpack_function
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 

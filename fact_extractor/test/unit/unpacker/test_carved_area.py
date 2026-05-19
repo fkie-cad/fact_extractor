@@ -1,6 +1,6 @@
 import pytest
 
-from unpacker.helper.carving import Area, CarvingArea
+from fact_extractor.unpacker.helper.carving import Area, CarvingArea
 
 
 @pytest.mark.parametrize(

@@ -1,12 +1,8 @@
 import os
-import sys
 
 from common_helper_files import write_binary_to_file
 
-THIS_FILE = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(THIS_FILE, '..', 'internal'))
-
-from dsk_container import DskOne  # noqa: E402 pylint: disable=import-error,wrong-import-position
+from fact_extractor.plugins.unpacking.xerox.internal.dsk_container import DskOne
 
 NAME = 'DSK'
 MIME_PATTERNS = ['firmware/dsk1.0']

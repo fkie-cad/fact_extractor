@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 import pytest
 from common_helper_files import get_binary_from_file
 
-from ..internal.pjl_helper import (
+from fact_extractor.plugins.unpacking.hp.internal.pjl_helper import (
     _extract_file_from_upgrade,
     _get_binary_of_upgrade,
     _get_end_postion_of_first_preamble,

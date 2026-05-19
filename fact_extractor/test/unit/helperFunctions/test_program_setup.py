@@ -1,8 +1,8 @@
 import logging
 from pathlib import Path
 
-from helperFunctions.config import get_config_dir
-from helperFunctions.program_setup import load_config, setup_argparser, setup_logging
+from fact_extractor.helperFunctions.config import get_config_dir
+from fact_extractor.helperFunctions.program_setup import load_config, setup_argparser, setup_logging
 
 
 class ArgumentMock:

@@ -1,6 +1,6 @@
 from tempfile import NamedTemporaryFile, TemporaryDirectory
 
-from plugins.unpacking.linuxkernel.internal.extractor import Extractor
+from fact_extractor.plugins.unpacking.linuxkernel.internal.extractor import Extractor
 
 SAMPLE_DATA = b'####-------\x1f\x8b\x08-------\x1f\x8b\x08$$$$BZh$$$$'
 SAMPLE_DATA_BE32 = b'\xff\xff\xff\xff\xff\x08\x8b\x1f\x00boof21raet43ts'

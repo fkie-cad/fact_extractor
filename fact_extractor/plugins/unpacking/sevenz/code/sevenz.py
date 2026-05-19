@@ -14,8 +14,8 @@ from common_helper_files.fail_safe_file_operations import _iterate_path_recursiv
 from common_helper_passwords import get_merged_password_set
 from common_helper_process import execute_shell_command
 
-from helperFunctions import magic
-from helperFunctions.file_system import get_src_dir
+from fact_extractor.helperFunctions import magic
+from fact_extractor.helperFunctions.file_system import get_src_dir
 
 NAME = '7z'
 MIME_PATTERNS = [

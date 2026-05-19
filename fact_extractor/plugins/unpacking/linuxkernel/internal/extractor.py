@@ -1,9 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
-from plugins.unpacking.linuxkernel.internal.pattern_searcher import PatternSearcher
+from fact_extractor.plugins.unpacking.linuxkernel.internal.pattern_searcher import PatternSearcher
 
 
 class Extractor:

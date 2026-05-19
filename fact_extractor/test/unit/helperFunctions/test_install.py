@@ -1,11 +1,11 @@
 import pytest
 
-from helperFunctions.install import InstallationError, run_shell_command_raise_on_return_code
+from fact_extractor.helperFunctions.install import InstallationError, run_shell_command_raise_on_return_code
 
 
 def _patch_shell_command(patch, mock_output: str, mock_return_code: int):
     patch.setattr(
-        'helperFunctions.install.execute_shell_command_get_return_code',
+        'fact_extractor.helperFunctions.install.execute_shell_command_get_return_code',
         lambda shell_command, timeout=None: (mock_output, mock_return_code),
     )
 

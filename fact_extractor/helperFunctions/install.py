@@ -6,6 +6,7 @@ import os
 import shutil
 import sys
 from pathlib import Path
+from subprocess import run
 from typing import List
 
 from common_helper_process import execute_shell_command_get_return_code
@@ -46,15 +47,12 @@ def log_current_packages(packages, install=True):
     logging.info(f'{action} {" ".join(packages)}')
 
 
-def run_shell_command_raise_on_return_code(  # pylint: disable=invalid-name
-    command: str, error: str, add_output_on_error=False
-) -> str:
-    output, return_code = execute_shell_command_get_return_code(command)
-    if return_code != 0:
-        if add_output_on_error:
-            error = f'{error}\n{output}'
+def run_shell_command_raise_on_return_code(command: str, error: str, add_output_on_error=False) -> str:
+    proc = run(command, shell=True, text=True, capture_output=True, check=False)
+    if proc.returncode != 0:
+        error = f'{error}\n{proc.stdout}\n{proc.stderr}'
         raise InstallationError(error)
-    return output
+    return proc.stdout
 
 
 def apt_update_sources():

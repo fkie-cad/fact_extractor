@@ -6,7 +6,7 @@ from struct import unpack
 
 from common_helper_files import get_binary_from_file
 
-from helperFunctions.dataConversion import make_unicode_string
+from fact_extractor.helperFunctions.dataConversion import make_unicode_string
 
 ENCODING_OVERHEAD = 0.33
 

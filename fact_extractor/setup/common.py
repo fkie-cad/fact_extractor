@@ -2,13 +2,11 @@ import logging
 import subprocess as sp
 from pathlib import Path
 
-from helperFunctions.config import load_config
-from helperFunctions.install import (
+from fact_extractor.helperFunctions.config import load_config
+from fact_extractor.helperFunctions.install import (
     OperateInDirectory,
     apt_install_packages,
     apt_update_sources,
-    load_requirements_file,
-    pip_install_packages,
 )
 
 APT_DEPENDENCIES = [
@@ -18,8 +16,6 @@ APT_DEPENDENCIES = [
     'autoconf',
     'libtool',
 ]
-
-PIP_DEPENDENCY_FILE = Path(__file__).parent.parent.parent / 'requirements-common.txt'
 BIN_DIR = Path(__file__).parent.parent / 'bin'
 
 
@@ -54,7 +50,6 @@ def main():
 
     # install dependencies
     install_apt_dependencies()
-    pip_install_packages(*load_requirements_file(PIP_DEPENDENCY_FILE))
 
     BIN_DIR.mkdir(exist_ok=True)
 

@@ -8,7 +8,7 @@ from subprocess import PIPE, STDOUT, run
 from tempfile import TemporaryDirectory
 from time import sleep
 
-from helperFunctions import magic
+from fact_extractor.helperFunctions import magic
 
 NAME = 'genericFS'
 MIME_PATTERNS = [

@@ -10,7 +10,7 @@ from os import PathLike
 
 import magic as pymagic
 
-from helperFunctions.file_system import get_src_dir
+from fact_extractor.helperFunctions.file_system import get_src_dir
 
 # On ubuntu this is provided by the libmagic-mgc package
 _default_magic = os.getenv('MAGIC', '/usr/lib/file/magic.mgc')

@@ -1,7 +1,7 @@
 import os
 from configparser import ConfigParser, NoOptionError, NoSectionError
 
-from helperFunctions.file_system import get_src_dir
+from fact_extractor.helperFunctions.file_system import get_src_dir
 
 
 def load_config(config_file_name):
@@ -14,7 +14,7 @@ def load_config(config_file_name):
     if os.path.exists(config_path):
         config.read(config_path)
         return config
-    raise RuntimeError('Cannot load config')
+    raise RuntimeError(f'Cannot load config {config_path}')
 
 
 def get_config_dir():

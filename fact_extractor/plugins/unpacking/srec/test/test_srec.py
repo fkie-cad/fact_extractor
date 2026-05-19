@@ -2,9 +2,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from helperFunctions.file_system import get_test_data_dir
-from plugins.unpacking.srec.code.srec import unpack_function
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.helperFunctions.file_system import get_test_data_dir
+from fact_extractor.plugins.unpacking.srec.code.srec import unpack_function
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 

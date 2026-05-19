@@ -1,6 +1,6 @@
 from hashlib import new
 
-from helperFunctions.dataConversion import make_bytes
+from fact_extractor.helperFunctions.dataConversion import make_bytes
 
 
 def get_hash(hash_function, binary):

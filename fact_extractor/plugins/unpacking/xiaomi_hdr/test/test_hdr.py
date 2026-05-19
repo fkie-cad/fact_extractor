@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from plugins.unpacking.xiaomi_hdr.code.xiaomi_hdr import MIME_PATTERNS
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.plugins.unpacking.xiaomi_hdr.code.xiaomi_hdr import MIME_PATTERNS
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 

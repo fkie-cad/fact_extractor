@@ -2,7 +2,7 @@ from pathlib import Path
 
 from common_helper_process.fail_safe_subprocess import execute_shell_command
 
-from helperFunctions.file_system import get_fact_bin_dir
+from fact_extractor.helperFunctions.file_system import get_fact_bin_dir
 
 NAME = 'avm_kernel_image'
 MIME_PATTERNS = ['linux/avm-kernel-image-v1', 'linux/avm-kernel-image-v2']
