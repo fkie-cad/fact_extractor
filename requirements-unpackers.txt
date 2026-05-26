@@ -34,3 +34,5 @@ pylibfdt ~= 1.7.1
 structlog~=25.1.0
 # unblob
 unblob~=25.1.8
+# SFX unpacker
+lief~=0.17.1
