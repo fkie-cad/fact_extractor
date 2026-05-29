@@ -5,6 +5,7 @@ This plugin unpacks all files via carving
 from __future__ import annotations
 
 import logging
+import re
 import traceback
 from itertools import chain
 from pathlib import Path
@@ -64,7 +65,19 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
             report += f'\nFiltered chunks:\n{filter_report}'
     except Exception as error:
         report = f'Error {error} during unblob extraction:\n{traceback.format_exc()}'
+    _rename_extracted_files(Path(tmp_dir), path.stat().st_size)
     return {'output': report}
+
+
+def _rename_extracted_files(tmp_dir: Path, filesize: int):
+    """Default filenames are not sortable. This Function adds leading zeroes to the offsets to fix this."""
+    pad_width = len(str(filesize))
+    name_regex = re.compile(r'(\d+)-(\d+)\.(.+)')
+    for file in tmp_dir.iterdir():
+        if match := name_regex.match(file.name):
+            start, end, extension = match.groups()
+            filename = f'{int(start):0{pad_width}d}-{int(end):0{pad_width}d}.{extension}'
+            file.rename(tmp_dir / filename)
 
 
 def _find_chunks(file_path: Path, file: File) -> Iterable[Chunk]:

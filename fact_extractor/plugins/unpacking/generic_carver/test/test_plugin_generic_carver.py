@@ -1,11 +1,12 @@
 import re
 import zlib
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import pytest
 
 from helperFunctions.file_system import get_test_data_dir
-from plugins.unpacking.generic_carver.code.generic_carver import unpack_function
+from plugins.unpacking.generic_carver.code.generic_carver import _rename_extracted_files, unpack_function
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
@@ -45,7 +46,7 @@ class TestGenericCarver(TestUnpackerBase):
         files = set(files)
         assert len(files) == 4, 'file number incorrect'
         assert 'removed chunk 300-428' in meta_data['output']
-        for file in ('0-128.unknown', '128-300.zip', '428-562.sevenzip', '562-626.unknown'):
+        for file in ('000-128.unknown', '128-300.zip', '428-562.sevenzip', '562-626.unknown'):
             assert f'{self.tmp_dir.name}/{file}' in files
 
     @pytest.mark.parametrize('file_format', ['7z', 'gz', 'tar', 'xz', 'zip'])
@@ -62,3 +63,33 @@ class TestGenericCarver(TestUnpackerBase):
         meta = unpack_function(str(in_file), self.tmp_dir.name)
         carved_size = int(re.search(r'size: (\d+)', meta['output']).group(1))
         assert carved_size == expected_size
+
+
+def test_rename_extracted_files():
+    input_files = [
+        '0-576.unknown',
+        '1651790-2814674.xz',
+        '221934-619666.xz',
+        '2814674-3718110.unknown',
+        '3718110-7578970.xz',
+        '576-80860.xz',
+        '619666-1651790.unknown',
+        '80860-221934.unknown',
+    ]
+    with TemporaryDirectory() as tmp_dir:
+        path = Path(tmp_dir)
+        for f in input_files:
+            (path / f).touch()
+        _rename_extracted_files(path, 7578970)
+        renamed_files = sorted(f.name for f in path.iterdir())
+
+    assert renamed_files == [
+        '0000000-0000576.unknown',
+        '0000576-0080860.xz',
+        '0080860-0221934.unknown',
+        '0221934-0619666.xz',
+        '0619666-1651790.unknown',
+        '1651790-2814674.xz',
+        '2814674-3718110.unknown',
+        '3718110-7578970.xz',
+    ]
