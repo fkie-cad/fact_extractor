@@ -6,6 +6,7 @@
 .pydevproject
 .pytest_cache
 .settings
+.vscode
 __pycache__
 bin/
 install.log

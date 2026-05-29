@@ -76,3 +76,6 @@ docstring-quotes = "double"
 
 [tool.ruff.format]
 quote-style = "single"
+
+[tool.pyrefly]
+search_path = ["fact_extractor"]
