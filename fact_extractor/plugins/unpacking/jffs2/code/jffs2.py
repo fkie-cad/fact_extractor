@@ -9,8 +9,10 @@ from common_helper_process import execute_shell_command
 
 NAME = 'JFFS2'
 MIME_PATTERNS = ['filesystem/jffs2', 'filesystem/jffs2-big']
-VERSION = '0.7.0'
-ENTRY_REGEX = re.compile(r'(0x[0-9A-F]{8}): Jffs2_raw_(?:dirent|inode)\(magic=\d+, nodetype=\d+, totlen=(\d+)')
+VERSION = '0.7.1'
+ENTRY_REGEX = re.compile(
+    r'(0x[0-9A-Fa-f]{8}): <?Jffs2_raw_(?:dirent|inode) magic=0x[0-9a-f]+ nodetype=0x[0-9a-f]+ totlen=(0x[0-9a-f]+)'
+)
 
 
 def unpack_function(file_path, tmp_dir):
@@ -20,7 +22,7 @@ def unpack_function(file_path, tmp_dir):
     entries = ENTRY_REGEX.findall(output)
     if entries:
         last_offset, length = entries[-1]
-        fs_end = int(last_offset, 16) + int(length)
+        fs_end = int(last_offset, 16) + int(length, 0)
         return {'output': output, 'size': fs_end}
 
     return {'output': output}
