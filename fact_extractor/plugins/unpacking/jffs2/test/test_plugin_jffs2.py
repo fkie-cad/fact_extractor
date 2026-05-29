@@ -26,3 +26,10 @@ class TestJFFS2Unpacker(TestUnpackerBase):
         unpacked_files = {f.name: f for f in Path(self.tmp_dir.name).iterdir()}
         assert 'trailing.bin' in unpacked_files
         assert unpacked_files['trailing.bin'].read_bytes().startswith(b'foobar')
+
+    def test_jefferson_output_is_parsed(self):
+        _, meta_data = self.unpacker.base.extract_files_from_file(
+            str(TEST_DATA_DIR / 'jffs2_b2_trailing_data.img'), self.tmp_dir.name
+        )
+        assert 'size' in meta_data
+        assert meta_data['size'] == 612
