@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
 from pathlib import Path
 
-from helperFunctions.program_setup import load_config, setup_argparser, setup_logging
-from unpacker.unpack import unpack
+from fact_extractor.helperFunctions.program_setup import load_config, setup_argparser, setup_logging
+from fact_extractor.unpacker.unpack import unpack
 
 
 def main():

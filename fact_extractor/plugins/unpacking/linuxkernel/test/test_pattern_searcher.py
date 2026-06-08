@@ -1,4 +1,4 @@
-from ..internal.pattern_searcher import PatternSearcher
+from fact_extractor.plugins.unpacking.linuxkernel.internal.pattern_searcher import PatternSearcher
 
 
 class TestPatternSearcherCase:

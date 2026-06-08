@@ -7,9 +7,9 @@ from __future__ import annotations
 import logging
 import re
 import traceback
+from collections.abc import Iterable
 from itertools import chain
 from pathlib import Path
-from typing import Iterable
 
 from common_helper_unpacking_classifier import avg_entropy
 from structlog.testing import capture_logs
@@ -20,7 +20,7 @@ from unblob.handlers import BUILTIN_HANDLERS
 from unblob.models import Chunk, PaddingChunk, TaskResult, UnknownChunk, ValidChunk
 from unblob.processing import Task, calculate_unknown_chunks, remove_inner_chunks
 
-from plugins.unpacking.generic_carver.internal.handlers import CUSTOM_HANDLERS
+from fact_extractor.plugins.unpacking.generic_carver.internal.handlers import CUSTOM_HANDLERS
 
 NAME = 'generic_carver'
 MIME_PATTERNS = ['generic/carver']

@@ -10,28 +10,31 @@ Quickest usage if you have docker running:
 
 ```sh
 docker pull fkiecad/fact_extractor
-wget https://raw.githubusercontent.com/fkie-cad/fact_extractor/master/extract.py
-chmod +x extract.py
-./extract.py ./relative/or/absolute/path/to/your/file
+uv run fact-extractor extract-docker ./relative/or/absolute/path/to/your/file
 ```
 
 for more options see
 
 ```sh
-./extract.py --help
+uv run fact-extractor extract-docker --help
 ```
 
 ## Local setup (aka not running through docker)
 
-Install with:
+### Prerequisites
+
+Install system dependencies:
 
 ```bash
-fact_extractor/install/pre_install.sh
-fact_extractor/install.py
+sudo apt update
+sudo apt install -y git libmagic-dev xz-utils
 ```
 
-:warning: **We no longer support Ubuntu 18.04 and Python <3.8** 
-(It may still work with a bit of tinkering, though)
+Run apt installation (build tools, archive tools, etc.):
+
+```bash
+uv run fact-extractor install
+```
 
 :warning: For the `generic_fs` unpacker plugin to work with all file system types, you may need to install extra kernel modules
 
@@ -42,11 +45,12 @@ sudo apt install linux-modules-extra-$(uname -r)
 The tool can then be run with
 
 ```bash
-fact_extractor/fact_extract.py [OPTIONS] PATH_TO_FIRMWARE
+uv run fact-extractor
 ```
+
 The tool is build with docker in mind.
 To that end it extracts all files into a directory specified in the config.
-The same directory also contains the meta data report.
+The same directory also contains the metadata report.
 Directories are created during installation, if config is changed make sure to recreate the folder structure.
 It looks like:
 
@@ -57,9 +61,45 @@ It looks like:
 ```
 
 
-## Use docker container directly
+## Using uv
 
-Build with
+This project uses [uv](https://github.com/astral-sh/uv) for Python dependency management.
+See [the docs](https://docs.astral.sh/uv/getting-started/installation/) for information on how to install and use uv. 
+
+### Common Commands
+
+```bash
+# install dependencies (including dev dependencies)
+uv sync --extra dev
+
+# install only runtime dependencies
+uv sync
+
+# run extractor script
+uv run fact-extractor
+
+usage: fact-extractor [-h] [--version] {install,extract-docker,extract-local,server} ...
+
+FACT Extractor - Extractor for the Firmware Analysis and Comparison Tool
+
+positional arguments:
+  {install,extract-docker,extract-local,server}
+    install             Install system dependencies and packages
+    extract-docker      Extract using Docker container
+    extract-local       Extract locally without Docker
+    server              Run extraction server
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+
+# Run tests
+uv run pytest
+```
+
+## Docker
+
+Build the image with
 
 ```bash
 docker build -t fact_extractor .
@@ -85,11 +125,11 @@ docker run -v <path_to_shared_folder>:/tmp/extractor -v /dev:/dev --privileged -
 ```
 (see above)
 
-:warning: Note that the container is run in privileged mode and shares the /dev folder. Thus the container can possibly harm your system in every way.
-
+:warning: Note that the container is run in privileged mode and shares the /dev folder.
+Thus, the container can possibly harm your system in various ways.
 
 ## Contribute
-The easiest way to contribute is writing your own plug-in.
+The easiest way to contribute is writing your own plugin.
 Our Developers Manual can be found [here](https://github.com/fkie-cad/fact_extractor/wiki).
 
 ## Acknowledgments

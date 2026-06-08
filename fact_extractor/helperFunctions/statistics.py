@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING
 from common_helper_files import safe_rglob
 from common_helper_unpacking_classifier import avg_entropy, get_binary_size_without_padding, is_compressed
 
-from helperFunctions import magic
-from helperFunctions.config import read_list_from_config
+from fact_extractor.helperFunctions import magic
+from fact_extractor.helperFunctions.config import read_list_from_config
 
 if TYPE_CHECKING:
     from configparser import ConfigParser

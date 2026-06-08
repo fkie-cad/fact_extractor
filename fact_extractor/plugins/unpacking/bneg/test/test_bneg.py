@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 
@@ -13,7 +13,7 @@ class TestInstarBnegUnpacker(TestUnpackerBase):
         in_file = TEST_DATA_DIR / 'test.bneg'
         assert in_file.is_file(), 'test file is missing'
         files, meta = self.unpacker.extract_files_from_file(str(in_file), self.tmp_dir.name)
-        assert len(files) == 2  # noqa: PLR2004
+        assert len(files) == 2
         assert 'output' in meta
         assert 'size 7' in meta['output']
         assert 'size 8' in meta['output']

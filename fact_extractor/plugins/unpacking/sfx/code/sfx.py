@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from plugins.unpacking.sevenz.code.sevenz import unpack_function as sevenz
+from fact_extractor.plugins.unpacking.sevenz.code.sevenz import unpack_function as sevenz
 
 NAME = 'SFX'
 MIME_PATTERNS = [

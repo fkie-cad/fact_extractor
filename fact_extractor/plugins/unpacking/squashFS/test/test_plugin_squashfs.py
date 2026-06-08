@@ -3,9 +3,8 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
-
-from ..code.squash_fs import SQUASH_UNPACKER, _unpack_success, unpack_function
+from fact_extractor.plugins.unpacking.squashFS.code.squash_fs import SQUASH_UNPACKER, _unpack_success, unpack_function
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 

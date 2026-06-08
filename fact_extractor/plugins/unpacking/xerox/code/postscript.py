@@ -6,7 +6,7 @@ from base64 import a85decode
 
 from common_helper_files import get_binary_from_file, write_binary_to_file
 
-from helperFunctions.dataConversion import make_bytes, make_unicode_string, remove_uneccessary_spaces
+from fact_extractor.helperFunctions.dataConversion import make_bytes, make_unicode_string, remove_uneccessary_spaces
 
 NAME = 'Postscript'
 MIME_PATTERNS = ['text/postscript']

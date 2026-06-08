@@ -10,14 +10,12 @@ from tempfile import TemporaryDirectory
 
 from common_helper_process import execute_shell_command_get_return_code
 
-from helperFunctions.install import (
+from fact_extractor.helperFunctions.install import (
     InstallationError,
     OperateInDirectory,
     apt_install_packages,
     apt_remove_packages,
     install_github_project,
-    load_requirements_file,
-    pip_install_packages,
 )
 
 BIN_DIR = Path(__file__).parent.parent / 'bin'
@@ -119,7 +117,6 @@ GITHUB_DEPENDENCIES = [
         ],
     ),
 ]
-PIP_DEPENDENCY_FILE = Path(__file__).parent.parent.parent / 'requirements-unpackers.txt'
 if platform.machine() == 'x86_64':
     EXTERNAL_DEB_DEPS = [
         # zoo
@@ -173,7 +170,6 @@ def main():
 
     # install dependencies
     apt_install_packages(*APT_DEPENDENCIES)
-    pip_install_packages(*load_requirements_file(PIP_DEPENDENCY_FILE))
     install_github_dependencies()
 
     # installing freetz

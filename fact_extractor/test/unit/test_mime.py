@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from helperFunctions import magic
-from helperFunctions.file_system import get_fact_bin_dir, get_test_data_dir
+from fact_extractor.helperFunctions import magic
+from fact_extractor.helperFunctions.file_system import get_fact_bin_dir, get_test_data_dir
 
 
 def test_magic():

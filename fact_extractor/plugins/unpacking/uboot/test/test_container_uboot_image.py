@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ..internal.uboot_container import uBootHeader
+from fact_extractor.plugins.unpacking.uboot.internal.uboot_container import uBootHeader
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 

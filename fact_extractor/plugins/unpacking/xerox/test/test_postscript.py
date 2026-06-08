@@ -2,9 +2,8 @@ import os
 
 from common_helper_files import get_binary_from_file
 
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
-
-from ..code.postscript import _convert_payloads, _get_raw_payloads
+from fact_extractor.plugins.unpacking.xerox.code.postscript import _convert_payloads, _get_raw_payloads
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 

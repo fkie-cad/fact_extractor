@@ -8,14 +8,17 @@ from os import getgid, getuid
 from pathlib import Path
 from subprocess import PIPE, Popen
 from time import time
-from typing import Callable, Dict, List, Tuple
+from typing import TYPE_CHECKING
 
 from common_helper_files import get_files_in_dir
 
-from helperFunctions import magic
-from helperFunctions.config import read_list_from_config
-from helperFunctions.file_system import copy_file_offset_to_file
-from helperFunctions.plugin import import_plugins
+from fact_extractor.helperFunctions import magic
+from fact_extractor.helperFunctions.config import read_list_from_config
+from fact_extractor.helperFunctions.file_system import copy_file_offset_to_file
+from fact_extractor.helperFunctions.plugin import import_plugins
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 PADDING_END_REGEX = re.compile(rb'[^\x00\xff]')
 TRAILING_DATA_MIN_SIZE = 2**10
@@ -39,7 +42,7 @@ class UnpackBase:
         self._set_whitelist()
 
     def load_plugins(self):
-        self.source = import_plugins('unpacker.plugins', 'plugins/unpacking')
+        self.source = import_plugins('fact_extractor.unpacker.plugins', 'plugins/unpacking')
         for plugin_name in self.source.list_plugins():
             plugin = self.source.load_plugin(plugin_name)
             plugin.setup(self)
@@ -50,7 +53,7 @@ class UnpackBase:
         for item in self.blacklist:
             self.register_plugin(item, self.unpacker_plugins['generic/nop'])
 
-    def register_plugin(self, mime_type: str, unpacker_name_and_function: Tuple[Callable[[str, str], Dict], str, str]):
+    def register_plugin(self, mime_type: str, unpacker_name_and_function: tuple[Callable[[str, str], dict], str, str]):
         self.unpacker_plugins[mime_type] = unpacker_name_and_function
 
     def get_unpacker(self, mime_type: str):
@@ -59,11 +62,11 @@ class UnpackBase:
             return self.unpacker_plugins[mime_type]
         return self.unpacker_plugins['generic/carver']
 
-    def extract_files_from_file(self, file_path: str | Path, tmp_dir) -> Tuple[List, Dict]:
+    def extract_files_from_file(self, file_path: str | Path, tmp_dir) -> tuple[list, dict]:
         current_unpacker = self.get_unpacker(magic.from_file(file_path, mime=True))
         return self._extract_files_from_file_using_specific_unpacker(str(file_path), tmp_dir, current_unpacker)
 
-    def unpacking_fallback(self, file_path, tmp_dir, old_meta, fallback_plugin_mime) -> Tuple[List, Dict]:
+    def unpacking_fallback(self, file_path, tmp_dir, old_meta, fallback_plugin_mime) -> tuple[list, dict]:
         fallback_plugin = self.unpacker_plugins[fallback_plugin_mime]
         old_meta[f"""0_FALLBACK_{old_meta['plugin_used']}"""] = (
             f"""{old_meta['plugin_used']} (failed) -> {fallback_plugin_mime} (fallback)"""
@@ -80,7 +83,7 @@ class UnpackBase:
 
     def _extract_files_from_file_using_specific_unpacker(
         self, file_path: str, tmp_dir: str, selected_unpacker, meta_data: dict | None = None
-    ) -> Tuple[List, Dict]:
+    ) -> tuple[list, dict]:
         unpack_function, name, version = (
             selected_unpacker  # TODO Refactor register method to directly use four parameters instead of three
         )

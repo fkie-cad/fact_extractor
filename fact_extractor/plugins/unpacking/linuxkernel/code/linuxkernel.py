@@ -11,7 +11,7 @@ from subprocess import run
 
 from common_helper_process import execute_shell_command, execute_shell_command_get_return_code
 
-from plugins.unpacking.linuxkernel.internal.extractor import Extractor
+from fact_extractor.plugins.unpacking.linuxkernel.internal.extractor import Extractor
 
 NAME = 'LinuxKernel'
 MIME_PATTERNS = ['linux/kernel']

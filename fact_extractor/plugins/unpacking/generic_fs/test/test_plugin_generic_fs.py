@@ -1,10 +1,13 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from helperFunctions.file_system import decompress_test_file
-from test.unit.unpacker.test_unpacker import TestUnpackerBase
-
-from ..code.generic_fs import TYPES, _extract_loop_devices, _mount_single_filesystem
+from fact_extractor.helperFunctions.file_system import decompress_test_file
+from fact_extractor.plugins.unpacking.generic_fs.code.generic_fs import (
+    TYPES,
+    _extract_loop_devices,
+    _mount_single_filesystem,
+)
+from fact_extractor.test.unit.unpacker.test_unpacker import TestUnpackerBase
 
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 KPARTX_OUTPUT = """
