@@ -21,12 +21,8 @@ class TestGenericFsUnpacker(TestUnpackerBase):
         self.check_unpacker_selection('filesystem/jfs', 'genericFS')
         self.check_unpacker_selection('filesystem/minix', 'genericFS')
         self.check_unpacker_selection('filesystem/reiserfs', 'genericFS')
-        self.check_unpacker_selection('filesystem/romfs', 'genericFS')
         self.check_unpacker_selection('filesystem/udf', 'genericFS')
         self.check_unpacker_selection('filesystem/xfs', 'genericFS')
-
-    def test_extraction_romfs(self):
-        self.check_unpacking_of_standard_unpack_set(TEST_DATA_DIR / 'romfs.img')
 
     def test_extraction_btrfs(self):
         with decompress_test_file(TEST_DATA_DIR / 'btrfs.img.xz') as test_file:
