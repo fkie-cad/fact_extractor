@@ -37,6 +37,17 @@ class TestGenericCarver(TestUnpackerBase):
         content = zlib.decompress(Path(zlib_file_1).read_bytes())
         assert b'test file' in content, 'test file not carved correctly'
 
+    def test_elf_carving(self):
+        in_file = TEST_DATA_DIR / 'elf_with_zlib'
+        files, meta_data = self.unpacker.base._extract_files_from_file_using_specific_unpacker(
+            in_file, self.tmp_dir.name, self.unpacker.base.unpacker_plugins['generic/carver']
+        )
+        assert len(files) == 3, 'file number incorrect'
+        assert sum(1 if f.endswith('.zlib_carver') else 0 for f in files), 'wrong number of carved zlib streams'
+        zlib_file_1 = sorted(files)[1]
+        content = zlib.decompress(Path(zlib_file_1).read_bytes())
+        assert b'test1234' in content, 'test file not carved correctly'
+
     def test_filter(self):
         in_file = TEST_DATA_DIR / 'carving_test_file'
         assert Path(in_file).is_file()
