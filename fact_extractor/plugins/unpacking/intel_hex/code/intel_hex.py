@@ -7,8 +7,12 @@ from pathlib import Path
 from intelhex import HexRecordError, IntelHex, IntelHexError
 
 NAME = 'IntelHEX'
-MIME_PATTERNS = ['firmware/intel-hex']
-VERSION = '0.1'
+MIME_PATTERNS = [
+    'firmware/intel-hex',
+    # in newer versions of file, a new MIME type is available for this format:
+    'text/x-hex',
+]
+VERSION = '0.1.1'
 
 
 def unpack_function(file_path, tmp_dir):
