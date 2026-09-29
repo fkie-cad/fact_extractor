@@ -9,7 +9,7 @@ class TestUbootImage:
     def test_header(self):
         ubh = uBootHeader()
         test_firmware = TEST_DATA_DIR / 'uboot.image_with_header'
-        with test_firmware.open('r+b') as uboot_image:
+        with test_firmware.open('rb') as uboot_image:
             ubh.create_from_binary(uboot_image.read(64))
         assert ubh.image_data_size == 32753
         assert ubh.cpu_architecture == 5
