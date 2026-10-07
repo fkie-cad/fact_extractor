@@ -24,7 +24,7 @@ from plugins.unpacking.generic_carver.internal.handlers import CUSTOM_HANDLERS
 
 NAME = 'generic_carver'
 MIME_PATTERNS = ['generic/carver']
-VERSION = '1.2.0'
+VERSION = '1.3.0'
 
 MIN_FILE_ENTROPY = 0.01
 
@@ -80,11 +80,21 @@ def _rename_extracted_files(tmp_dir: Path, filesize: int):
             file.rename(tmp_dir / filename)
 
 
-def _find_chunks(file_path: Path, file: File) -> Iterable[Chunk]:
+def _find_chunks(file_path: Path, file: File, handlers=HANDLERS) -> Iterable[Chunk]:
     task = Task(path=file_path, depth=0, blob_id='')
-    known_chunks = remove_inner_chunks(search_chunks(file, file.size(), HANDLERS, TaskResult(task=task)))
-    unknown_chunks = calculate_unknown_chunks(known_chunks, file.size())
+    size = file.size()
+    known_chunks = remove_inner_chunks(search_chunks(file, size, handlers, TaskResult(task=task)))
+    if _is_only_one_chunk(known_chunks, size):
+        # problem : unblob won't carve if it knows the file type and has an umpacker for it
+        # solution: temporarily remove the handler
+        yield from _find_chunks(file_path, file, tuple(h for h in HANDLERS if h.NAME != known_chunks[0].handler.NAME))
+        return
+    unknown_chunks = calculate_unknown_chunks(known_chunks, size)
     yield from chain(known_chunks, unknown_chunks)
+
+
+def _is_only_one_chunk(known_chunks: list[ValidChunk], size: int) -> bool:
+    return len(known_chunks) == 1 and known_chunks[0].start_offset == 0 and known_chunks[0].end_offset == size
 
 
 def _create_report(chunk_list: list[dict]) -> str:
