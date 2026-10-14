@@ -131,8 +131,8 @@ if platform.machine() == 'x86_64':
         # sasquatch
         (
             'sasquatch_1.0_amd64.deb',
-            'https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-4',
-            'bb211daf90069a43b7d5e76f136766a8542a5328015773e9b8be87541b307b60',
+            'https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-6',
+            'efbc92bd27594e01211e1b582f105a463a0017360a0746a93de3f283906ade95',
         ),
     ]
 elif platform.machine() == 'aarch64':
@@ -146,8 +146,8 @@ elif platform.machine() == 'aarch64':
         # sasquatch
         (
             'sasquatch_1.0_arm64.deb',
-            'https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-4',
-            'fb281906a25667414e8b6aff96b49ceb227519122a7844bbc8166f2b6a59554a',
+            'https://github.com/onekey-sec/sasquatch/releases/download/sasquatch-v4.5.1-6',
+            '28e57a4ff545da32a65c3e061ff8a51e5ebaa5d170985c49f0b3eef08923476e',
         ),
     ]
 
