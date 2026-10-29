@@ -39,6 +39,9 @@ class OpenPgpError(Exception):
     pass
 
 
+PARSING_ERRORS = (OpenPgpError, zlib.error, OSError)
+
+
 class _MessageParser:
     def __init__(self, tmp_dir: str):
         self.tmp_dir = Path(tmp_dir)
@@ -51,17 +54,27 @@ class _MessageParser:
         if depth > MAX_NESTING_DEPTH:
             raise OpenPgpError('maximum nesting depth of compressed data packets exceeded')
         offset = 0
-        for tag, body, packet_end in _iter_packets(data):
-            self._handle_packet(tag, body, depth)
-            offset = packet_end
+        try:
+            for tag, body, packet_end, indeterminate_length in _iter_packets(data):
+                unused_bytes = self._handle_packet(tag, body, depth)
+                # a packet with indeterminate length extends to the end of the data, but its content may end earlier
+                offset = packet_end - unused_bytes if indeterminate_length else packet_end
+        except PARSING_ERRORS as error:
+            if depth > 0 or offset == 0:
+                raise
+            # at least one packet was parsed: treat the rest as trailing data (e.g. padding)
+            self.log.append(f'stopped parsing at offset {offset}: {error}')
         return offset
 
-    def _handle_packet(self, tag: int, body: bytes, depth: int):
+    def _handle_packet(self, tag: int, body: bytes, depth: int) -> int:
+        """Handle the packet and return the number of unused bytes at the end of the packet body."""
         if tag == TAG_COMPRESSED_DATA:
             algorithm = COMPRESSION_ALGORITHMS.get(body[0], f'unknown ({body[0]})') if body else 'unknown'
             self.log.append(f'compressed data packet ({algorithm})')
-            self.parse(_decompress(body), depth + 1)
-        elif tag == TAG_LITERAL_DATA:
+            decompressed, unused_bytes = _decompress(body)
+            self.parse(decompressed, depth + 1)
+            return unused_bytes
+        if tag == TAG_LITERAL_DATA:
             self._extract_literal_data(body)
         elif tag == TAG_ONE_PASS_SIGNATURE:
             self.log.append('one-pass signature packet')
@@ -74,12 +87,13 @@ class _MessageParser:
             self.log.append(f'{ENCRYPTED_TAGS[tag]} packet: encrypted messages cannot be unpacked')
         else:
             self.log.append(f'skipping packet with tag {tag}')
+        return 0
 
     def _extract_literal_data(self, body: bytes):
-        if len(body) < 6:  # noqa: PLR2004
+        name_length = body[1] if len(body) > 1 else 0
+        if len(body) < 6 + name_length:
             raise OpenPgpError('literal data packet is too short')
-        name_length = body[1]
-        name = body[2 : 2 + name_length].decode(errors='replace')
+        name = body[2 : 2 + name_length].decode(errors='replace').replace('\x00', '_')
         date = _timestamp(body[2 + name_length : 6 + name_length])
         content = body[6 + name_length :]
         output_path = self._get_output_path(name)
@@ -98,9 +112,9 @@ class _MessageParser:
         return output_path
 
 
-def _iter_packets(data: bytes) -> Iterator[tuple[int, bytes, int]]:
+def _iter_packets(data: bytes) -> Iterator[tuple[int, bytes, int, bool]]:
     """
-    Yields the tag, the body and the end offset of each packet.
+    Yields the tag, the body, the end offset and whether the packet has an indeterminate length for each packet.
     Stops at the first byte that is not a valid packet header (e.g. padding or trailing data).
     """
     offset = 0
@@ -108,6 +122,7 @@ def _iter_packets(data: bytes) -> Iterator[tuple[int, bytes, int]]:
         header = data[offset]
         if not header & 0x80:
             return
+        indeterminate_length = False
         if header & 0x40:  # new packet format
             tag = header & 0x3F
             body, offset = _read_new_format_body(data, offset + 1)
@@ -117,14 +132,14 @@ def _iter_packets(data: bytes) -> Iterator[tuple[int, bytes, int]]:
             offset += 1
             if length_type == 3:  # noqa: PLR2004
                 # indeterminate length: the packet extends to the end of the data
-                body, offset = data[offset:], len(data)
+                body, offset, indeterminate_length = data[offset:], len(data), True
             else:
                 length_size = 1 << length_type
                 length = _read_int(data, offset, length_size)
                 offset += length_size
                 body = _read_bytes(data, offset, length)
                 offset += length
-        yield tag, body, offset
+        yield tag, body, offset, indeterminate_length
 
 
 def _read_new_format_body(data: bytes, offset: int) -> tuple[bytes, int]:
@@ -156,18 +171,24 @@ def _read_int(data: bytes, offset: int, length: int) -> int:
     return int.from_bytes(_read_bytes(data, offset, length), 'big')
 
 
-def _decompress(body: bytes) -> bytes:
+def _decompress(body: bytes) -> tuple[bytes, int]:
+    """Returns the decompressed data and the number of unused bytes after the end of the compressed stream."""
     if not body:
         raise OpenPgpError('compressed data packet is empty')
     algorithm, compressed = body[0], body[1:]
     if algorithm == 0:
-        return compressed
+        return compressed, 0
     if algorithm in (1, 2):
         decompressor = zlib.decompressobj(-zlib.MAX_WBITS if algorithm == 1 else zlib.MAX_WBITS)
-        return decompressor.decompress(compressed) + decompressor.flush()
-    if algorithm == 3:  # noqa: PLR2004
-        return bz2.BZ2Decompressor().decompress(compressed)
-    raise OpenPgpError(f'unknown compression algorithm {algorithm}')
+        decompressed = decompressor.decompress(compressed) + decompressor.flush()
+    elif algorithm == 3:  # noqa: PLR2004
+        decompressor = bz2.BZ2Decompressor()
+        decompressed = decompressor.decompress(compressed)
+    else:
+        raise OpenPgpError(f'unknown compression algorithm {algorithm}')
+    if not decompressor.eof:
+        raise OpenPgpError('compressed data is truncated')
+    return decompressed, len(decompressor.unused_data)
 
 
 def _parse_signature(body: bytes) -> dict:
@@ -224,7 +245,7 @@ def unpack_function(file_path: str, tmp_dir: str) -> dict:
     meta = {}
     try:
         meta['size'] = parser.parse(Path(file_path).read_bytes())
-    except (OpenPgpError, zlib.error, OSError) as error:
+    except PARSING_ERRORS as error:
         parser.log.append(f'error: {error}')
     meta['output'] = '\n'.join(parser.log)
     meta['signatures'] = parser.signatures

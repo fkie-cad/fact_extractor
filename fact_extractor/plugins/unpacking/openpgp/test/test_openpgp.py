@@ -1,3 +1,6 @@
+import bz2
+import random
+import zlib
 from pathlib import Path
 
 import pytest
@@ -5,6 +8,7 @@ import pytest
 from helperFunctions.file_system import get_test_data_dir
 from plugins.unpacking.openpgp.code.openpgp import (
     MIME_PATTERNS,
+    TAG_LITERAL_DATA,
     OpenPgpError,
     _read_new_format_body,
     unpack_function,
@@ -14,6 +18,11 @@ from test.unit.unpacker.test_unpacker import TestUnpackerBase
 TEST_DATA_DIR = Path(__file__).parent / 'data'
 TEST_FILE = Path(get_test_data_dir()) / 'get_files_test' / 'testfile1'
 TEST_KEY_ID = 'D6921DFEB6FE4FA9'
+
+
+def _deflate(data: bytes) -> bytes:
+    compressor = zlib.compressobj(wbits=-zlib.MAX_WBITS)
+    return compressor.compress(data) + compressor.flush()
 
 
 class TestOpenPgpUnpacker(TestUnpackerBase):
@@ -59,13 +68,51 @@ class TestOpenPgpUnpacker(TestUnpackerBase):
         assert not list(Path(self.tmp_dir.name).iterdir())
         assert 'truncated' in meta['output']
 
-    def test_extraction_trailing_data(self, tmp_path):
+    @pytest.mark.parametrize('file_name', ['zip.gpg', 'zlib.gpg', 'bzip2.gpg', 'uncompressed.gpg', 'stdin.gpg'])
+    @pytest.mark.parametrize(
+        'trailing_data', [b'\x00' * 16 + b'trailing data', b'\xff' * 2048], ids=['null-padded', 'ff-padding']
+    )
+    def test_extraction_trailing_data(self, tmp_path, file_name, trailing_data):
         test_file = tmp_path / 'trailing.gpg'
-        content = (TEST_DATA_DIR / 'uncompressed.gpg').read_bytes()
-        test_file.write_bytes(content + b'\x00' * 16 + b'trailing data')
+        content = (TEST_DATA_DIR / file_name).read_bytes()
+        test_file.write_bytes(content + trailing_data)
         meta = unpack_function(str(test_file), self.tmp_dir.name)
         assert meta['size'] == len(content)
-        assert (Path(self.tmp_dir.name) / 'testfile1').is_file()
+        assert (Path(self.tmp_dir.name) / 'testfile1').read_bytes() == TEST_FILE.read_bytes()
+
+    def test_extraction_null_byte_in_file_name(self, tmp_path):
+        body = b'b\x03a\x00b' + b'\x00' * 4 + b'content'
+        test_file = tmp_path / 'null_byte.gpg'
+        test_file.write_bytes(bytes([0xC0 | TAG_LITERAL_DATA, len(body)]) + body)
+        meta = unpack_function(str(test_file), self.tmp_dir.name)
+        assert meta['size'] == len(body) + 2
+        assert (Path(self.tmp_dir.name) / 'a_b').read_bytes() == b'content'
+
+    def test_extraction_file_name_exceeds_packet(self, tmp_path):
+        body = b'b\xff' + b'\x00' * 4 + b'content'
+        test_file = tmp_path / 'long_name.gpg'
+        test_file.write_bytes(bytes([0xC0 | TAG_LITERAL_DATA, len(body)]) + body)
+        meta = unpack_function(str(test_file), self.tmp_dir.name)
+        assert not list(Path(self.tmp_dir.name).iterdir())
+        assert 'literal data packet is too short' in meta['output']
+
+    @pytest.mark.parametrize(
+        ('algorithm', 'compress'),
+        [
+            (1, _deflate),
+            (2, zlib.compress),
+            (3, bz2.compress),
+        ],
+    )
+    def test_extraction_truncated_compressed_data(self, tmp_path, algorithm, compress):
+        # old format literal data packet with indeterminate length (i.e. it is not truncated by itself)
+        literal_packet = bytes([0x80 | TAG_LITERAL_DATA << 2 | 3]) + b'b\x04test' + b'\x00' * 4
+        compressed = compress(literal_packet + random.Random(0).randbytes(4096))
+        test_file = tmp_path / 'truncated_compressed.gpg'
+        test_file.write_bytes(bytes([0xA3, algorithm]) + compressed[: len(compressed) // 2])
+        meta = unpack_function(str(test_file), self.tmp_dir.name)
+        assert not list(Path(self.tmp_dir.name).iterdir())
+        assert 'compressed data is truncated' in meta['output']
 
 
 @pytest.mark.parametrize(
