@@ -1,10 +1,11 @@
+import json
 from configparser import ConfigParser
 from pathlib import Path
 
 import pytest
 
 from helperFunctions.file_system import get_test_data_dir
-from helperFunctions.statistics import _detect_unpack_loss, get_unpack_status
+from helperFunctions.statistics import _add_chi_square_statistics, _detect_unpack_loss, get_unpack_status
 
 
 @pytest.fixture
@@ -30,6 +31,7 @@ def test_unpack_status_packed_file(config_fixture):
 
     assert result['entropy'] > 0.7, 'entropy not valid'
     assert result['summary'] == ['packed'], '7z file should be packed'
+    assert {'chi_square', 'chi_square_p_value'} <= result.keys()
 
     result = {}
     config_fixture.set('ExpertSettings', 'compressed_file_types', 'application/x-7z-compressed, ')
@@ -43,6 +45,32 @@ def test_unpack_status_unpacked_file(config_fixture):
 
     assert result['entropy'] < 0.7, 'entropy not valid'
     assert result['summary'] == ['unpacked']
+    assert {'chi_square', 'chi_square_p_value'} <= result.keys()
+
+
+@pytest.mark.parametrize(
+    ('binary', 'expected_chi_square', 'expected_p_value'),
+    [
+        (bytes(range(256)) * 8, 0.0, 1.0),  # perfectly uniform
+        (b'a' * 2048, 255 * 2048, 0.0),  # constant
+        (bytes(range(256)) * 5, 0.0, 1.0),  # exactly the minimum size for the p-value (1280 bytes)
+    ],
+)
+def test_add_chi_square_statistics(binary, expected_chi_square, expected_p_value):
+    result = {}
+    _add_chi_square_statistics(binary, result)
+
+    assert result['chi_square'] == pytest.approx(expected_chi_square)
+    assert result['chi_square_p_value'] == pytest.approx(expected_p_value)
+
+
+@pytest.mark.parametrize('binary', [b'', b'aaaaa', (bytes(range(256)) * 5)[:-1]])
+def test_add_chi_square_statistics_too_small(binary):
+    result = {}
+    _add_chi_square_statistics(binary, result)
+
+    assert result['chi_square_p_value'] is None
+    assert json.loads(json.dumps(result, allow_nan=False)) == result, 'must be valid JSON (NaN is not)'
 
 
 def test_detect_unpack_loss_data_lost(config_fixture, common_tmpdir):
