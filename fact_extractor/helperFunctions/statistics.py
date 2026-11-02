@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import math
 from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from common_helper_files import safe_rglob
 from common_helper_unpacking_classifier import avg_entropy, get_binary_size_without_padding, is_compressed
+from entropython import chi_square, chi_square_p_value
 
 from helperFunctions import magic
 from helperFunctions.config import read_list_from_config
@@ -31,6 +33,7 @@ def get_unpack_status(
 ):
     meta_data['summary'] = []
     meta_data['entropy'] = avg_entropy(binary)
+    _add_chi_square_statistics(binary, meta_data)
 
     if not extracted_files and meta_data.get('number_of_excluded_files', 0) == 0:
         if magic.from_file(file_path, mime=True) in read_list_from_config(
@@ -45,6 +48,18 @@ def get_unpack_status(
             meta_data['summary'] = ['packed']
     else:
         _detect_unpack_loss(binary, extracted_files, meta_data, config.getint('ExpertSettings', 'header_overhead'))
+
+
+def _add_chi_square_statistics(binary: bytes, meta_data: dict):
+    """
+    Add the chi-square statistic of the byte distribution (against a uniform distribution) and its p-value.
+    Unlike the entropy, this helps to tell compressed data (not uniformly distributed, given a large enough file) from
+    encrypted data (uniformly distributed). The p-value is `None` for files that are too small for the test
+    (entropython returns NaN, which is not valid JSON).
+    """
+    meta_data['chi_square'] = chi_square(binary)
+    p_value = chi_square_p_value(binary)
+    meta_data['chi_square_p_value'] = None if math.isnan(p_value) else p_value
 
 
 def _detect_unpack_loss(binary: bytes, extracted_files: list[Path], meta_data: dict, header_overhead: int):
