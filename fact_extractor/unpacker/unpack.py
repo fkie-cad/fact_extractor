@@ -44,7 +44,10 @@ class Unpacker:
         else:
             logging.debug(f'Extracting {Path(file_path).name}')
 
-            tmp_dir = TemporaryDirectory(prefix='fact_unpack_')
+            # create the tmp dir inside the (shared) data folder so that moving the extracted files is a cheap rename
+            # instead of a copy across file systems (from the container overlay FS to the bind mount)
+            self._file_folder.parent.mkdir(parents=True, exist_ok=True)
+            tmp_dir = TemporaryDirectory(prefix='fact_unpack_', dir=self._file_folder.parent)
 
             extracted_files, meta_data = self.base.extract_files_from_file(file_path, tmp_dir.name)
             extracted_files, meta_data = self._do_fallback_if_necessary(

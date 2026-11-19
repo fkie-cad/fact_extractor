@@ -66,6 +66,9 @@ def decompress_test_file(test_file: Path) -> Iterable[Path]:
         target_file = Path(tmp_dir) / 'fs.img'
         with lzma.open(test_file) as decompressed_file:
             target_file.write_bytes(decompressed_file.read())
+        # the input file is mounted read-only in the container -> make sure that plugins don't write to it
+        target_file.chmod(0o444)
+        Path(tmp_dir).chmod(0o555)
         yield target_file
 
 
