@@ -2,8 +2,8 @@
 set -e
 
 echo "------------------------------------"
-echo "     install liblz4-tools, zstd     "
+echo "      install lz4 tools, zstd       "
 echo "------------------------------------"
 
-sudo apt-get install -y liblz4-tool zstd
+sudo apt-get install -y lz4 zstd
 exit 0

@@ -269,6 +269,11 @@ def _install_freetz(version='ng26020'):
                     'sudo mkdir -p /home/makeuser',
                     'sudo chown -R makeuser /home/makeuser',
                     f'cp {freetz_build_config} ./.config',
+                    # tmp dir is created with 0o700, so we need to change permissions in order to still have permissions
+                    # to clean up if an error occurs during the build
+                    f'sudo chmod 777 {build_directory}',
+                    # freetz-ng refuses to compile if uutils is installed (for no real reason) -> patch
+                    "sed 's/ifeq ($(shell ls --version | grep -q uutils && echo y),y)/ifeq (n,y)/g' -i Makefile",
                     f'sudo chown -R makeuser {build_directory}',
                     'sudo su makeuser -c "make -j$(nproc) tools"',
                     f'sudo chmod -R 777 {build_directory}',

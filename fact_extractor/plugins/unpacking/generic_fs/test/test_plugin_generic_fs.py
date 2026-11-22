@@ -1,5 +1,9 @@
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
+import pytest
+from semver import Version
 
 from helperFunctions.file_system import decompress_test_file
 from test.unit.unpacker.test_unpacker import TestUnpackerBase
@@ -40,6 +44,8 @@ class TestGenericFsUnpacker(TestUnpackerBase):
         with decompress_test_file(TEST_DATA_DIR / 'minix.img.xz') as test_file:
             self.check_unpacking_of_standard_unpack_set(test_file, additional_prefix_folder='get_files_test')
 
+    # FixMe: deprecated since Kernel 6.13
+    @pytest.mark.skipif(Version.parse(os.uname().release) >= Version.parse('6.13.0'), reason='reiserfs2 is deprecated')
     def test_extraction_reiserfs(self):
         with decompress_test_file(TEST_DATA_DIR / 'reiserfs.img.xz') as test_file:
             self.check_unpacking_of_standard_unpack_set(test_file, additional_prefix_folder='get_files_test')

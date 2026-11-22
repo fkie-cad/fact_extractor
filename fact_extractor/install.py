@@ -39,13 +39,13 @@ PROGRAM_VERSION = __VERSION__
 PROGRAM_DESCRIPTION = 'Firmware Analysis and Comparison Tool (FACT) Extractor installation script'
 
 # Compatible Ubuntu releases
-FOCAL_CODE_NAMES = ['focal', 'ulyana', 'ulyssa', 'uma', 'una']
 JAMMY_CODE_NAMES = ['jammy', 'vanessa', 'vera', 'victoria', 'virginia']
 NOBLE_CODE_NAMES = ['noble', 'wilma', 'xia']
+RESOLUTE_CODE_NAMES = ['resolute']
 
 # Compatible Debian/Kali releases
-BULLSEYE_CODE_NAMES = ['bullseye']
-BOOKWORM_CODE_NAMES = ['bookworm', 'kali-rolling']
+BOOKWORM_CODE_NAMES = ['bookworm']
+TRIXIE_CODE_NAMES = ['trixie', 'kali-rolling']
 
 
 def _setup_argparser():
@@ -74,24 +74,24 @@ def check_python_version():
 
 def check_distribution():
     codename = distro.codename().lower()
-    if codename in FOCAL_CODE_NAMES:
-        logging.debug('Ubuntu 20.04 detected')
-        return 'focal'
     if codename in JAMMY_CODE_NAMES:
         logging.debug('Ubuntu 22.04 detected')
         return 'jammy'
     if codename in NOBLE_CODE_NAMES:
         logging.debug('Ubuntu 24.04 detected')
         return 'noble'
-    if codename in BULLSEYE_CODE_NAMES:
-        logging.debug('Debian 11 detected')
-        return 'buster'
+    if codename in RESOLUTE_CODE_NAMES:
+        logging.debug('Ubuntu 26.04 detected')
+        return 'resolute'
     if codename in BOOKWORM_CODE_NAMES:
-        logging.debug('Debian 12/Kali detected')
-        return 'bullseye'
+        logging.debug('Debian 12')
+        return 'bookworm'
+    if codename in TRIXIE_CODE_NAMES:
+        logging.debug('Debian 13/Kali detected detected')
+        return 'trixie'
     sys.exit(
         f'Your Distribution ({distro.id()} {distro.version()}) is not supported. '
-        f'FACT Extractor Installer requires Ubuntu 20.04/22.04/24.04, Debian 11/12, Kali or compatible!'
+        f'FACT Extractor Installer requires Ubuntu 20.04/22.04/24.04, Debian 12/13, Kali or compatible!'
     )
 
 
