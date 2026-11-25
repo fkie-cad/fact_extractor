@@ -68,7 +68,7 @@ def _run(command: str):
 
 
 def _mount_from_boot_record(file_path, tmp_dir):
-    output = _get_output(f'sudo kpartx -a -v {file_path}')
+    output = _get_output(f'sudo kpartx -a -r -v {file_path}')
     sleep(1)  # Necessary since initialization of special devices seem to take some time
     # kpartx may return an error on one partition but others are still loaded correctly.
     loop_devices = _extract_loop_devices(output)
